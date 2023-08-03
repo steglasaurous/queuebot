@@ -1,0 +1,105 @@
+@startuml
+    package DataStore {
+        class Channel {
+            +string channelName
+        }
+
+        note as N1
+            If a channel is in this table, the bot should join it.
+        endnote
+    }
+
+    package Chat {
+        class ChatMessage {
+            <<interface>>
+            +number id
+            +string username
+            +string channel_name
+            +string message
+            +Map<string, string[]> emotes
+            +Date date
+            +string color
+        }
+        package ChatClient {
+            abstract class AbstractChatClient {
+                {abstract} Promise<void> connect()
+                {abstract} Promise<void> disconnect()
+                {abstract} +Observable<ChatMessage> messages$
+                {abstract} Promise<void> joinChannel(string channelName)
+                {abstract} Promise<void> leaveChannel(string channelName)
+            }
+
+            class TwitchChatClient {
+                +Observable<ChatMessage> messages$
+                -RefreshingAuthProvider authProvider
+                -any tokenData
+                -ChatClient chatClient
+                -string twitchAppClientId
+                -string twitchAppClientSecret
+                -string tokenFilePath
+                -string twitchChannel
+                +Promise<void> connect()
+                +Promise<void> disconnect()
+                -void loadTokenData()
+            }
+
+            TwitchChatClient ..> AbstractChatClient : implements
+            AbstractChatClient ..> ChatMessage : returns
+        }
+
+        class ChatManagerService {
+            -AbstractChatClient[] chatClients
+            -eventEmitter: EventEmitter2
+            +void addChatClient(AbstractChatClient chatClient)
+            +void connect()
+        }
+
+        class ChatMessageReceiveEvent {
+            +ChatMessage chatMessage
+        }
+
+        class ChatMessageSendEvent {
+            +string channel_name
+            +string message
+        }
+
+        class ChatMessageSendListener {
+            -ChatManagerService chatManagerService
+            +Promise<void> handle(ChatMessageSendEvent chatMessageSendEvent)
+        }
+
+        ChatManagerService ..> ChatMessageReceiveEvent: emits
+        ChatMessageSendListener ..> ChatMessageSendEvent: listens for
+        ChatMessageSendListener ..> ChatManagerService: depends on
+        ChatMessageReceiveEvent ..> ChatMessage: depends on
+        ChatManagerService o.. AbstractChatClient: 0..*
+    }
+
+    package BotCommands {
+        class BotCommandInterface {
+            <<interface>>
+            +bool matchesTrigger(string message)
+            +Promise<void> execute(ChatMessage chatMessage)
+        }
+
+        class BotCommandListener {
+            -BotCommand[] botCommands
+            +void addBotCommand(BotCommand botCommand)
+            +Promise<void> handle(ChatMessage chatMessage)
+        }
+
+        BotCommandListener ..> ChatMessageReceiveEvent: listens for
+        BotCommandInterface ..> ChatMessageSendEvent: emits
+
+        class JoinChannelBotCommand {
+            -Repository<Channel> channelRepository
+            +bool matchesTrigger(string message)
+            +Promise<void> execute(ChatMessage chatMessage)
+        }
+
+        JoinChannelBotCommand ..> BotCommandInterface: implements
+        JoinChannelBotCommand ..> Channel: uses
+    }
+
+
+@enduml
