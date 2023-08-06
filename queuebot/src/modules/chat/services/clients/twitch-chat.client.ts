@@ -1,7 +1,7 @@
 import { AbstractChatClient } from './abstract-chat.client';
 import { Subject } from 'rxjs';
 import { ChatMessage } from '../chat-message';
-import { Inject, Injectable } from '@nestjs/common';
+import {Inject, Injectable, Logger} from '@nestjs/common';
 import { RefreshingAuthProvider } from '@twurple/auth';
 import * as fs from 'fs';
 import { ChatClient } from '@twurple/chat';
@@ -17,6 +17,8 @@ export class TwitchChatClient extends AbstractChatClient {
     private tokenData: any = undefined;
 
     private chatClient: ChatClient;
+
+    private logger: Logger = new Logger(TwitchChatClient.name);
 
     constructor(
         @Inject('TWITCH_APP_CLIENT_ID') private twitchAppClientId: string,
@@ -68,7 +70,8 @@ export class TwitchChatClient extends AbstractChatClient {
                     message: text,
                     emotes: msg.emoteOffsets,
                     date: msg.date,
-                    color: msg.userInfo.color
+                    color: msg.userInfo.color,
+                    client: this
                 });
             },
         );
@@ -79,11 +82,11 @@ export class TwitchChatClient extends AbstractChatClient {
     }
 
     async joinChannel(channelName: string) {
-
+        await this.chatClient.join(channelName);
     }
 
     async leaveChannel(channelName: string) {
-
+        await this.chatClient.part(channelName);
     }
 
     private loadTokenData(): void {
@@ -91,6 +94,5 @@ export class TwitchChatClient extends AbstractChatClient {
         this.tokenData = JSON.parse(
             fs.readFileSync(this.tokenFilePath).toString(),
         );
-        console.log(this.tokenData);
     }
 }

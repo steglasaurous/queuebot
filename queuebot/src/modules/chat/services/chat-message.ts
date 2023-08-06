@@ -1,3 +1,5 @@
+import {AbstractChatClient} from "./clients/abstract-chat.client";
+
 export interface ChatMessage {
     id: string;
     username: string;
@@ -6,4 +8,5 @@ export interface ChatMessage {
     emotes: Map<string, string[]>;
     date: Date;
     color: string;
+    client: AbstractChatClient;
 }

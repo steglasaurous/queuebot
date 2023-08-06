@@ -1,6 +1,6 @@
 import {ChatMessage} from "../../chat/services/chat-message";
 
 export interface BotCommandInterface {
-    matchesTrigger(message: string): boolean;
+    matchesTrigger(chatMessage: ChatMessage): boolean;
     execute(chatMessage: ChatMessage): Promise<void>;
 }
