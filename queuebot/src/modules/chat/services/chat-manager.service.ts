@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common';
 import { AbstractChatClient } from './clients/abstract-chat.client';
 import {EventEmitter2} from "@nestjs/event-emitter";
-import {ChatMessageReceiveEvent} from "./events/chat-message-receive.event";
+import {ChatMessageReceiveEvent} from "../events/chat-message-receive.event";
 
 @Injectable()
 export class ChatManagerService {
@@ -31,5 +31,10 @@ export class ChatManagerService {
         for (const chatClient of this.chatClients) {
             await chatClient.connect();
         }
+    }
+
+    public async sendMessage(channelName: string, message: string) {
+        // FIXME: Finish implementing this.
+
     }
 }

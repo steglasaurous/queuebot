@@ -1,4 +1,4 @@
-import {ChatMessageReceiveEvent} from "../../chat/services/events/chat-message-receive.event";
+import {ChatMessageReceiveEvent} from "../../chat/events/chat-message-receive.event";
 import {OnEvent} from "@nestjs/event-emitter";
 import {BotCommandInterface} from "../commands/bot-command.interface";
 import {Inject, Injectable, Logger} from "@nestjs/common";
