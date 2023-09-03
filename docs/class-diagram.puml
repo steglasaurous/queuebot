@@ -1,13 +1,45 @@
 @startuml
-    package DataStore {
-        class Channel {
-            +string channelName
-            +Date joinedOn
-        }
+    package DataStoreModule {
+        package Entities {
+            class Channel {
+                +string channelName
+                +Date joinedOn
+                +songRequests: SongRequest[]
+            }
 
-        note as N1
-            If a channel is in this table, the bot should join it.
-        endnote
+            class Game {
+                +id: number
+                +name: string
+                +displayName: string
+            }
+
+            class Song {
+                +id: number
+                +songHash: string
+                +title: string
+                +artist: string
+                +mapper: string
+                +game: Game
+                +requests: SongRequest[]
+            }
+
+            class SongRequest {
+                +id: number
+                +song: Song
+                +requesterName: string
+                +requestTimestamp: number
+                +requestOrder: number
+                +channel: Channel
+            }
+
+            Song ..> SongRequest: 0..*
+            Game ..> Song: 0..*
+            Channel ..> SongRequest: 0..*
+
+            note top of Channel
+                If a channel is in this table, the bot should join it.
+            endnote
+        }
     }
 
     package Chat {
@@ -103,5 +135,67 @@
         JoinChannelBotCommand ..> Channel: uses
     }
 
+    package SongStoreModule {
+        package Services {
+            class SongImporterInterface {
+                <<interface>>
+                +gameName: string
+                +importSongs: Promise<number>
+            }
+            class AudioTripSongImporter {
+                -googleSheetsService: GoogleSheetsApi
+                -sheetsRange: string
+                -songService: SongService
+                -gameRepository: Repository<Game>
+                +gameName: string
+                +importSongs: Promise<number>
+            }
 
+            class SongService {
+                -songRepository: Repository<Song>
+                -gameRepository: Repository<Game>
+                +searchSongs(query: string, game: Game): Promise<Song[]>
+                +saveSong(title: string, artist: string, mapper: string, hash?: string): Promise<Song>
+            }
+
+            AudioTripSongImporter --> SongImporterInterface: implements
+            AudioTripSongImporter ..> SongService: depends on
+
+        }
+
+        class SongStoreModule {
+        }
+    }
+
+    package SongRequestModule {
+        package Services {
+
+            class SongRequestErrorType {
+                <<enum>>
+                NOT_FOUND
+                ALREADY_IN_QUEUE
+                SERVER_ERROR
+            }
+            interface SongRequestResponse {
+                <<interface>>
+                +success: bool
+                +errorType: SongRequestErrorType
+            }
+
+            class SongRequestService {
+                -songService: SongService
+                -songRequestRepository: Repository<SongRequest>
+                +addRequest(song: Song, channel: Channel): Promise<SongRequestResponse>
+                +removeRequest(song: Song, channel: Channel): Promise<SongRequestResponse>
+                +removeLastRequest(channel: Channel, requesterName?: string): Promise<SongRequestResponse>
+                +getNextRequest(channel: Channel): Promise<SongRequest>
+                +getAllSongRequests(channel: Channel): Promise<SongRequest[]>
+                +clearChannelSongRequests(channel: Channel): Promise<SongRequestResponse>
+            }
+
+            SongRequestService ..> SongService: depends on
+            SongRequestService ..> SongRequestResponse: returns
+            SongRequestResponse ..> SongRequestErrorType: uses
+        }
+    }
 @enduml
