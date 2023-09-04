@@ -7,5 +7,6 @@ import { SongRequest } from './entities/song-request.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Channel, Game, Song, SongRequest])],
+  exports: [TypeOrmModule],
 })
 export class DataStoreModule {}

@@ -7,6 +7,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ConfigModule } from '@nestjs/config';
 import { BotCommandsModule } from './modules/bot-commands/bot-commands.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SongStoreModule } from './modules/song-store/song-store.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -19,7 +21,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'queuebot.db',
       type: 'sqlite',
       autoLoadEntities: true,
+      // logging: true,
     }),
+    SongStoreModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

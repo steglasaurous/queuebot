@@ -143,8 +143,6 @@
                 +importSongs: Promise<number>
             }
             class AudioTripSongImporter {
-                -googleSheetsService: GoogleSheetsApi
-                -sheetsRange: string
                 -songService: SongService
                 -gameRepository: Repository<Game>
                 +gameName: string
