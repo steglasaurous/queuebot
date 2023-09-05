@@ -2,9 +2,9 @@
 
 - [ ] !remove (song #)
 - [ ] !oops - Remove last song requested by user
-- [ ] !nextsong - Pop the newest song off the queue
-- [ ] Implement proper ordering of the queue
-- [ ] !queue - List songs in queue
+- [x] !nextsong - Pop the newest song off the queue
+- [x] Implement proper ordering of the queue
+- [x] !queue - List songs in queue
 - [ ] !top - Move song to the top of the queue - use title? song position? Or move last added song?
 
 

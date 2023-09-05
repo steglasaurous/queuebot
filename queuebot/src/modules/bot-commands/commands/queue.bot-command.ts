@@ -1,12 +1,12 @@
 import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { Repository } from 'typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 
-export class NextSongBotCommand implements BotCommandInterface {
+export class QueueBotCommand implements BotCommandInterface {
   constructor(
     private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
@@ -16,35 +16,38 @@ export class NextSongBotCommand implements BotCommandInterface {
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });
-    const nextRequest = await this.songRequestService.getNextRequest(channel);
-    if (nextRequest) {
+    const songRequests = await this.songRequestService.getAllRequests(channel);
+    if (songRequests.length == 0) {
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.i18n.t('chat.NextRequest', {
-          lang: channel.lang,
-          args: {
-            title: nextRequest.song.title,
-            artist: nextRequest.song.artist,
-            mapper: nextRequest.song.mapper,
-            requesterName: nextRequest.requesterName,
-          },
-        }),
+        this.i18n.t('chat.QueueEmpty', { lang: channel.lang }),
       );
 
       return Promise.resolve();
     }
 
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.i18n.t('chat.QueueEmpty', {
-        lang: channel.lang,
-      }),
-    );
+    // Spit out up to 5 songs.
+    let output = '';
+    let requestCountLimit = 5;
+    if (songRequests.length < 5) {
+      requestCountLimit = songRequests.length;
+    }
 
-    return Promise.resolve();
+    for (let i = 0; i < requestCountLimit; i++) {
+      output += '#' + (i + 1) + ' ' + songRequests[i].song.title + ' ';
+    }
+
+    if (songRequests.length > requestCountLimit) {
+      output += this.i18n.t('chat.AndMore', {
+        lang: channel.lang,
+        args: { songsRemaining: songRequests.length - requestCountLimit },
+      });
+    }
+
+    await chatMessage.client.sendMessage(chatMessage.channelName, output);
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!nextsong');
+    return chatMessage.message.toLowerCase().startsWith('!queue');
   }
 }

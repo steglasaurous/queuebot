@@ -13,7 +13,7 @@ import {
 export class SongRequest {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Song, (song) => song.requests)
+  @ManyToOne(() => Song, (song) => song.requests, { eager: true })
   song: Song;
   @Column()
   requesterName: string;

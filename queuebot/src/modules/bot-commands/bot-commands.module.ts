@@ -10,6 +10,8 @@ import { SongRequestBotCommand } from './commands/song-request.bot-command';
 import { SongStoreModule } from '../song-store/song-store.module';
 import { JoinChannelsOnConnectListener } from './listeners/join-channels-on-connect.listener';
 import { SongRequestModule } from '../song-request/song-request.module';
+import { NextSongBotCommand } from './commands/next-song.bot-command';
+import { QueueBotCommand } from './commands/queue.bot-command';
 
 @Module({
   imports: [
@@ -29,14 +31,28 @@ import { SongRequestModule } from '../song-request/song-request.module';
     },
     JoinChannelBotCommand,
     SongRequestBotCommand,
+    NextSongBotCommand,
+    QueueBotCommand,
     {
       provide: 'BOT_COMMANDS',
-      inject: [JoinChannelBotCommand, SongRequestBotCommand],
+      inject: [
+        JoinChannelBotCommand,
+        SongRequestBotCommand,
+        NextSongBotCommand,
+        QueueBotCommand,
+      ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
         songRequestBotCommand: SongRequestBotCommand,
+        nextSongBotCommand: NextSongBotCommand,
+        queueBotCommand: QueueBotCommand,
       ) => {
-        return [joinChannelBotCommand, songRequestBotCommand];
+        return [
+          joinChannelBotCommand,
+          songRequestBotCommand,
+          nextSongBotCommand,
+          queueBotCommand,
+        ];
       },
     },
     BotCommandListener,

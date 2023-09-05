@@ -12,6 +12,7 @@ export type I18nTranslations = {
         "SelectSong": string;
         "AndMore": string;
         "NextRequest": string;
+        "QueueEmpty": string;
     };
 };
 export type I18nPath = Path<I18nTranslations>;

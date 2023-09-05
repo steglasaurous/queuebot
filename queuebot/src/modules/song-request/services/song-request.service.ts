@@ -21,7 +21,7 @@ export class SongRequestService {
     requesterName: string,
   ): Promise<SongRequestResponse> {
     return new Promise<SongRequestResponse>(async (resolve) => {
-      let songRequest = new SongRequest();
+      const songRequest = new SongRequest();
       songRequest.song = song;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = Date.now();
@@ -62,5 +62,12 @@ export class SongRequestService {
     await this.songRequestRepository.remove(nextRequest);
 
     return nextRequest;
+  }
+
+  async getAllRequests(channel: Channel): Promise<SongRequest[]> {
+    return await this.songRequestRepository.find({
+      where: { channel: channel },
+      order: { requestOrder: 'asc' },
+    });
   }
 }
