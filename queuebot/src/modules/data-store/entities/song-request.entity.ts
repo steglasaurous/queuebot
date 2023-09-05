@@ -1,8 +1,15 @@
 import { Song } from './song.entity';
 import { Channel } from './channel.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 
 @Entity()
+@Unique(['channel', 'song'])
 export class SongRequest {
   @PrimaryGeneratedColumn()
   id: number;

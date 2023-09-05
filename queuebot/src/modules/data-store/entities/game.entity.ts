@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Song } from './song.entity';
+import { Channel } from './channel.entity';
 
 @Entity()
 export class Game {
@@ -14,4 +15,7 @@ export class Game {
 
   @OneToMany(() => Song, (song) => song.requests)
   songs: Song[];
+
+  @OneToMany(() => Channel, (channel) => channel.game)
+  channels: Channel[];
 }

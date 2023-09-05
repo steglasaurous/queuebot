@@ -1,0 +1,10 @@
+{
+  "NoSongsFound": "No Songs Found...",
+  "JoinedChannel": "Join channel #{channelName}. Enjoy!",
+  "HelloChannel": "Queuebot ready for action.",
+  "SongAlreadyInQueue": "Song is already in queue.",
+  "SongRequestFailed": "Queuebot error while attempting to add song to queue.",
+  "SongAddedToQueue": "{title} added to the queue.",
+  "SelectSong": "Select song with !req #: ",
+  "AndMore": "and {songsRemaining} more."
+}

@@ -22,5 +22,6 @@ export const SONG_IMPORTERS = 'SONG_IMPORTERS';
     },
     SongImporterManagerService,
   ],
+  exports: [SongService],
 })
 export class SongStoreModule {}

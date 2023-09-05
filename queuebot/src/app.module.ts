@@ -9,6 +9,9 @@ import { BotCommandsModule } from './modules/bot-commands/bot-commands.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SongStoreModule } from './modules/song-store/song-store.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { SongRequestModule } from './modules/song-request/song-request.module';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -25,6 +28,22 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     SongStoreModule,
     ScheduleModule.forRoot(),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, 'i18n'),
+        watch: true,
+      },
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+      ],
+      typesOutputPath: path.join(
+        __dirname,
+        '../../src/generated/i18n.generated.ts',
+      ),
+    }),
+    SongRequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

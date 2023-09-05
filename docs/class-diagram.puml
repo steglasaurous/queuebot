@@ -5,6 +5,7 @@
                 +string channelName
                 +Date joinedOn
                 +songRequests: SongRequest[]
+                +game: Game
             }
 
             class Game {
@@ -32,12 +33,20 @@
                 +channel: Channel
             }
 
+            class UserBotState {
+                +requesterName: string
+                +channel: Channel
+                +state: json
+                +timestamp: number
+            }
+
             Song ..> SongRequest: 0..*
             Game ..> Song: 0..*
             Channel ..> SongRequest: 0..*
 
             note top of Channel
                 If a channel is in this table, the bot should join it.
+                game should be set to the active 'game' for which it should search for requests.
             endnote
         }
     }
@@ -102,6 +111,10 @@
             +Promise<void> handle(ChatMessageSendEvent chatMessageSendEvent)
         }
 
+        class ChatClientConnectedEvent {
+            +client: ChatClient
+        }
+
         ChatManagerService ..> ChatMessageReceiveEvent: emits
         ChatMessageSendListener ..> ChatMessageSendEvent: listens for
         ChatMessageSendListener ..> ChatManagerService: depends on
@@ -133,6 +146,15 @@
 
         JoinChannelBotCommand ..> BotCommandInterface: implements
         JoinChannelBotCommand ..> Channel: uses
+
+        class SongRequestBotCommand {
+            -songService: SongService
+            +matchesTrigger(message: string): bool
+            +execute(chatMessage: ChatMessage): Promise<void>
+        }
+
+        SongRequestBotCommand ..> BotCommandInterface: implements
+        SongRequestBotCommand ..> SongService: uses
     }
 
     package SongStoreModule {
