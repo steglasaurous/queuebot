@@ -6,5 +6,6 @@
   "SongRequestFailed": "Queuebot error while attempting to add song to queue.",
   "SongAddedToQueue": "{title} added to the queue.",
   "SelectSong": "Select song with !req #: ",
-  "AndMore": "and {songsRemaining} more."
+  "AndMore": "and {songsRemaining} more.",
+  "NextRequest": "{title} by {artist} ({mapper}) requested by {requesterName} is next!"
 }

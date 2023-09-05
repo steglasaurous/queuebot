@@ -25,7 +25,10 @@ export class SongRequestService {
       songRequest.song = song;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = Date.now();
-      songRequest.requestOrder = 1; // FIXME: Need to properly handle order.
+      songRequest.requestOrder =
+        (await this.songRequestRepository.maximum('requestOrder', {
+          channel: channel,
+        })) + 1; // Not sure what the performance implications are on this.  Will have to keep an eye on it for now.
       songRequest.channel = channel;
 
       try {
@@ -45,5 +48,19 @@ export class SongRequestService {
         });
       }
     });
+  }
+
+  async getNextRequest(channel: Channel): Promise<SongRequest> {
+    const nextRequest = await this.songRequestRepository.findOne({
+      where: { channel: channel },
+      order: { requestOrder: 'asc' },
+    });
+    if (!nextRequest) {
+      return undefined;
+    }
+
+    await this.songRequestRepository.remove(nextRequest);
+
+    return nextRequest;
   }
 }
