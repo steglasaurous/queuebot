@@ -1,5 +1,6 @@
 # Todo
 
+- [ ] Create docker container config
 - [ ] !remove (song #)
 - [ ] !oops - Remove last song requested by user
 - [x] !nextsong - Pop the newest song off the queue
