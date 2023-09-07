@@ -37,9 +37,6 @@ export class ChatManagerService {
     for (const chatClient of this.chatClients) {
       await chatClient.connect();
       this.logger.log('Connected');
-      this.eventEmitter.emitAsync(ChatClientConnectedEvent.name, <
-        ChatClientConnectedEvent
-      >{ client: chatClient });
     }
   }
 }

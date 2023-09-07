@@ -5,6 +5,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { RefreshingAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 import * as fs from 'fs';
+import { ChatClientConnectedEvent } from '../../events/chat-client-connected.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TwitchChatClient extends AbstractChatClient {
@@ -25,6 +27,7 @@ export class TwitchChatClient extends AbstractChatClient {
     private twitchAppClientSecret: string,
     private tokenFilePath: string,
     private twitchChannel: string,
+    private eventEmitter: EventEmitter2,
   ) {
     super();
   }
@@ -57,6 +60,9 @@ export class TwitchChatClient extends AbstractChatClient {
       // Tie into onConnect? OnDisconnect?
       this.chatClient.onConnect(() => {
         this.logger.log('Twitch chat connected');
+        this.eventEmitter.emitAsync(ChatClientConnectedEvent.name, <
+          ChatClientConnectedEvent
+        >{ client: this });
         resolve();
       });
       this.chatClient.connect();

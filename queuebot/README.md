@@ -14,3 +14,4 @@
 - [ ] Add queue controls to web client
 - [ ] Allow adding songs via client?
 
+- [ ] Add ability to set limits on how many requests can be queued per user, per role, etc. 
