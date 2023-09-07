@@ -13,6 +13,11 @@ export class NextSongBotCommand implements BotCommandInterface {
     private i18n: I18nService,
   ) {}
   async execute(chatMessage: ChatMessage): Promise<void> {
+    // Only broadcaster and mods can trigger this command.
+    if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
+      return;
+    }
+
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });

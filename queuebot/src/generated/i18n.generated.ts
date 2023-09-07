@@ -13,6 +13,8 @@ export type I18nTranslations = {
         "AndMore": string;
         "NextRequest": string;
         "QueueEmpty": string;
+        "NoUserSongRequestToRemove": string;
+        "RequestRemoved": string;
     };
 };
 export type I18nPath = Path<I18nTranslations>;

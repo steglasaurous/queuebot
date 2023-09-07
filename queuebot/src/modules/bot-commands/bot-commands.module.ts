@@ -12,6 +12,7 @@ import { JoinChannelsOnConnectListener } from './listeners/join-channels-on-conn
 import { SongRequestModule } from '../song-request/song-request.module';
 import { NextSongBotCommand } from './commands/next-song.bot-command';
 import { QueueBotCommand } from './commands/queue.bot-command';
+import { OopsBotCommand } from './commands/oops.bot-command';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { QueueBotCommand } from './commands/queue.bot-command';
     SongRequestBotCommand,
     NextSongBotCommand,
     QueueBotCommand,
+    OopsBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -40,18 +42,21 @@ import { QueueBotCommand } from './commands/queue.bot-command';
         SongRequestBotCommand,
         NextSongBotCommand,
         QueueBotCommand,
+        OopsBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
         songRequestBotCommand: SongRequestBotCommand,
         nextSongBotCommand: NextSongBotCommand,
         queueBotCommand: QueueBotCommand,
+        oopsBotCommand: OopsBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
           songRequestBotCommand,
           nextSongBotCommand,
           queueBotCommand,
+          oopsBotCommand,
         ];
       },
     },

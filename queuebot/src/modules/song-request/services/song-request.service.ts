@@ -70,4 +70,20 @@ export class SongRequestService {
       order: { requestOrder: 'asc' },
     });
   }
+
+  async removeMostRecentRequest(
+    channel: Channel,
+    requesterName: string,
+  ): Promise<SongRequest> {
+    const mostRecentRequest = await this.songRequestRepository.findOne({
+      where: { channel: channel, requesterName: requesterName },
+      order: { requestOrder: 'desc' },
+    });
+    if (mostRecentRequest) {
+      await this.songRequestRepository.remove(mostRecentRequest);
+      return mostRecentRequest;
+    }
+
+    return;
+  }
 }

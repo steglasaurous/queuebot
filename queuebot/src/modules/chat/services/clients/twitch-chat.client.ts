@@ -58,7 +58,7 @@ export class TwitchChatClient extends AbstractChatClient {
       });
 
       // Tie into onConnect? OnDisconnect?
-      this.chatClient.onConnect(() => {
+      this.chatClient.onAuthenticationSuccess(() => {
         this.logger.log('Twitch chat connected');
         this.eventEmitter.emitAsync(ChatClientConnectedEvent.name, <
           ChatClientConnectedEvent
@@ -77,6 +77,10 @@ export class TwitchChatClient extends AbstractChatClient {
             date: msg.date,
             color: msg.userInfo.color,
             client: this,
+            userIsBroadcaster: msg.userInfo.isBroadcaster,
+            userIsMod: msg.userInfo.isMod,
+            userIsSubscriber: msg.userInfo.isSubscriber,
+            userIsVip: msg.userInfo.isVip,
           });
         },
       );
