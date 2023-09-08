@@ -4,8 +4,8 @@ services:
   server:
     build: ./queuebot
     restart: unless-stopped
-#    networks:
-#      - proxynet
+    networks:
+      - proxynet
     environment:
       - VIRTUAL_HOST=queuebot.steglasaurous.com
       - LETSENCRYPT_HOST=queuebot.steglasaurous.com
@@ -15,7 +15,10 @@ services:
     volumes:
       - queuebot_database:/server/queuebot/queuebot.db
 
-#networks:
-#  proxynet:
-#    name: nextcloud-docker_proxy-tier
-#    external: true
+networks:
+  proxynet:
+    name: nextcloud-docker_proxy-tier
+    external: true
+volumes:
+  queuebot_database:
+
