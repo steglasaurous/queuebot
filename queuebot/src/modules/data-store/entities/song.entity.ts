@@ -20,6 +20,10 @@ export class Song {
   artist: string;
   @Column()
   mapper: string;
+  @Column({ nullable: true })
+  duration?: number;
+  @Column({ nullable: true })
+  bpm?: number;
   @ManyToOne(() => Game, (game) => game.songs)
   game: Game;
 

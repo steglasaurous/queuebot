@@ -13,6 +13,8 @@ export class Game {
   @Column()
   displayName: string;
 
+  @Column()
+  twitchCategoryId: string;
   @OneToMany(() => Song, (song) => song.requests)
   songs: Song[];
 
