@@ -15,6 +15,8 @@ export type I18nTranslations = {
         "QueueEmpty": string;
         "NoUserSongRequestToRemove": string;
         "RequestRemoved": string;
+        "ImOut": string;
+        "AlreadyJoined": string;
     };
 };
 export type I18nPath = Path<I18nTranslations>;

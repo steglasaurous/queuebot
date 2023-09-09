@@ -13,6 +13,7 @@ import { SongRequestModule } from '../song-request/song-request.module';
 import { NextSongBotCommand } from './commands/next-song.bot-command';
 import { QueueBotCommand } from './commands/queue.bot-command';
 import { OopsBotCommand } from './commands/oops.bot-command';
+import { GetOutBotCommand } from './commands/get-out.bot-command';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { OopsBotCommand } from './commands/oops.bot-command';
     NextSongBotCommand,
     QueueBotCommand,
     OopsBotCommand,
+    GetOutBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -43,6 +45,7 @@ import { OopsBotCommand } from './commands/oops.bot-command';
         NextSongBotCommand,
         QueueBotCommand,
         OopsBotCommand,
+        GetOutBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -50,6 +53,7 @@ import { OopsBotCommand } from './commands/oops.bot-command';
         nextSongBotCommand: NextSongBotCommand,
         queueBotCommand: QueueBotCommand,
         oopsBotCommand: OopsBotCommand,
+        getOutBotCommand: GetOutBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -57,6 +61,7 @@ import { OopsBotCommand } from './commands/oops.bot-command';
           nextSongBotCommand,
           queueBotCommand,
           oopsBotCommand,
+          getOutBotCommand,
         ];
       },
     },

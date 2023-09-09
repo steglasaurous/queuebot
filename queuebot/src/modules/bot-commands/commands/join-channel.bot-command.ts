@@ -25,18 +25,31 @@ export class JoinChannelBotCommand implements BotCommandInterface {
     let channelNameEntity = await this.channelRepository.findOneBy({
       channelName: chatMessage.username,
     });
+    if (channelNameEntity && channelNameEntity.inChannel == true) {
+      // They're already in the channel - no need to join again.
+      await chatMessage.client.sendMessage(
+        chatMessage.channelName,
+        this.i18n.t('chat.AlreadyJoined'),
+      );
+
+      return;
+    }
     if (!channelNameEntity) {
       channelNameEntity = new Channel();
       channelNameEntity.channelName = chatMessage.username;
-      channelNameEntity.joinedOn = new Date();
-      channelNameEntity.game = await this.gameRepository.findOneBy({
-        name: 'audio_trip',
-      }); // FIXME: Replace this with game detection.
-      await this.channelRepository.save(channelNameEntity);
-      this.logger.debug('Saved channel to database', {
-        channelName: channelNameEntity.channelName,
-      });
     }
+    channelNameEntity.inChannel = true;
+    channelNameEntity.enabled = true;
+    channelNameEntity.joinedOn = new Date();
+    channelNameEntity.game = await this.gameRepository.findOneBy({
+      name: 'audio_trip',
+    }); // FIXME: Replace this with game detection.
+
+    await this.channelRepository.save(channelNameEntity);
+    this.logger.debug('Saved channel to database', {
+      channelName: channelNameEntity.channelName,
+    });
+
     this.logger.debug('Joining channel', {
       channelName: channelNameEntity.channelName,
     });

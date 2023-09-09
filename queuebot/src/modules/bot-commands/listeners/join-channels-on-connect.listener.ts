@@ -12,7 +12,9 @@ export class JoinChannelsOnConnectListener {
   ) {}
   @OnEvent(ChatClientConnectedEvent.name)
   async handle(chatConnectedEvent: ChatClientConnectedEvent) {
-    const channels = await this.channelRepository.find();
+    const channels = await this.channelRepository.find({
+      where: { inChannel: true },
+    });
     channels.forEach(async (channel) => {
       await chatConnectedEvent.client.joinChannel(channel.channelName);
       this.logger.log(`Joined channel ${channel.channelName}`);
