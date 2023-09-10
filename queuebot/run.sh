@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
-# FIXME: Add .env params configured here
-# FIXME: Add twitch_token.json to a docker volume so it survives upgrades.
+envsubst < /server/.env.dist > /server/.env
 cd /server && npm run typeorm:run-migrations && npm run start
