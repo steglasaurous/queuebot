@@ -11,8 +11,8 @@ services:
     ports:
       - 3000
     volumes:
-      - queuebot_database:/server/queuebot/queuebot.db
-      - twitch_token:/server/queuebot/twitch_token.json
+      - queuebot_database:/server/queuebot.db
+      - ./queuebot/twitch_token.json:/server/twitch_token.json
 
 networks:
   proxynet:
