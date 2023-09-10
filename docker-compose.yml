@@ -6,14 +6,13 @@ services:
     restart: unless-stopped
     networks:
       - proxynet
-    environment:
-      - VIRTUAL_HOST=queuebot.steglasaurous.com
-      - LETSENCRYPT_HOST=queuebot.steglasaurous.com
-      - LETSENCRYPT_EMAIL=me@steglasaurous.com
+    env_file:
+      - .env
     ports:
       - 3000
     volumes:
       - queuebot_database:/server/queuebot/queuebot.db
+      - twitch_token:/server/queuebot/twitch_token.json
 
 networks:
   proxynet:
