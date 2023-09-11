@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Like, Repository } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { Song } from '../../data-store/entities/song.entity';
 import { Game } from '../../data-store/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from 'node:crypto';
+import { SongSearchStrategyInterface } from './song-search-strategies/song-search-strategy.interface';
+import { SONG_SEARCH_STRATEGIES } from '../song-store.module';
 
 @Injectable()
 export class SongService {
@@ -11,17 +13,21 @@ export class SongService {
   constructor(
     @InjectRepository(Song)
     private songRepository: Repository<Song>,
-    @InjectRepository(Game)
-    private gameRepository: Repository<Game>,
+    @Inject(SONG_SEARCH_STRATEGIES)
+    private searchStrategies: SongSearchStrategyInterface[],
   ) {}
 
   async searchSongs(query: string, game: Game): Promise<Song[]> {
     // FUTURE IMPROVEMENTS:
     //   Full-text search of title, artist and mapper
     //   Modifiers like -title sometitle, -artist someartist, -mapper somemapper or in some fashion, directly by -id ?
-    return await this.songRepository.find({
-      where: { title: Like('%' + query + '%'), game: game },
-    });
+    for (const strategy of this.searchStrategies) {
+      if (strategy.supportsGame(game)) {
+        return await strategy.search(game, query);
+      }
+    }
+
+    return [];
   }
   async saveSong(
     game: Game,
