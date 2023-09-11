@@ -6,7 +6,7 @@ request system.
 ## How to use
 
 1. Goto https://twitch.tv/requestobot, click on "Chat", then type `!join` to have the bot join your channel.
-2. Commands and info on how to use the bot are detailed on the requestobot's about page- you can find that [here](https://www.twitch.tv/requestobot/about). 
+2. Commands and info on how to use the bot are detailed on the requestobot's about page.  You can find that [here](https://www.twitch.tv/requestobot/about). 
 
 ## Feature Requests and Bugs
 
