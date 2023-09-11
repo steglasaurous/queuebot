@@ -18,3 +18,8 @@
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc. 
 
 - [x] Load up entries for Audio Trip OSTs
+
+
+- [ ] Apparently krishna appears twice
+- [x] Look into why database wasn't persisted between rebuilds (docker volume)
+- [x] Add exclamation in front of all messages so TTS doesn't read them by default.

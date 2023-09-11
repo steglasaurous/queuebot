@@ -13,7 +13,7 @@ import { Migration1694283902832 } from '../migrations/1694283902832-migration';
 
 export default new DataSource({
   type: 'sqlite',
-  database: 'queuebot.db',
+  database: 'database/queuebot.db',
   entities: [Channel, Game, Song, SongRequest, UserBotState],
   migrations: [
     Migration1694269783271,

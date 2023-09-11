@@ -5,12 +5,14 @@ import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
+import { MessageFormatterService } from '../services/message-formatter.service';
 
 export class QueueBotCommand implements BotCommandInterface {
   constructor(
     private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
+    private messageFormatterService: MessageFormatterService,
   ) {}
   async execute(chatMessage: ChatMessage): Promise<void> {
     const channel = await this.channelRepository.findOneBy({
@@ -20,7 +22,9 @@ export class QueueBotCommand implements BotCommandInterface {
     if (songRequests.length == 0) {
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.i18n.t('chat.QueueEmpty', { lang: channel.lang }),
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.QueueEmpty', { lang: channel.lang }),
+        ),
       );
 
       return Promise.resolve();
@@ -44,7 +48,10 @@ export class QueueBotCommand implements BotCommandInterface {
       });
     }
 
-    await chatMessage.client.sendMessage(chatMessage.channelName, output);
+    await chatMessage.client.sendMessage(
+      chatMessage.channelName,
+      this.messageFormatterService.formatMessage(output),
+    );
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {

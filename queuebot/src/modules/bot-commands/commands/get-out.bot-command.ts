@@ -5,12 +5,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
+import { MessageFormatterService } from '../services/message-formatter.service';
 
 @Injectable()
 export class GetOutBotCommand implements BotCommandInterface {
   constructor(
     private i18n: I18nService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
+    private messageFormatterService: MessageFormatterService,
   ) {}
   async execute(chatMessage: ChatMessage): Promise<void> {
     // Only broadcasters and mods should be allowed to do this.
@@ -21,7 +23,7 @@ export class GetOutBotCommand implements BotCommandInterface {
     // Signal that we're gonna GTFO
     await chatMessage.client.sendMessage(
       chatMessage.channelName,
-      this.i18n.t('chat.ImOut'),
+      this.messageFormatterService.formatMessage(this.i18n.t('chat.ImOut')),
     );
 
     // Leave the channel

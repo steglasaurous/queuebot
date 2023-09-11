@@ -21,7 +21,7 @@ import * as path from 'path';
     ConfigModule.forRoot(),
     BotCommandsModule,
     TypeOrmModule.forRoot({
-      database: 'queuebot.db',
+      database: 'database/queuebot.db',
       type: 'sqlite',
       autoLoadEntities: true,
       // logging: true,

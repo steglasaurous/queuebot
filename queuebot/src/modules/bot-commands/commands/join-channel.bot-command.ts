@@ -6,6 +6,7 @@ import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Game } from '../../data-store/entities/game.entity';
+import { MessageFormatterService } from '../services/message-formatter.service';
 // import { I18nTranslations } from '../../../generated/i18n.generated';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class JoinChannelBotCommand implements BotCommandInterface {
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(Game) private gameRepository: Repository<Game>,
     private readonly i18n: I18nService,
+    private messageFormatterService: MessageFormatterService,
   ) {}
 
   async execute(chatMessage: ChatMessage): Promise<void> {
@@ -70,10 +72,12 @@ export class JoinChannelBotCommand implements BotCommandInterface {
 
     await chatMessage.client.sendMessage(
       channelNameEntity.channelName,
-      this.i18n.t('chat.HelloChannel', {
-        lang: channelNameEntity.lang,
-        defaultValue: 'Queuebot ready for action.',
-      }),
+      this.messageFormatterService.formatMessage(
+        this.i18n.t('chat.HelloChannel', {
+          lang: channelNameEntity.lang,
+          defaultValue: 'Queuebot ready for action.',
+        }),
+      ),
     );
 
     return Promise.resolve();

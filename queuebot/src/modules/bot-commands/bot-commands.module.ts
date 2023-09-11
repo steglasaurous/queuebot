@@ -14,6 +14,7 @@ import { NextSongBotCommand } from './commands/next-song.bot-command';
 import { QueueBotCommand } from './commands/queue.bot-command';
 import { OopsBotCommand } from './commands/oops.bot-command';
 import { GetOutBotCommand } from './commands/get-out.bot-command';
+import { MessageFormatterService } from './services/message-formatter.service';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { GetOutBotCommand } from './commands/get-out.bot-command';
     BotCommandListener,
     BotStateService,
     JoinChannelsOnConnectListener,
+    MessageFormatterService,
   ],
 })
 export class BotCommandsModule {}

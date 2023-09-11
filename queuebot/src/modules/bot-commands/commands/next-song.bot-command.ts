@@ -5,12 +5,14 @@ import { Repository } from 'typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
+import { MessageFormatterService } from '../services/message-formatter.service';
 
 export class NextSongBotCommand implements BotCommandInterface {
   constructor(
     private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
+    private messageFormatterService: MessageFormatterService,
   ) {}
   async execute(chatMessage: ChatMessage): Promise<void> {
     // Only broadcaster and mods can trigger this command.
@@ -25,15 +27,17 @@ export class NextSongBotCommand implements BotCommandInterface {
     if (nextRequest) {
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.i18n.t('chat.NextRequest', {
-          lang: channel.lang,
-          args: {
-            title: nextRequest.song.title,
-            artist: nextRequest.song.artist,
-            mapper: nextRequest.song.mapper,
-            requesterName: nextRequest.requesterName,
-          },
-        }),
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.NextRequest', {
+            lang: channel.lang,
+            args: {
+              title: nextRequest.song.title,
+              artist: nextRequest.song.artist,
+              mapper: nextRequest.song.mapper,
+              requesterName: nextRequest.requesterName,
+            },
+          }),
+        ),
       );
 
       return Promise.resolve();
@@ -41,9 +45,11 @@ export class NextSongBotCommand implements BotCommandInterface {
 
     await chatMessage.client.sendMessage(
       chatMessage.channelName,
-      this.i18n.t('chat.QueueEmpty', {
-        lang: channel.lang,
-      }),
+      this.messageFormatterService.formatMessage(
+        this.i18n.t('chat.QueueEmpty', {
+          lang: channel.lang,
+        }),
+      ),
     );
 
     return Promise.resolve();

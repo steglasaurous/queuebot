@@ -10,6 +10,7 @@ import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 import { Song } from '../../data-store/entities/song.entity';
+import { MessageFormatterService } from '../services/message-formatter.service';
 // import { I18nTranslations } from '../../../generated/i18n.generated';
 
 export class SongRequestBotCommand implements BotCommandInterface {
@@ -22,6 +23,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
     private channelRepository: Repository<Channel>,
     private readonly i18n: I18nService,
     private songRequestService: SongRequestService,
+    private messageFormatterService: MessageFormatterService,
   ) {}
   async execute(chatMessage: ChatMessage): Promise<void> {
     // Load the channel object so we know what game we're searching requests for.
@@ -69,7 +71,9 @@ export class SongRequestBotCommand implements BotCommandInterface {
       }
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.i18n.t('chat.NoSongsFound', { lang: channel.lang }),
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.NoSongsFound', { lang: channel.lang }),
+        ),
       );
 
       return Promise.resolve();
@@ -83,7 +87,9 @@ export class SongRequestBotCommand implements BotCommandInterface {
     if (searchResults.length < 1) {
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.i18n.t('chat.NoSongsFound', { lang: channel.lang }),
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.NoSongsFound', { lang: channel.lang }),
+        ),
       );
 
       return Promise.resolve();
@@ -117,7 +123,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
 
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        outputMessage,
+        this.messageFormatterService.formatMessage(outputMessage),
       );
 
       return Promise.resolve();
@@ -153,20 +159,24 @@ export class SongRequestBotCommand implements BotCommandInterface {
       if (requestResult.errorType == SongRequestErrorType.ALREADY_IN_QUEUE) {
         await chatMessage.client.sendMessage(
           chatMessage.channelName,
-          this.i18n.t('chat.SongAlreadyInQueue', {
-            lang: channel.lang,
-            defaultValue: 'Song is already in queue.',
-          }),
+          this.messageFormatterService.formatMessage(
+            this.i18n.t('chat.SongAlreadyInQueue', {
+              lang: channel.lang,
+              defaultValue: 'Song is already in queue.',
+            }),
+          ),
         );
         return Promise.resolve();
       } else {
         await chatMessage.client.sendMessage(
           chatMessage.channelName,
-          this.i18n.t('chat.SongRequestFailed', {
-            lang: channel.lang,
-            defaultValue:
-              'Queuebot error while attempting to add song to queue.',
-          }),
+          this.messageFormatterService.formatMessage(
+            this.i18n.t('chat.SongRequestFailed', {
+              lang: channel.lang,
+              defaultValue:
+                'Queuebot error while attempting to add song to queue.',
+            }),
+          ),
         );
         return Promise.resolve();
       }
@@ -174,13 +184,15 @@ export class SongRequestBotCommand implements BotCommandInterface {
 
     await chatMessage.client.sendMessage(
       chatMessage.channelName,
-      this.i18n.t('chat.SongAddedToQueue', {
-        lang: channel.lang,
-        args: {
-          title: song.title,
-          artist: song.artist,
-        },
-      }),
+      this.messageFormatterService.formatMessage(
+        this.i18n.t('chat.SongAddedToQueue', {
+          lang: channel.lang,
+          args: {
+            title: song.title,
+            artist: song.artist,
+          },
+        }),
+      ),
     );
 
     return Promise.resolve();
