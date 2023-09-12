@@ -5,7 +5,7 @@ import { Game } from '../../data-store/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from 'node:crypto';
 import { SongSearchStrategyInterface } from './song-search-strategies/song-search-strategy.interface';
-import { SONG_SEARCH_STRATEGIES } from '../song-store.module';
+import { SONG_SEARCH_STRATEGIES } from '../injection-tokens';
 
 @Injectable()
 export class SongService {

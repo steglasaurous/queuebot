@@ -14,7 +14,14 @@ import { MessageFormatterService } from '../services/message-formatter.service';
 // import { I18nTranslations } from '../../../generated/i18n.generated';
 
 export class SongRequestBotCommand implements BotCommandInterface {
-  private requestTriggers = ['!req', '!srr', '!bsr', '!ssr', '!request'];
+  private requestTriggers = [
+    '!req',
+    '!srr',
+    '!bsr',
+    '!ssr',
+    '!request',
+    '!atr',
+  ];
   private logger: Logger = new Logger(this.constructor.name);
   constructor(
     private songService: SongService,
@@ -41,7 +48,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
     }
 
     // Load bot state for this user, if any.
-    let userBotState = await this.botStateService.getState(
+    const userBotState = await this.botStateService.getState(
       chatMessage.username,
       chatMessage.channelName,
     );
@@ -79,7 +86,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
       return Promise.resolve();
     }
 
-    let searchResults = await this.songService.searchSongs(
+    const searchResults = await this.songService.searchSongs(
       searchTerms,
       channel.game,
     );

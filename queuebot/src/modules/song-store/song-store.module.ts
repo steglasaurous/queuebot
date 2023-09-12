@@ -7,11 +7,14 @@ import { HttpModule } from '@nestjs/axios';
 import { SongImporterManagerService } from './services/song-importer-manager.service';
 import { LocalStrategy } from './services/song-search-strategies/local.strategy';
 import { SpinRhythmSearchStrategy } from './services/song-search-strategies/spin-rhythm-search.strategy';
+import { SONG_IMPORTERS, SONG_SEARCH_STRATEGIES } from './injection-tokens';
 
-export const SONG_IMPORTERS = 'SONG_IMPORTERS';
-export const SONG_SEARCH_STRATEGIES = 'SONG_SEARCH_STRATEGIES';
 @Module({
-  imports: [TypeOrmModule.forFeature(), DataStoreModule, HttpModule],
+  imports: [
+    TypeOrmModule.forFeature(),
+    DataStoreModule,
+    HttpModule.register({}),
+  ],
   providers: [
     SongService,
     AudioTripSongImporterService,

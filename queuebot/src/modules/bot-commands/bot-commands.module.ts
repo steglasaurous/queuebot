@@ -15,6 +15,8 @@ import { QueueBotCommand } from './commands/queue.bot-command';
 import { OopsBotCommand } from './commands/oops.bot-command';
 import { GetOutBotCommand } from './commands/get-out.bot-command';
 import { MessageFormatterService } from './services/message-formatter.service';
+import { SetGameBotCommand } from './commands/set-game.bot-command';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { MessageFormatterService } from './services/message-formatter.service';
     TypeOrmModule.forFeature([Channel]),
     SongStoreModule,
     SongRequestModule,
+    HttpModule,
   ],
   providers: [
     {
@@ -38,6 +41,7 @@ import { MessageFormatterService } from './services/message-formatter.service';
     QueueBotCommand,
     OopsBotCommand,
     GetOutBotCommand,
+    SetGameBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -47,6 +51,7 @@ import { MessageFormatterService } from './services/message-formatter.service';
         QueueBotCommand,
         OopsBotCommand,
         GetOutBotCommand,
+        SetGameBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -55,6 +60,7 @@ import { MessageFormatterService } from './services/message-formatter.service';
         queueBotCommand: QueueBotCommand,
         oopsBotCommand: OopsBotCommand,
         getOutBotCommand: GetOutBotCommand,
+        setGameBotCommand: SetGameBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -63,6 +69,7 @@ import { MessageFormatterService } from './services/message-formatter.service';
           queueBotCommand,
           oopsBotCommand,
           getOutBotCommand,
+          setGameBotCommand,
         ];
       },
     },

@@ -43,7 +43,7 @@ export class Channel {
   /**
    * If populated, this is the game it should search song requests for.  If null, the bot is effectively disabled.
    */
-  @ManyToOne(() => Game, (game) => game.channels)
+  @ManyToOne(() => Game, (game) => game.channels, { eager: true })
   game?: Game;
 
   /**

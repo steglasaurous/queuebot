@@ -6,13 +6,12 @@ import {
 } from '@nestjs/common';
 import { SongImporter } from './song-importers/song-importer.interface';
 import { Cron } from '@nestjs/schedule';
+import { SONG_IMPORTERS } from '../injection-tokens';
 
 @Injectable()
 export class SongImporterManagerService implements OnApplicationBootstrap {
   private logger: Logger = new Logger(SongImporterManagerService.name);
-  constructor(
-    @Inject('SONG_IMPORTERS') private songImporters: SongImporter[],
-  ) {}
+  constructor(@Inject(SONG_IMPORTERS) private songImporters: SongImporter[]) {}
 
   async runImporters() {
     this.songImporters.forEach(async (importer) => {

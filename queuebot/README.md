@@ -23,3 +23,4 @@
 - [ ] Apparently krishna appears twice
 - [x] Look into why database wasn't persisted between rebuilds (docker volume)
 - [x] Add exclamation in front of all messages so TTS doesn't read them by default.
+- [ ] For multiple search results, include artist and mapper

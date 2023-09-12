@@ -6,6 +6,7 @@ import { Song } from '../../data-store/entities/song.entity';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { SongRequestResponse } from '../models/song-request-response.interface';
 import { SongRequestErrorType } from '../models/song-request-error-type.enum';
+import { SongService } from '../../song-store/services/song.service';
 
 @Injectable()
 export class SongRequestService {
@@ -13,6 +14,7 @@ export class SongRequestService {
   constructor(
     @InjectRepository(SongRequest)
     private songRequestRepository: Repository<SongRequest>,
+    private songService: SongService,
   ) {}
 
   async addRequest(
@@ -21,8 +23,22 @@ export class SongRequestService {
     requesterName: string,
   ): Promise<SongRequestResponse> {
     return new Promise<SongRequestResponse>(async (resolve) => {
+      let savedSong;
+      if (!song.id) {
+        // If the song hasn't been persisted to database, do that first.
+        savedSong = await this.songService.saveSong(
+          song.game,
+          song.title,
+          song.artist,
+          song.mapper,
+          song.songHash,
+        );
+      } else {
+        savedSong = song;
+      }
+
       const songRequest = new SongRequest();
-      songRequest.song = song;
+      songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = Date.now();
       songRequest.requestOrder =

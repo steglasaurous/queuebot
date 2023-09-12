@@ -17,6 +17,10 @@ export type I18nTranslations = {
         "RequestRemoved": string;
         "ImOut": string;
         "AlreadyJoined": string;
+        "NoGameSpecified": string;
+        "MatchedTooManyGames": string;
+        "UnsupportedGame": string;
+        "GameChanged": string;
     };
 };
 export type I18nPath = Path<I18nTranslations>;

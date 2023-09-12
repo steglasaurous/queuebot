@@ -13,6 +13,10 @@ export class Game {
   @Column()
   displayName: string;
 
+  // The game name that's matched when using !setgame
+  @Column()
+  setGameName: string;
+
   @Column()
   twitchCategoryId: string;
   @OneToMany(() => Song, (song) => song.requests)

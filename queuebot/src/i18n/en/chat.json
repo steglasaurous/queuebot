@@ -12,5 +12,9 @@
   "NoUserSongRequestToRemove": "You have no requests in queue to remove.",
   "RequestRemoved": "{title} removed from the queue.",
   "ImOut": "I'm out!  Cya!",
-  "AlreadyJoined": "I've already joined your channel.  Try using commands in your own channel to interact with the bot."
+  "AlreadyJoined": "I've already joined your channel.  Try using commands in your own channel to interact with the bot.",
+  "NoGameSpecified": "You must specify a game when using !setgame.",
+  "MatchedTooManyGames": "Matched too many games, please narrow down your game name.",
+  "UnsupportedGame": "Game is unsupported.",
+  "GameChanged": "Game changed to {gameName}."
 }
