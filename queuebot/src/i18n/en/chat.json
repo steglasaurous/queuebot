@@ -20,5 +20,13 @@
   "AlreadyOff": "Requestobot is already off.  Use !requestobot on to turn it back on.",
   "BotIsOff": "Requestobot is now off.  Use !requestobot on to turn it back on.",
   "AlreadyOn": "Requestobot is already on.  Use !requestobot off to turn it off.",
-  "BotIsOn": "Requestobot is now on.  Use !setgame to set which game you want to offer requests for, and !requestobot off to turn it off."
+  "BotIsOn": "Requestobot is now on.  Use !setgame to set which game you want to offer requests for, and !requestobot off to turn it off.",
+  "RequestHelp_audio_trip": "How to request songs: Goto https://atcd.club and click on 'Choreography Library' for available songs. To request, type !req title in chat.",
+  "RequestHelp_spin_rhythm": "How to request songs: Goto https://spinsha.re for available songs.  To request, type !req title in chat. You can also request by spinsha.re id like !req 9559 or by URL !req https://spinsha.re/song/9559",
+  "QueueCleared": "Queue cleared.",
+  "QueueAlreadyClosed": "Queue is already closed.",
+  "QueueClosed": "Queue is now closed.",
+  "QueueAlreadyOpen": "Queue is already open.",
+  "QueueOpen": "Queue is now open.",
+  "SorryQueueIsClosed": "Sorry, the request queue is closed."
 }

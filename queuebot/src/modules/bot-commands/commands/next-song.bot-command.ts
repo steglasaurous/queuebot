@@ -44,7 +44,7 @@ export class NextSongBotCommand implements BotCommandInterface {
         ),
       );
 
-      return Promise.resolve();
+      return;
     }
 
     await chatMessage.client.sendMessage(
@@ -56,7 +56,7 @@ export class NextSongBotCommand implements BotCommandInterface {
       ),
     );
 
-    return Promise.resolve();
+    return;
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {

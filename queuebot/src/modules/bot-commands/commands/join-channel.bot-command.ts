@@ -43,6 +43,7 @@ export class JoinChannelBotCommand implements BotCommandInterface {
     channelNameEntity.inChannel = true;
     channelNameEntity.enabled = true;
     channelNameEntity.joinedOn = new Date();
+    channelNameEntity.queueOpen = true;
     channelNameEntity.game = await this.gameRepository.findOneBy({
       name: 'audio_trip',
     }); // FIXME: Replace this with game detection.

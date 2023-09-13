@@ -42,7 +42,9 @@ export class QueueBotCommand implements BotCommandInterface {
     }
 
     for (let i = 0; i < requestCountLimit; i++) {
-      output += '#' + (i + 1) + ' ' + songRequests[i].song.title + ' ';
+      output += `#${i + 1} ${songRequests[i].song.title} - ${
+        songRequests[i].song.artist
+      } (${songRequests[i].song.mapper}) `;
     }
 
     if (songRequests.length > requestCountLimit) {

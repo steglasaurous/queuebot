@@ -1,48 +1,59 @@
 import { BotCommandInterface } from './bot-command.interface';
+import { ChatMessage } from '../../chat/services/chat-message';
+import { I18nService } from 'nestjs-i18n';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
-import { I18nService } from 'nestjs-i18n';
 import { MessageFormatterService } from '../services/message-formatter.service';
-import { ChatMessage } from '../../chat/services/chat-message';
+import { SongRequestService } from '../../song-request/services/song-request.service';
 
 @Injectable()
-export class OnBotCommand implements BotCommandInterface {
+export class CloseBotCommand implements BotCommandInterface {
   constructor(
-    @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
-    private messageFormatter: MessageFormatterService,
+    @InjectRepository(Channel) private channelRepository: Repository<Channel>,
+    private messageFormatterService: MessageFormatterService,
   ) {}
-
   async execute(chatMessage: ChatMessage): Promise<void> {
-    // Only broadcaster and mods can use this.
+    // Only broadcasters and mods should be allowed to do this.
     if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
       return;
     }
 
+    // Mark the channel that we're not to join it again (until asked to do so).
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });
-    if (channel.enabled) {
+    if (!channel.enabled) {
+      return;
+    }
+
+    if (channel.queueOpen == false) {
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.messageFormatter.formatMessage(this.i18n.t('chat.AlreadyOn')),
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.QueueAlreadyClosed'),
+        ),
       );
       return;
     }
 
-    channel.enabled = true;
-
+    channel.queueOpen = false;
     await this.channelRepository.save(channel);
+
     await chatMessage.client.sendMessage(
       chatMessage.channelName,
-      this.messageFormatter.formatMessage(this.i18n.t('chat.BotIsOn')),
+      this.messageFormatterService.formatMessage(
+        this.i18n.t('chat.QueueClosed'),
+      ),
     );
+
+    // Done.
     return;
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!requestobot on');
+    return chatMessage.message.toLowerCase().startsWith('!close');
   }
 }

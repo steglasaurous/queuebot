@@ -19,6 +19,9 @@ import { SetGameBotCommand } from './commands/set-game.bot-command';
 import { HttpModule } from '@nestjs/axios';
 import { OffBotCommand } from './commands/off.bot.command';
 import { OnBotCommand } from './commands/on.bot-command';
+import { ClearBotCommand } from './commands/clear.bot-command';
+import { OpenBotCommand } from './commands/open.bot-command';
+import { CloseBotCommand } from './commands/close.bot-command';
 
 @Module({
   imports: [
@@ -44,6 +47,11 @@ import { OnBotCommand } from './commands/on.bot-command';
     OopsBotCommand,
     GetOutBotCommand,
     SetGameBotCommand,
+    OffBotCommand,
+    OnBotCommand,
+    ClearBotCommand,
+    OpenBotCommand,
+    CloseBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -56,6 +64,9 @@ import { OnBotCommand } from './commands/on.bot-command';
         SetGameBotCommand,
         OffBotCommand,
         OnBotCommand,
+        ClearBotCommand,
+        OpenBotCommand,
+        CloseBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -67,6 +78,9 @@ import { OnBotCommand } from './commands/on.bot-command';
         setGameBotCommand: SetGameBotCommand,
         offBotCommand: OffBotCommand,
         onBotCommand: OnBotCommand,
+        clearBotCommand: ClearBotCommand,
+        openBotCommand: OpenBotCommand,
+        closeBotCommand: CloseBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -78,6 +92,9 @@ import { OnBotCommand } from './commands/on.bot-command';
           setGameBotCommand,
           offBotCommand,
           onBotCommand,
+          clearBotCommand,
+          openBotCommand,
+          closeBotCommand,
         ];
       },
     },

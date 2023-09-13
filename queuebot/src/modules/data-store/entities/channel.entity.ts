@@ -26,6 +26,9 @@ export class Channel {
   @Column()
   joinedOn: Date;
 
+  @Column({ default: true })
+  queueOpen: boolean;
+
   /**
    * When the bot was last asked to leave via !getout
    */

@@ -3,28 +3,57 @@ import { Song } from '../../../data-store/entities/song.entity';
 import { Game } from '../../../data-store/entities/game.entity';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class SpinRhythmSearchStrategy implements SongSearchStrategyInterface {
+  private logger: Logger = new Logger(this.constructor.name);
   constructor(private readonly httpService: HttpService) {}
 
   async search(game: Game, query: string): Promise<Song[]> {
     // If we get a number, we can interpret as a search by id and just use that directly.
     // Otherwise, fallback to standard search.
-    if (query.match(/^[0-9]*$/)) {
+    // Check for a full spinshare URL and pull out the id if the user pasted in a URL
+    let songId: string = '';
+
+    this.logger.debug('Spin search', { query: query });
+
+    const spinshareUrlMatch = query.match(/spinsha\.re\/song\/([0-9]*)$/);
+    this.logger.debug('spinshareUrlMatch', spinshareUrlMatch);
+    if (spinshareUrlMatch) {
+      songId = spinshareUrlMatch[1];
+    }
+    const idMatch = query.match(/^[0-9]*$/);
+    this.logger.debug('idMatch', idMatch);
+    if (idMatch) {
+      songId = idMatch[0];
+    }
+
+    if (songId != '') {
+      this.logger.debug('Getting specific song from spinshare', {
+        songId: songId,
+      });
       const songIdResult = await firstValueFrom(
-        this.httpService.get('https://spinsha.re/api/song/' + query),
+        this.httpService.get('https://spinsha.re/api/song/' + songId),
       );
       if (songIdResult.data.data) {
         return [this.getSongFromData(game, songIdResult.data.data)];
+      } else {
+        return [];
       }
     }
+
+    this.logger.debug('Querying spinshare', { query: query });
+
     const result = await firstValueFrom(
       this.httpService.post('https://spinsha.re/api/searchCharts', {
         searchQuery: query,
       }),
     );
+    this.logger.debug('spinshare result', {
+      resultStatus: result.status,
+      data: result.data,
+    });
     // Parse results, but get about 10 results.  Don't try to boil the ocean.
     return result.data.data.map((resultItem) => {
       // No bpm or duration - future consideration: Pull down the song in a separate async process and pick it out of the song itself?

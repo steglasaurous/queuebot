@@ -102,4 +102,8 @@ export class SongRequestService {
 
     return;
   }
+
+  async clearAllRequests(channel: Channel) {
+    await this.songRequestRepository.delete({ channel: channel });
+  }
 }

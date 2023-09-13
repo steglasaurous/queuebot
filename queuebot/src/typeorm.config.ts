@@ -12,6 +12,7 @@ import { Migration1694279063189 } from '../migrations/1694279063189-migration';
 import { Migration1694283902832 } from '../migrations/1694283902832-migration';
 import { Migration1694473306655 } from '../migrations/1694473306655-migration';
 import { Migration1694525381985 } from '../migrations/1694525381985-migration';
+import { Migration1694645009778 } from '../migrations/1694645009778-migration';
 
 export default new DataSource({
   type: 'sqlite',
@@ -24,5 +25,6 @@ export default new DataSource({
     Migration1694283902832,
     Migration1694473306655,
     Migration1694525381985,
+    Migration1694645009778,
   ],
 });

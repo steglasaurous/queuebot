@@ -11,6 +11,7 @@ import { SongRequestService } from '../../song-request/services/song-request.ser
 import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 import { Song } from '../../data-store/entities/song.entity';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { Game } from '../../data-store/entities/game.entity';
 // import { I18nTranslations } from '../../../generated/i18n.generated';
 
 export class SongRequestBotCommand implements BotCommandInterface {
@@ -61,9 +62,37 @@ export class SongRequestBotCommand implements BotCommandInterface {
     // a new request.
 
     // New request.
-    const searchTerms = chatMessage?.message.substring(
-      chatMessage?.message.indexOf(' ') + 1,
-    );
+    if (chatMessage.message.indexOf(' ') == -1) {
+      // No search term.  Display help.
+      if (channel.game) {
+        await chatMessage.client.sendMessage(
+          chatMessage.channelName,
+          this.messageFormatterService.formatMessage(
+            this.i18n.t(this.getHelpMessageTranslationKey(channel.game)),
+          ),
+        );
+        return;
+      }
+    }
+
+    // If the queue is closed, let them know and stop.
+    if (
+      !channel.queueOpen &&
+      !chatMessage.userIsBroadcaster &&
+      !chatMessage.userIsMod
+    ) {
+      await chatMessage.client.sendMessage(
+        chatMessage.channelName,
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.SorryQueueIsClosed'),
+        ),
+      );
+      return;
+    }
+
+    const searchTerms = chatMessage.message
+      .trim()
+      .substring(chatMessage.message.indexOf(' ') + 1);
 
     const searchSongNumberResult = searchTerms.match(/^#(?<songNumber>[0-9]?)/);
     if (searchSongNumberResult && userBotState.state) {
@@ -124,7 +153,9 @@ export class SongRequestBotCommand implements BotCommandInterface {
         songLimit = searchResults.length;
       }
       for (let i = 0; i < songLimit; i++) {
-        outputMessage += '#' + (i + 1) + ' ' + searchResults[i].title + ' ';
+        outputMessage += `#${i + 1} ${searchResults[i].title} - ${
+          searchResults[i].artist
+        } (${searchResults[i].mapper}) `;
       }
       if (searchResults.length > songLimit) {
         outputMessage += this.i18n.t('chat.AndMore', {
@@ -148,7 +179,13 @@ export class SongRequestBotCommand implements BotCommandInterface {
     const cleanedChatMessage = chatMessage.message.toLowerCase();
 
     this.requestTriggers.forEach((requestTrigger) => {
-      if (cleanedChatMessage.startsWith(requestTrigger)) {
+      // We intentionally look for a space after the command so it doesn't accidentially match other commands like
+      // !requestobot on
+      // We also test for an exact match, which is an opportunity to show some help.
+      if (
+        cleanedChatMessage.startsWith(requestTrigger + ' ') ||
+        cleanedChatMessage == requestTrigger
+      ) {
         result = true;
       }
     });
@@ -207,5 +244,9 @@ export class SongRequestBotCommand implements BotCommandInterface {
     );
 
     return Promise.resolve();
+  }
+
+  private getHelpMessageTranslationKey(game: Game) {
+    return 'chat.RequestHelp_' + game.name;
   }
 }
