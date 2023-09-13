@@ -18,6 +18,10 @@ export class QueueBotCommand implements BotCommandInterface {
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });
+    if (!channel.enabled) {
+      return; // We've been told to turn off. Don't do anything.
+    }
+
     const songRequests = await this.songRequestService.getAllRequests(channel);
     if (songRequests.length == 0) {
       await chatMessage.client.sendMessage(

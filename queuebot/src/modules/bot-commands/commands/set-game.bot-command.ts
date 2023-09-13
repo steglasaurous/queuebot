@@ -25,6 +25,9 @@ export class SetGameBotCommand implements BotCommandInterface {
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });
+    if (!channel.enabled) {
+      return; // We've been told to turn off. Don't do anything.
+    }
 
     // Try to find the game specified.
     const inputGameName = chatMessage.message

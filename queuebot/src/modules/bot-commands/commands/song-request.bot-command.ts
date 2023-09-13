@@ -47,6 +47,10 @@ export class SongRequestBotCommand implements BotCommandInterface {
       return;
     }
 
+    if (!channel.enabled) {
+      return; // We've been told to turn off. Don't do anything.
+    }
+
     // Load bot state for this user, if any.
     const userBotState = await this.botStateService.getState(
       chatMessage.username,

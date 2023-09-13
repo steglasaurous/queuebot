@@ -23,6 +23,10 @@ export class NextSongBotCommand implements BotCommandInterface {
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });
+
+    if (!channel.enabled) {
+      return; // We've been told to turn off. Don't do anything.
+    }
     const nextRequest = await this.songRequestService.getNextRequest(channel);
     if (nextRequest) {
       await chatMessage.client.sendMessage(

@@ -1,53 +1,47 @@
 import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
-import { SongRequestService } from '../../song-request/services/song-request.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { Injectable } from '@nestjs/common';
 
-export class OopsBotCommand implements BotCommandInterface {
+@Injectable()
+export class OffBotCommand implements BotCommandInterface {
   constructor(
-    private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
-    private messageFormatterService: MessageFormatterService,
+    private messageFormatter: MessageFormatterService,
   ) {}
   async execute(chatMessage: ChatMessage): Promise<void> {
+    // Only broadcaster and mods can use this.
+    if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
+      return;
+    }
+
     const channel = await this.channelRepository.findOneBy({
       channelName: chatMessage.channelName,
     });
     if (!channel.enabled) {
-      return; // We've been told to turn off. Don't do anything.
-    }
-
-    // Find the most recent request this user made on this channel, and remove it.
-    const songRequest = await this.songRequestService.removeMostRecentRequest(
-      channel,
-      chatMessage.username,
-    );
-    if (songRequest) {
+      // It's already disabled.  Let the user know.
       await chatMessage.client.sendMessage(
         chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.RequestRemoved', {
-            args: { title: songRequest.song.title },
-          }),
-        ),
+        this.messageFormatter.formatMessage(this.i18n.t('chat.AlreadyOff')),
       );
       return;
     }
 
+    channel.enabled = false;
+    await this.channelRepository.save(channel);
     await chatMessage.client.sendMessage(
       chatMessage.channelName,
-      this.messageFormatterService.formatMessage(
-        this.i18n.t('chat.NoUserSongRequestToRemove'),
-      ),
+      this.messageFormatter.formatMessage(this.i18n.t('chat.BotIsOff')),
     );
+    return;
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!oops');
+    return chatMessage.message.toLowerCase().startsWith('!requestobot off');
   }
 }

@@ -17,6 +17,8 @@ import { GetOutBotCommand } from './commands/get-out.bot-command';
 import { MessageFormatterService } from './services/message-formatter.service';
 import { SetGameBotCommand } from './commands/set-game.bot-command';
 import { HttpModule } from '@nestjs/axios';
+import { OffBotCommand } from './commands/off.bot.command';
+import { OnBotCommand } from './commands/on.bot-command';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { HttpModule } from '@nestjs/axios';
         OopsBotCommand,
         GetOutBotCommand,
         SetGameBotCommand,
+        OffBotCommand,
+        OnBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -61,6 +65,8 @@ import { HttpModule } from '@nestjs/axios';
         oopsBotCommand: OopsBotCommand,
         getOutBotCommand: GetOutBotCommand,
         setGameBotCommand: SetGameBotCommand,
+        offBotCommand: OffBotCommand,
+        onBotCommand: OnBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -70,6 +76,8 @@ import { HttpModule } from '@nestjs/axios';
           oopsBotCommand,
           getOutBotCommand,
           setGameBotCommand,
+          offBotCommand,
+          onBotCommand,
         ];
       },
     },

@@ -16,5 +16,9 @@
   "NoGameSpecified": "You must specify a game when using !setgame.",
   "MatchedTooManyGames": "Matched too many games, please narrow down your game name.",
   "UnsupportedGame": "Game is unsupported.",
-  "GameChanged": "Game changed to {gameName}."
+  "GameChanged": "Game changed to {gameName}.",
+  "AlreadyOff": "Requestobot is already off.  Use !requestobot on to turn it back on.",
+  "BotIsOff": "Requestobot is now off.  Use !requestobot on to turn it back on.",
+  "AlreadyOn": "Requestobot is already on.  Use !requestobot off to turn it off.",
+  "BotIsOn": "Requestobot is now on.  Use !setgame to set which game you want to offer requests for, and !requestobot off to turn it off."
 }
