@@ -8,6 +8,34 @@ request system.
 1. Goto https://twitch.tv/requestobot, click on "Chat", then type `!join` to have the bot join your channel.
 2. Commands and info on how to use the bot are detailed on the requestobot's about page.  You can find that [here](https://www.twitch.tv/requestobot/about). 
 
+## Command List
+
+**!setgame** - Set the game the bot should search requests with.  This would be the game name similar to how you'd see it on Twitch.  Examples: **!setgame audio trip**, **!setgame spin rhythm xd**
+
+**!req** - Add a song request to the queue.  Use the song title to request a song.  If more than one song matches, you will be presented with a list of matches, and can respond with **!req #1** to select the first song, **!req #2** to select the second song, etc.
+
+Also note using **!req** on its own will show instructions on how to request songs, and where to find songs for the current game.
+
+**!oops** - Requested the wrong song?  This removes the last song request you made.
+
+**!nextsong** - For broadcaster and mods only.  Takes the next song off the top of the request queue and posts it to chat.  This removes the song from the request queue.
+
+**!queue** - Shows the list of songs in the queue.  If the queue is too long, only the top 5 songs are shown, with a count of how many additional songs there are.
+
+**!clear** - For broadcasters and mods only.  This completely clears the request queue.
+
+**!close** - Close the queue from requests so viewers cannot add new requests to the queue. Note that the broadcaster and mods can still add requests even if it's closed.
+
+**!open** - Open the queue for requests from anyone.
+
+**!requestobot off** - This turns off all commands until you turn them back on with **!requestobot on**.  This is a way of disabling the bot without removing it from your channel.
+
+**!requestobot on** - Enable the bot to respond to commands in your channel.
+
+**!getout** - Broadcaster and mods only. Have requestobot leave your channel.  Once left, commands will not work until you invite the bot into your channel again.
+
+
+
 ## Feature Requests and Bugs
 
 If you have feature requests, would like to see the bot do something differently, or want to file a bug report, please
