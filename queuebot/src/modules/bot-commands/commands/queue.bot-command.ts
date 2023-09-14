@@ -6,8 +6,10 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { Logger } from '@nestjs/common';
 
 export class QueueBotCommand implements BotCommandInterface {
+  private logger: Logger = new Logger(this.constructor.name);
   constructor(
     private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
@@ -40,7 +42,10 @@ export class QueueBotCommand implements BotCommandInterface {
     if (songRequests.length < 5) {
       requestCountLimit = songRequests.length;
     }
-
+    this.logger.debug('!queue', {
+      songRequests: songRequests,
+      requestCountLimit: requestCountLimit,
+    });
     for (let i = 0; i < requestCountLimit; i++) {
       output += `#${i + 1} ${songRequests[i].song.title} - ${
         songRequests[i].song.artist

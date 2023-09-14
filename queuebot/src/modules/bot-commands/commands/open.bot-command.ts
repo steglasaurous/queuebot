@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { MessageFormatterService } from '../services/message-formatter.service';
-import { SongRequestService } from '../../song-request/services/song-request.service';
 
 @Injectable()
 export class OpenBotCommand implements BotCommandInterface {
@@ -52,6 +51,6 @@ export class OpenBotCommand implements BotCommandInterface {
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!close');
+    return chatMessage.message.toLowerCase().startsWith('!open');
   }
 }
