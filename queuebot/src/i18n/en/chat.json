@@ -28,5 +28,6 @@
   "QueueClosed": "Queue is now closed.",
   "QueueAlreadyOpen": "Queue is already open.",
   "QueueOpen": "Queue is now open.",
-  "SorryQueueIsClosed": "Sorry, the request queue is closed."
+  "SorryQueueIsClosed": "Sorry, the request queue is closed.",
+  "SearchErrorTryAgain": "Sorry, a search error occurred.  Please try your request again."
 }

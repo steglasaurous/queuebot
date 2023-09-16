@@ -54,6 +54,16 @@ export class SpinRhythmSearchStrategy implements SongSearchStrategyInterface {
       resultStatus: result.status,
       data: result.data,
     });
+
+    if (result.status > 399) {
+      // Something went wrong.  Throw an error so the caller can catch it and handle accordingly.
+      throw new Error(
+        JSON.stringify({
+          status: result.status,
+          statusText: result.statusText,
+        }),
+      );
+    }
     // Parse results, but get about 10 results.  Don't try to boil the ocean.
     return result.data.data.map((resultItem) => {
       // No bpm or duration - future consideration: Pull down the song in a separate async process and pick it out of the song itself?

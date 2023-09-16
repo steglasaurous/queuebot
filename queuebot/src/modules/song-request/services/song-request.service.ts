@@ -23,7 +23,7 @@ export class SongRequestService {
     requesterName: string,
   ): Promise<SongRequestResponse> {
     return new Promise<SongRequestResponse>(async (resolve) => {
-      let savedSong;
+      let savedSong: Song;
       if (!song.id) {
         // If the song hasn't been persisted to database, do that first.
         savedSong = await this.songService.saveSong(
