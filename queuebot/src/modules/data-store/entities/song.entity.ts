@@ -24,6 +24,10 @@ export class Song {
   duration?: number;
   @Column({ nullable: true })
   bpm?: number;
+
+  @Column({ nullable: true })
+  downloadUrl?: string;
+
   @ManyToOne(() => Game, (game) => game.songs)
   game: Game;
 

@@ -7,6 +7,10 @@ import { Channel } from '../../data-store/entities/channel.entity';
 import { SongRequestResponse } from '../models/song-request-response.interface';
 import { SongRequestErrorType } from '../models/song-request-error-type.enum';
 import { SongService } from '../../song-store/services/song.service';
+import {EventEmitter2} from "@nestjs/event-emitter";
+import {SongRequestAddedEvent} from "../events/song-request-added.event";
+import {SongRequestRemovedEvent} from "../events/song-request-removed.event";
+import {SongRequestQueueClearedEvent} from "../events/song-request-queue-cleared.event";
 
 @Injectable()
 export class SongRequestService {
@@ -15,6 +19,7 @@ export class SongRequestService {
     @InjectRepository(SongRequest)
     private songRequestRepository: Repository<SongRequest>,
     private songService: SongService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async addRequest(
@@ -48,7 +53,8 @@ export class SongRequestService {
       songRequest.channel = channel;
 
       try {
-        await this.songRequestRepository.save(songRequest);
+        const savedSongRequest = await this.songRequestRepository.save(songRequest);
+        this.eventEmitter.emit(SongRequestAddedEvent.name, { songRequest: savedSongRequest});
         resolve({ success: true });
       } catch (error) {
         let errorType = SongRequestErrorType.SERVER_ERROR;
@@ -76,7 +82,7 @@ export class SongRequestService {
     }
 
     await this.songRequestRepository.remove(nextRequest);
-
+    this.eventEmitter.emit(SongRequestRemovedEvent.name, { songRequest: nextRequest});
     return nextRequest;
   }
 
@@ -97,6 +103,7 @@ export class SongRequestService {
     });
     if (mostRecentRequest) {
       await this.songRequestRepository.remove(mostRecentRequest);
+      this.eventEmitter.emit(SongRequestRemovedEvent.name, { songRequest: mostRecentRequest});
       return mostRecentRequest;
     }
 
@@ -105,5 +112,6 @@ export class SongRequestService {
 
   async clearAllRequests(channel: Channel) {
     await this.songRequestRepository.delete({ channel: channel });
+    this.eventEmitter.emit(SongRequestQueueClearedEvent.name);
   }
 }
