@@ -116,13 +116,27 @@ export class SongRequestBotCommand implements BotCommandInterface {
         ),
       );
 
-      return Promise.resolve();
+      return;
     }
 
-    const searchResults = await this.songService.searchSongs(
-      searchTerms,
-      channel.game,
-    );
+    let searchResults: Song[];
+    try {
+      searchResults = await this.songService.searchSongs(
+        searchTerms,
+        channel.game,
+      );
+    } catch (err) {
+      this.logger.warn('searchSongs returned an error', err);
+
+      // Let the user know something borked and try again.
+      await chatMessage.client.sendMessage(
+        chatMessage.channelName,
+        this.messageFormatterService.formatMessage(
+          this.i18n.t('chat.SearchErrorTryAgain', { lang: channel.lang }),
+        ),
+      );
+      return;
+    }
 
     if (searchResults.length < 1) {
       await chatMessage.client.sendMessage(
@@ -132,7 +146,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
         ),
       );
 
-      return Promise.resolve();
+      return;
     }
 
     if (searchResults.length == 1) {
@@ -168,10 +182,10 @@ export class SongRequestBotCommand implements BotCommandInterface {
         this.messageFormatterService.formatMessage(outputMessage),
       );
 
-      return Promise.resolve();
+      return;
     }
 
-    return Promise.resolve();
+    return;
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {
@@ -214,7 +228,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
             }),
           ),
         );
-        return Promise.resolve();
+        return;
       } else {
         await chatMessage.client.sendMessage(
           chatMessage.channelName,
@@ -226,7 +240,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
             }),
           ),
         );
-        return Promise.resolve();
+        return;
       }
     }
 
@@ -243,7 +257,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
       ),
     );
 
-    return Promise.resolve();
+    return;
   }
 
   private getHelpMessageTranslationKey(game: Game) {
