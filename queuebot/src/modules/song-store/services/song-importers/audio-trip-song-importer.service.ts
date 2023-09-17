@@ -35,10 +35,16 @@ export class AudioTripSongImporterService implements SongImporter {
               lineSkipped = true;
             } else {
               this.songService.saveSong(
-                game,
-                row.Title,
-                row.Artists,
-                row.Mapper,
+                this.songService.createSongEntity(
+                  game,
+                  row.Title,
+                  row.Artists,
+                  row.Mapper,
+                  undefined,
+                  row['GET ALL'],
+                  parseInt(row.BPM) > 0 ? parseInt(row.BPM) : undefined,
+                  undefined, // FIXME: Need to convert this from time format to seconds.
+                ),
               );
             }
           });

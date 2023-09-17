@@ -36,6 +36,8 @@ export class SpinRhythmSearchStrategy implements SongSearchStrategyInterface {
       const songIdResult = await firstValueFrom(
         this.httpService.get('https://spinsha.re/api/song/' + songId),
       );
+      // FIXME: Apparently this can come back with an empty response or something that makes it try to insert an empty song?
+      // Try with example: !req 1
       if (songIdResult.data.data) {
         return [this.getSongFromData(game, songIdResult.data.data)];
       } else {
@@ -82,6 +84,9 @@ export class SpinRhythmSearchStrategy implements SongSearchStrategyInterface {
     song.title = data.title;
     song.artist = data.artist;
     song.mapper = data.charter;
+    song.downloadUrl = data.zip;
+
+    this.logger.log('Song object', JSON.stringify(song));
 
     return song;
   }
