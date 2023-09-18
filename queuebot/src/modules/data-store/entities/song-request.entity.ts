@@ -21,6 +21,6 @@ export class SongRequest {
   requestTimestamp: number;
   @Column()
   requestOrder: number;
-  @ManyToOne(() => Channel, (channel) => channel.requests)
+  @ManyToOne(() => Channel, (channel) => channel.requests, { eager: true })
   channel: Channel;
 }

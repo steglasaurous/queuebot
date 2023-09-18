@@ -29,14 +29,17 @@ export class SongService {
 
     return [];
   }
-  async saveSong(
+
+  createSongEntity(
     game: Game,
     title: string,
     artist: string,
     mapper: string,
     hash?: string,
-  ): Promise<Song> {
-    // If there's no hash, generate it first.  That's how we determine if we already have the song.
+    downloadUrl?: string,
+    bpm?: number,
+    duration?: number,
+  ): Song {
     if (!hash) {
       hash = crypto
         .createHash('sha256')
@@ -44,29 +47,46 @@ export class SongService {
         .digest('hex');
     }
 
-    // Because this all happens asyncronously, we can have a shitload of inserts happening
+    const song = new Song();
+    song.game = game;
+    song.songHash = hash;
+    song.artist = artist;
+    song.title = title;
+    song.mapper = mapper;
+    song.downloadUrl = downloadUrl;
+    song.bpm = bpm;
+    song.duration = duration;
+
+    return song;
+  }
+
+  async saveSong(song: Song): Promise<Song> {
+    // Because this all happens asynchronously, we can have a shitload of inserts happening
     // all at once.  This helps to deal with dupes within the dataset itself (of which do exist in sources like
     // the audio trip spreadsheet.
-    if (this.hashes.includes(hash)) {
+    if (this.hashes.includes(song.songHash)) {
       return;
     }
 
-    this.hashes.push(hash);
+    this.hashes.push(song.songHash);
 
-    let song: Song;
-    song = await this.songRepository.findOneBy({ songHash: hash });
+    const existingSong = await this.songRepository.findOneBy({
+      game: song.game,
+      songHash: song.songHash,
+    });
 
-    if (!song) {
-      song = new Song();
-      song.game = game;
-      song.songHash = hash;
-      song.artist = artist;
-      song.title = title;
-      song.mapper = mapper;
+    if (existingSong) {
+      // Do an update on this.
+      existingSong.title = song.title;
+      existingSong.artist = song.artist;
+      existingSong.mapper = song.mapper;
+      existingSong.downloadUrl = song.downloadUrl;
+      existingSong.bpm = song.bpm;
+      existingSong.duration = song.duration;
 
-      song = await this.songRepository.save(song);
+      return await this.songRepository.save(existingSong);
     }
 
-    return song;
+    return await this.songRepository.save(song);
   }
 }
