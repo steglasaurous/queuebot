@@ -7,4 +7,5 @@ export class SongDto {
   duration?: number;
   bpm?: number;
   downloadUrl?: string;
+  gameName: string;
 }

@@ -172,6 +172,7 @@ export class QueueGateway
     songDto.bpm = songRequest.song.bpm;
     songDto.duration = songRequest.song.duration;
     songDto.downloadUrl = songRequest.song.downloadUrl;
+    songDto.gameName = songRequest.song.game.name;
 
     const songRequestDto = new SongRequestDto();
     songRequestDto.id = songRequest.id;
