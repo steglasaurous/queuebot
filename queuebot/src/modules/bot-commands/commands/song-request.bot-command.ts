@@ -92,7 +92,8 @@ export class SongRequestBotCommand implements BotCommandInterface {
 
     const searchTerms = chatMessage.message
       .trim()
-      .substring(chatMessage.message.indexOf(' ') + 1);
+      .substring(chatMessage.message.indexOf(' ') + 1)
+      .trim();
 
     const searchSongNumberResult = searchTerms.match(/^#(?<songNumber>[0-9]?)/);
     if (searchSongNumberResult && userBotState.state) {
