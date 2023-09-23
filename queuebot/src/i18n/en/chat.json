@@ -3,6 +3,7 @@
   "JoinedChannel": "Join channel #{channelName}. Enjoy!",
   "HelloChannel": "Requestobot ready for action.",
   "SongAlreadyInQueue": "Song is already in queue.",
+  "SongAlreadyPlayed": "Song has already been played.",
   "SongRequestFailed": "Requestobot error while attempting to add song to queue.",
   "SongAddedToQueue": "{title} added to the queue.",
   "SelectSong": "Select song with !req #: ",

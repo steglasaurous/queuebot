@@ -230,6 +230,19 @@ export class SongRequestBotCommand implements BotCommandInterface {
           ),
         );
         return;
+      } else if (
+        requestResult.errorType == SongRequestErrorType.ALREADY_PLAYED
+      ) {
+        await chatMessage.client.sendMessage(
+          chatMessage.channelName,
+          this.messageFormatterService.formatMessage(
+            this.i18n.t('chat.SongAlreadyPlayed', {
+              lang: channel.lang,
+              defaultValue: 'Song has already been played.',
+            }),
+          ),
+        );
+        return;
       } else {
         await chatMessage.client.sendMessage(
           chatMessage.channelName,

@@ -29,6 +29,12 @@ export class SongRequest {
   @Column()
   requestOrder: number;
 
+  @Column({ default: false })
+  isActive: boolean;
+
+  @Column({ default: false })
+  isDone: boolean;
+
   @ManyToOne(() => Channel, (channel) => channel.requests, {
     eager: true,
     nullable: false,

@@ -7,6 +7,7 @@ export type I18nTranslations = {
         "JoinedChannel": string;
         "HelloChannel": string;
         "SongAlreadyInQueue": string;
+        "SongAlreadyPlayed": string;
         "SongRequestFailed": string;
         "SongAddedToQueue": string;
         "SelectSong": string;
