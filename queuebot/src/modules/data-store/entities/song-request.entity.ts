@@ -13,14 +13,25 @@ import {
 export class SongRequest {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Song, (song) => song.requests, { eager: true })
+
+  @ManyToOne(() => Song, (song) => song.requests, {
+    eager: true,
+    nullable: false,
+  })
   song: Song;
+
   @Column()
   requesterName: string;
+
   @Column()
   requestTimestamp: number;
+
   @Column()
   requestOrder: number;
-  @ManyToOne(() => Channel, (channel) => channel.requests, { eager: true })
+
+  @ManyToOne(() => Channel, (channel) => channel.requests, {
+    eager: true,
+    nullable: false,
+  })
   channel: Channel;
 }

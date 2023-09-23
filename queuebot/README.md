@@ -1,27 +1,26 @@
 # Todo
-
-- [x] For multiple search results, include artist and mapper
-- [ ] Add !clear to clean out the queue
-- [ ] !remove (song #) 
+- [ ] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
+- [ ] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
+- [ ] !remove (song #)
 - [ ] Clear out queue when switching games.
-- [ ] Add !open to open queue, !close to close queue, display appropriate message for requesters when queue is closed.
-- [x] Create docker container config
-- [x] Implement !getout to kick the bot out (or similar command)
-- [ ] Add twitch game detection to set game to search in
-- [x] !oops - Remove last song requested by user
-- [x] !nextsong - Pop the newest song off the queue
-- [x] Implement proper ordering of the queue
-- [x] !queue - List songs in queue
 - [ ] !top - Move song to the top of the queue - use title? song position? Or move last added song?
-- [x] Create a dedicated queuebot twitch account
 - [ ] !rollback - put the last song that was popped off the queue back on top
 - [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
 - [ ] Add queue controls to web client
 - [ ] Allow adding songs via client?
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc.
-- [x] Load up entries for Audio Trip OSTs
 
-- [ ] Apparently krishna appears twice
+- [x] For multiple search results, include artist and mapper
+- [x] Add !clear to clean out the queue
+- [x] Add !open to open queue, !close to close queue, display appropriate message for requesters when queue is closed.
+- [x] Create docker container config
+- [x] Implement !getout to kick the bot out (or similar command)
+- [x] !oops - Remove last song requested by user
+- [x] !nextsong - Pop the newest song off the queue
+- [x] Implement proper ordering of the queue
+- [x] !queue - List songs in queue
+- [x] Create a dedicated queuebot twitch account
+- [x] Load up entries for Audio Trip OSTs
 - [x] Look into why database wasn't persisted between rebuilds (docker volume)
 - [x] Add exclamation in front of all messages so TTS doesn't read them by default.
 
@@ -102,21 +101,3 @@ orderChange
 "id": 123,
 "requestOrder": 2
 ```
-
-- Implement as simple websocket?  Would be most compatible, as opposed to socket.io which requires socket.io to talk to it.  Plus I don't need the additional capabilities of socket.io here
-
-modules/song-request/events/
-- song-request-added.event.ts
-- song-request-removed.event.ts
-- song-request-order-changed.event.ts
-- song-request-queue-cleared.event.ts
-
-modules/websocket/
-  - events/
-  - gateways/queue.gateway.ts
-    - onConnect()
-    - handleSongRequestAdded()
-    - handleSongRequestRemoved()
-    - handleSongRequestOrderChanged()
-    - handleSongRequestQueueCleared()
-
