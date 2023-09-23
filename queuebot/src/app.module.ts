@@ -12,6 +12,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { SongRequestModule } from './modules/song-request/song-request.module';
 import { WebsocketModule } from './modules/websocket/websocket.module';
+import { ApiModule } from './modules/api/api.module';
 import * as path from 'path';
 
 @Module({
@@ -46,6 +47,7 @@ import * as path from 'path';
     }),
     SongRequestModule,
     WebsocketModule,
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

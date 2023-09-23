@@ -28,7 +28,7 @@ export class Song {
   @Column({ nullable: true })
   downloadUrl?: string;
 
-  @ManyToOne(() => Game, (game) => game.songs)
+  @ManyToOne(() => Game, (game) => game.songs, { eager: true })
   game: Game;
 
   @OneToMany(() => SongRequest, (songRequest) => songRequest.song)
