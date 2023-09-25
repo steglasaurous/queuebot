@@ -18,7 +18,7 @@ import { QueueDto } from '../../data-store/dto/queue.dto';
 import { SongRequestDto } from '../../data-store/dto/song-request.dto';
 import { OnEvent } from '@nestjs/event-emitter';
 import { SongRequestAddedEvent } from '../../song-request/events/song-request-added.event';
-import { DtoMappingService } from '../../data-store/services/dto-mapping/dto-mapping.service';
+import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
 
 @WebSocketGateway({})
 export class QueueGateway

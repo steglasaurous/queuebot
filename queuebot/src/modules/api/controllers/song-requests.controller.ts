@@ -10,7 +10,7 @@ import { SongRequestService } from '../../song-request/services/song-request.ser
 import { Repository } from 'typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DtoMappingService } from '../../data-store/services/dto-mapping/dto-mapping.service';
+import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
 import { SongRequestDto } from '../../data-store/dto/song-request.dto';
 
 @Controller('api/channels/:channelName/song-requests')

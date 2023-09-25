@@ -36,6 +36,7 @@ export class SongRequestService {
       } else {
         savedSong = song;
       }
+      this.logger.log('savedSong', JSON.stringify(savedSong));
 
       const songRequest = new SongRequest();
       songRequest.song = savedSong;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { SongRequest } from '../../entities/song-request.entity';
-import { SongRequestDto } from '../../dto/song-request.dto';
-import { SongDto } from '../../dto/song.dto';
+import { SongRequest } from '../entities/song-request.entity';
+import { SongRequestDto } from '../dto/song-request.dto';
+import { SongDto } from '../dto/song.dto';
 
 @Injectable()
 export class DtoMappingService {

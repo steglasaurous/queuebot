@@ -5,13 +5,14 @@ import { Game } from './entities/game.entity';
 import { Song } from './entities/song.entity';
 import { SongRequest } from './entities/song-request.entity';
 import { UserBotState } from './entities/user-bot-state.entity';
-import { DtoMappingService } from './services/dto-mapping/dto-mapping.service';
+import { DtoMappingService } from './services/dto-mapping.service';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Channel, Game, Song, SongRequest, UserBotState]),
   ],
-  exports: [TypeOrmModule, DtoMappingService],
-  providers: [DtoMappingService],
+  exports: [TypeOrmModule, DtoMappingService, UserService],
+  providers: [DtoMappingService, UserService],
 })
 export class DataStoreModule {}
