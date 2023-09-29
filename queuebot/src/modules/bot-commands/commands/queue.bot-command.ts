@@ -7,33 +7,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { Logger } from '@nestjs/common';
+import { BaseBotCommand } from './base.bot-command';
 
-export class QueueBotCommand implements BotCommandInterface {
+export class QueueBotCommand extends BaseBotCommand {
   private logger: Logger = new Logger(this.constructor.name);
   constructor(
     private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
     private messageFormatterService: MessageFormatterService,
-  ) {}
-  async execute(chatMessage: ChatMessage): Promise<void> {
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
-    if (!channel.enabled) {
-      return; // We've been told to turn off. Don't do anything.
-    }
-
+  ) {
+    super();
+    this.triggers = ['!queue'];
+  }
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     const songRequests = await this.songRequestService.getAllRequests(channel);
     if (songRequests.length == 0) {
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.QueueEmpty', { lang: channel.lang }),
-        ),
-      );
-
-      return Promise.resolve();
+      return this.i18n.t('chat.QueueEmpty', { lang: channel.lang });
     }
 
     // Spit out up to 5 songs.
@@ -59,13 +49,10 @@ export class QueueBotCommand implements BotCommandInterface {
       });
     }
 
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.messageFormatterService.formatMessage(output),
-    );
+    return output;
   }
 
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!queue');
+  getDescription(): string {
+    return 'Shows the list of songs in the queue. If the queue is too long, only the top 5 songs are shown, with a count of how many additional songs there are.';
   }
 }

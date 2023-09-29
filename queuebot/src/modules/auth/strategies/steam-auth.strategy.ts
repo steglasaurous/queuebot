@@ -1,9 +1,9 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-steam';
-import { UserService } from '../../users/services/user.service';
-import { AuthSource } from '../../users/entities/user-auth-source.entity';
 import { Inject, Injectable } from '@nestjs/common';
-import { BASE_URL, STEAM_APIKEY } from '../../injection-tokens';
+import { BASE_URL, STEAM_APIKEY } from '../../../injection-tokens';
+import { UserService } from '../../data-store/services/user.service';
+import { AuthSource } from '../../data-store/entities/user-auth-source.entity';
 
 @Injectable()
 export class SteamAuthStrategy extends PassportStrategy(Strategy) {

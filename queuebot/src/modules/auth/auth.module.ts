@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { UsersModule } from '../users/users.module';
 import { SteamAuthController } from './controllers/steam-auth.controller';
 import { AuthController } from './controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
@@ -12,13 +11,17 @@ import {
   JWT_EXPIRE_TIME,
   JWT_SECRET,
   STEAM_APIKEY,
+  TWITCH_CLIENT_ID,
+  TWITCH_CLIENT_SECRET,
 } from '../../injection-tokens';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { DataStoreModule } from '../data-store/data-store.module';
+import { TwitchAuthController } from './controllers/twitch-auth.controller';
 
 @Module({
   imports: [
-    UsersModule,
+    DataStoreModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({
@@ -64,7 +67,21 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       provide: JWT_EXPIRE_TIME,
       useValue: '8h',
     },
+    {
+      provide: TWITCH_CLIENT_ID,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return config.get<string>('TWITCH_CLIENT_ID');
+      },
+    },
+    {
+      provide: TWITCH_CLIENT_SECRET,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return config.get<string>('TWITCH_CLIENT_SECRET');
+      },
+    },
   ],
-  controllers: [SteamAuthController, AuthController],
+  controllers: [SteamAuthController, AuthController, TwitchAuthController],
 })
 export class AuthModule {}

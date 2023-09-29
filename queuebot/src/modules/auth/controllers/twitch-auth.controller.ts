@@ -13,7 +13,7 @@ import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JWT_COOKIE_NAME, JWT_EXPIRE_TIME } from '../../../injection-tokens';
 
-@Controller('auth/steam')
+@Controller('auth/twitch')
 export class SteamAuthController {
   constructor(
     private authService: AuthService,
@@ -22,12 +22,12 @@ export class SteamAuthController {
   ) {}
 
   @Get('/')
-  @UseGuards(AuthGuard('steam'))
+  @UseGuards(AuthGuard('twitch'))
   authSteamStart() {
     return;
   }
 
-  @UseGuards(AuthGuard('steam'))
+  @UseGuards(AuthGuard('twitch'))
   @Get('/return')
   authSteamReturn(
     @Request() req,

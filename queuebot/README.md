@@ -1,6 +1,12 @@
 # Todo
-- [ ] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
-- [ ] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
+- [x] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
+- [x] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
+- [ ] Implement Twitch SSO
+- [ ] Implement broadcaster queue manager UI
+  - [ ] Queue display
+  - [ ] Next song button
+  - [ ] Remove song from queue
+
 - [ ] !remove (song #)
 - [ ] Clear out queue when switching games.
 - [ ] !top - Move song to the top of the queue - use title? song position? Or move last added song?

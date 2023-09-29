@@ -6,51 +6,34 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { BaseBotCommand } from './base.bot-command';
 
 @Injectable()
-export class OpenBotCommand implements BotCommandInterface {
+export class OpenBotCommand extends BaseBotCommand {
   constructor(
     private i18n: I18nService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
-    private messageFormatterService: MessageFormatterService,
-  ) {}
-  async execute(chatMessage: ChatMessage): Promise<void> {
+  ) {
+    super();
+    this.triggers = ['!open'];
+  }
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Only broadcasters and mods should be allowed to do this.
     if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
       return;
     }
 
-    // Mark the channel that we're not to join it again (until asked to do so).
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
-    if (!channel.enabled) {
-      return;
-    }
-
     if (channel.queueOpen == true) {
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.QueueAlreadyOpen'),
-        ),
-      );
-      return;
+      return this.i18n.t('chat.QueueAlreadyOpen', { lang: channel.lang });
     }
 
     channel.queueOpen = true;
     await this.channelRepository.save(channel);
 
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.messageFormatterService.formatMessage(this.i18n.t('chat.QueueOpen')),
-    );
-
-    // Done.
-    return;
+    return this.i18n.t('chat.QueueOpen', { lang: channel.lang });
   }
 
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!open');
+  getDescription(): string {
+    return 'Open the queue for requests from anyone.';
   }
 }

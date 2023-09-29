@@ -6,43 +6,39 @@ import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { ChatMessage } from '../../chat/services/chat-message';
+import { BaseBotCommand } from './base.bot-command';
 
 @Injectable()
-export class OnBotCommand implements BotCommandInterface {
+export class OnBotCommand extends BaseBotCommand {
   constructor(
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
-    private messageFormatter: MessageFormatterService,
-  ) {}
+  ) {
+    super();
+    this.triggers = ['!requestobot on'];
+  }
 
-  async execute(chatMessage: ChatMessage): Promise<void> {
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Only broadcaster and mods can use this.
     if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
       return;
     }
 
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
     if (channel.enabled) {
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatter.formatMessage(this.i18n.t('chat.AlreadyOn')),
-      );
-      return;
+      return this.i18n.t('chat.AlreadyOn', { lang: channel.lang });
     }
 
     channel.enabled = true;
 
     await this.channelRepository.save(channel);
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.messageFormatter.formatMessage(this.i18n.t('chat.BotIsOn')),
-    );
-    return;
+    return this.i18n.t('chat.BotIsOn', { lang: channel.lang });
   }
 
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!requestobot on');
+  getDescription(): string {
+    return 'Enable the bot to respond to commands in your channel.';
+  }
+
+  shouldAlwaysTrigger(): boolean {
+    return true;
   }
 }

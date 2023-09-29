@@ -12,6 +12,7 @@ import { User } from './user.entity';
 
 export enum AuthSource {
   STEAM = 'steam',
+  TWITCH = 'twitch',
 }
 
 @Entity()
