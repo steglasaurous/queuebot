@@ -1,8 +1,8 @@
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Inject, Injectable } from '@nestjs/common';
-import { JWT_COOKIE_NAME, JWT_SECRET } from '../../injection-tokens';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../data-store/entities/user.entity';
+import { JWT_COOKIE_NAME, JWT_SECRET } from '../../../injection-tokens';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

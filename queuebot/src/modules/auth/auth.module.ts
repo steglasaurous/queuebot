@@ -18,6 +18,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { DataStoreModule } from '../data-store/data-store.module';
 import { TwitchAuthController } from './controllers/twitch-auth.controller';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TwitchAuthController } from './controllers/twitch-auth.controller';
       }),
       inject: [ConfigService],
     }),
+    HttpModule.register({}),
   ],
   providers: [
     AuthService,
@@ -71,14 +73,14 @@ import { TwitchAuthController } from './controllers/twitch-auth.controller';
       provide: TWITCH_CLIENT_ID,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        return config.get<string>('TWITCH_CLIENT_ID');
+        return config.get<string>('TWITCH_APP_CLIENT_ID');
       },
     },
     {
       provide: TWITCH_CLIENT_SECRET,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        return config.get<string>('TWITCH_CLIENT_SECRET');
+        return config.get<string>('TWITCH_APP_CLIENT_SECRET');
       },
     },
   ],

@@ -15,6 +15,7 @@ import { WebsocketModule } from './modules/websocket/websocket.module';
 import { ApiModule } from './modules/api/api.module';
 import { ClientLauncherModule } from './modules/client-launcher/client-launcher.module';
 import * as path from 'path';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import * as path from 'path';
     WebsocketModule,
     ApiModule,
     ClientLauncherModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

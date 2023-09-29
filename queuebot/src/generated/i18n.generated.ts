@@ -36,5 +36,8 @@ export type I18nTranslations = {
         "SorryQueueIsClosed": string;
         "SearchErrorTryAgain": string;
     };
+    "commands": {
+        "!close": string;
+    };
 };
 export type I18nPath = Path<I18nTranslations>;
