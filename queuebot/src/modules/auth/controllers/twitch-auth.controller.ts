@@ -45,6 +45,11 @@ export class TwitchAuthController {
     state: string,
     @Res({ passthrough: true }) response: Response,
   ) {
+    // FIXME: THis has ZERO error handling.  Need to add handling for:
+    // - Error returned from twitch (user didn't authorize, redirect was incorrect, etc.)
+    // - Code exchange failed
+    // - API call to get user information failed.
+
     // Send server-server request to get actual oauth token.
     const oauthCodeResponse = await firstValueFrom(
       this.httpService.post('https://id.twitch.tv/oauth2/token', {
