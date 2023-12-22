@@ -38,6 +38,10 @@ export class SongRequestService {
       }
       this.logger.log('savedSong', JSON.stringify(savedSong));
 
+      // Search for an existing song request in the queue.
+      // If it's present as a pending request, return the 'already in queue' error.
+      // If it's present as a recently played request, return the 'was already played' error.
+      // FUTURE: Make this configurable that if the streamer wants to allow repeats after playing a song, they can do so
       const songRequest = new SongRequest();
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
@@ -147,4 +151,6 @@ export class SongRequestService {
     await this.songRequestRepository.delete({ channel: channel });
     this.eventEmitter.emit(SongRequestQueueClearedEvent.name);
   }
+
+  // FIXME: Add a cron that clears out requests that have been played that are older than 12h
 }
