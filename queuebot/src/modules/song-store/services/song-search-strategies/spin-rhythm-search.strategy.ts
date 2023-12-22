@@ -85,6 +85,7 @@ export class SpinRhythmSearchStrategy implements SongSearchStrategyInterface {
     song.artist = data.artist;
     song.mapper = data.charter;
     song.downloadUrl = data.zip;
+    song.fileReference = data.fileReference;
 
     this.logger.log('Song object', JSON.stringify(song));
 

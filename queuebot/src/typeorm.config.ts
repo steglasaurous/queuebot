@@ -19,6 +19,7 @@ import { Migration1695489436659 } from '../migrations/1695489436659-migration';
 import { User } from './modules/data-store/entities/user.entity';
 import { UserAuthSource } from './modules/data-store/entities/user-auth-source.entity';
 import { Migration1696022219356 } from '../migrations/1696022219356-migration';
+import {Migration1703217098530} from "../migrations/1703217098530-migration";
 
 export default new DataSource({
   type: 'sqlite',
@@ -44,5 +45,6 @@ export default new DataSource({
     Migration1695472504194,
     Migration1695489436659,
     Migration1696022219356,
+    Migration1703217098530
   ],
 });

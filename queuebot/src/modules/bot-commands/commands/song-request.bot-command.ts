@@ -1,25 +1,22 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { SongService } from '../../song-store/services/song.service';
 import { BotStateService } from '../services/bot-state.service';
 import { Channel } from '../../data-store/entities/channel.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 import { Song } from '../../data-store/entities/song.entity';
-import { MessageFormatterService } from '../services/message-formatter.service';
 import { Game } from '../../data-store/entities/game.entity';
 import { BaseBotCommand } from './base.bot-command';
-// import { I18nTranslations } from '../../../generated/i18n.generated';
 
 export class SongRequestBotCommand extends BaseBotCommand {
   private logger: Logger = new Logger(this.constructor.name);
   constructor(
     private songService: SongService,
-    private botStateService: BotStateService,
+    // NOTE: Added @Inject here as BotStateService wasn't getting instantiated before this class was.
+    // Adding @Inject() makes an explicit reference to the dependency that NestJS seems to resolve.
+    @Inject(BotStateService) private botStateService: BotStateService,
     private readonly i18n: I18nService,
     private songRequestService: SongRequestService,
   ) {

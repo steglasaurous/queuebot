@@ -15,6 +15,7 @@ export class DtoMappingService {
     songDto.bpm = songRequest.song.bpm;
     songDto.duration = songRequest.song.duration;
     songDto.downloadUrl = songRequest.song.downloadUrl;
+    songDto.fileReference = songRequest.song.fileReference;
     songDto.gameName = songRequest.song.game.name;
 
     const songRequestDto = new SongRequestDto();

@@ -4,7 +4,7 @@ import { SteamAuthController } from './controllers/steam-auth.controller';
 import { AuthController } from './controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { SteamAuthStrategy } from './strategies/steam-auth.strategy';
+// import { SteamAuthStrategy } from './strategies/steam-auth.strategy';
 import {
   BASE_URL,
   JWT_COOKIE_NAME,
@@ -38,7 +38,7 @@ import { HttpModule } from '@nestjs/axios';
   ],
   providers: [
     AuthService,
-    SteamAuthStrategy,
+    // SteamAuthStrategy,
     JwtStrategy,
     {
       provide: STEAM_APIKEY,

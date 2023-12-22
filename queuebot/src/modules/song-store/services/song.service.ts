@@ -39,6 +39,7 @@ export class SongService {
     downloadUrl?: string,
     bpm?: number,
     duration?: number,
+    fileReference?: string,
   ): Song {
     if (!hash) {
       hash = crypto
@@ -56,6 +57,7 @@ export class SongService {
     song.downloadUrl = downloadUrl;
     song.bpm = bpm;
     song.duration = duration;
+    song.fileReference = fileReference;
 
     return song;
   }
