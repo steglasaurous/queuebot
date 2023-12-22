@@ -162,6 +162,7 @@ export class SongRequestBotCommand extends BaseBotCommand {
       args: {
         title: song.title,
         artist: song.artist,
+        mapper: song.mapper,
       },
     });
   }

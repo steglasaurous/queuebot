@@ -1,16 +1,13 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
-import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { MessageFormatterService } from '../services/message-formatter.service';
 import { BaseBotCommand } from './base.bot-command';
+import { Inject } from '@nestjs/common';
 
 export class OopsBotCommand extends BaseBotCommand {
   constructor(
-    private songRequestService: SongRequestService,
+    @Inject(SongRequestService) private songRequestService: SongRequestService,
     private i18n: I18nService,
   ) {
     super();
