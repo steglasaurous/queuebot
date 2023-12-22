@@ -3,7 +3,6 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WsResponse,
@@ -21,9 +20,7 @@ import { SongRequestAddedEvent } from '../../song-request/events/song-request-ad
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
 
 @WebSocketGateway({})
-export class QueueGateway
-  implements OnGatewayInit, OnGatewayDisconnect, OnGatewayConnection
-{
+export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
   // Maps to client OBJECT
   private channelToClientMap: Map<string, Set<any>> = new Map<
     string,
@@ -33,8 +30,6 @@ export class QueueGateway
   // Maps client ID to channel names
   private clientIdToChannelMap: Map<string, string> = new Map<string, string>();
 
-  private server;
-
   private logger: Logger = new Logger(this.constructor.name);
 
   constructor(
@@ -42,6 +37,7 @@ export class QueueGateway
     private songRequestService: SongRequestService,
     private dtoMappingService: DtoMappingService,
   ) {}
+
   @SubscribeMessage('subscribe')
   async subscribeToChannel(
     @ConnectedSocket() client,
@@ -52,6 +48,10 @@ export class QueueGateway
       channelName: channelName,
     });
     if (!channel) {
+      this.logger.log('Subscribe failed - channel not provided', {
+        clientId: client.id,
+      });
+
       // Should emit an error or something
       return {
         event: 'subscribe',
@@ -82,10 +82,6 @@ export class QueueGateway
     this.clientIdToChannelMap.set(client.id, channelName);
   }
 
-  afterInit(server: any): any {
-    this.server = server;
-  }
-
   handleDisconnect(client: any): any {
     if (this.clientIdToChannelMap.has(client.id)) {
       this.channelToClientMap
@@ -102,11 +98,17 @@ export class QueueGateway
     this.logger.log('No subscriptions to clear for user', {
       clientId: client.id,
     });
+
+    this.logger.log('Disconnected', {
+      clientId: client.id,
+    });
   }
 
   handleConnection(client: any, ...args: any[]): any {
     // Assign a unique id to this client so I can figure out how to deal with it in maps.
     client.id = uuidv4();
+
+    this.logger.log('Websocket client connected', { clientId: client.id });
   }
 
   @SubscribeMessage('queue')
