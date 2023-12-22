@@ -1,57 +1,30 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { SongService } from '../../song-store/services/song.service';
 import { BotStateService } from '../services/bot-state.service';
 import { Channel } from '../../data-store/entities/channel.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 import { Song } from '../../data-store/entities/song.entity';
-import { MessageFormatterService } from '../services/message-formatter.service';
 import { Game } from '../../data-store/entities/game.entity';
-// import { I18nTranslations } from '../../../generated/i18n.generated';
+import { BaseBotCommand } from './base.bot-command';
 
-export class SongRequestBotCommand implements BotCommandInterface {
-  private requestTriggers = [
-    '!req',
-    '!srr',
-    '!bsr',
-    '!ssr',
-    '!request',
-    '!atr',
-  ];
+export class SongRequestBotCommand extends BaseBotCommand {
   private logger: Logger = new Logger(this.constructor.name);
   constructor(
     private songService: SongService,
-    private botStateService: BotStateService,
-    @InjectRepository(Channel)
-    private channelRepository: Repository<Channel>,
+    // NOTE: Added @Inject here as BotStateService wasn't getting instantiated before this class was.
+    // Adding @Inject() makes an explicit reference to the dependency that NestJS seems to resolve.
+    @Inject(BotStateService) private botStateService: BotStateService,
     private readonly i18n: I18nService,
     private songRequestService: SongRequestService,
-    private messageFormatterService: MessageFormatterService,
-  ) {}
-  async execute(chatMessage: ChatMessage): Promise<void> {
-    // Load the channel object so we know what game we're searching requests for.
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
+  ) {
+    super();
 
-    if (!channel) {
-      this.logger.warn('Unable to process song request - channel not found', {
-        channelName: chatMessage.channelName,
-        requesterName: chatMessage.username,
-        message: chatMessage.message,
-      });
-      return;
-    }
-
-    if (!channel.enabled) {
-      return; // We've been told to turn off. Don't do anything.
-    }
-
+    this.triggers = ['!req', '!srr', '!bsr', '!ssr', '!request', '!atr'];
+  }
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Load bot state for this user, if any.
     const userBotState = await this.botStateService.getState(
       chatMessage.username,
@@ -65,13 +38,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
     if (chatMessage.message.indexOf(' ') == -1) {
       // No search term.  Display help.
       if (channel.game) {
-        await chatMessage.client.sendMessage(
-          chatMessage.channelName,
-          this.messageFormatterService.formatMessage(
-            this.i18n.t(this.getHelpMessageTranslationKey(channel.game)),
-          ),
-        );
-        return;
+        return this.i18n.t(this.getHelpMessageTranslationKey(channel.game));
       }
     }
 
@@ -81,13 +48,7 @@ export class SongRequestBotCommand implements BotCommandInterface {
       !chatMessage.userIsBroadcaster &&
       !chatMessage.userIsMod
     ) {
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.SorryQueueIsClosed'),
-        ),
-      );
-      return;
+      return this.i18n.t('chat.SorryQueueIsClosed', { lang: channel.lang });
     }
 
     const searchTerms = chatMessage.message
@@ -110,14 +71,8 @@ export class SongRequestBotCommand implements BotCommandInterface {
           return await this.addSongToQueue(channel, chatMessage, matchedSong);
         }
       }
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.NoSongsFound', { lang: channel.lang }),
-        ),
-      );
 
-      return;
+      return this.i18n.t('chat.NoSongsFound', { lang: channel.lang });
     }
 
     let searchResults: Song[];
@@ -127,27 +82,14 @@ export class SongRequestBotCommand implements BotCommandInterface {
         channel.game,
       );
     } catch (err) {
-      this.logger.warn('searchSongs returned an error', err);
+      this.logger.warn('searchSongs returned an error', err); // FIXME: put more context around the error.
 
       // Let the user know something borked and try again.
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.SearchErrorTryAgain', { lang: channel.lang }),
-        ),
-      );
-      return;
+      return this.i18n.t('chat.SearchErrorTryAgain', { lang: channel.lang });
     }
 
     if (searchResults.length < 1) {
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.NoSongsFound', { lang: channel.lang }),
-        ),
-      );
-
-      return;
+      return this.i18n.t('chat.NoSongsFound', { lang: channel.lang });
     }
 
     if (searchResults.length == 1) {
@@ -178,41 +120,17 @@ export class SongRequestBotCommand implements BotCommandInterface {
         });
       }
 
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(outputMessage),
-      );
-
-      return;
+      return outputMessage;
     }
-
-    return;
   }
-
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    let result = false;
-    const cleanedChatMessage = chatMessage.message.toLowerCase();
-
-    this.requestTriggers.forEach((requestTrigger) => {
-      // We intentionally look for a space after the command so it doesn't accidentially match other commands like
-      // !requestobot on
-      // We also test for an exact match, which is an opportunity to show some help.
-      if (
-        cleanedChatMessage.startsWith(requestTrigger + ' ') ||
-        cleanedChatMessage == requestTrigger
-      ) {
-        result = true;
-      }
-    });
-
-    return result;
+  getDescription(): string {
+    return 'Add a song request to the queue. Use the song title to request a song. If more than one song matches, you will be presented with a list of matches, and can respond with **!req #1** to select the first song, **!req #2** to select the second song, etc.';
   }
-
   private async addSongToQueue(
     channel: Channel,
     chatMessage: ChatMessage,
     song: Song,
-  ) {
+  ): Promise<string> {
     const requestResult = await this.songRequestService.addRequest(
       song,
       channel,
@@ -220,45 +138,33 @@ export class SongRequestBotCommand implements BotCommandInterface {
     );
     if (requestResult.success == false) {
       if (requestResult.errorType == SongRequestErrorType.ALREADY_IN_QUEUE) {
-        await chatMessage.client.sendMessage(
-          chatMessage.channelName,
-          this.messageFormatterService.formatMessage(
-            this.i18n.t('chat.SongAlreadyInQueue', {
-              lang: channel.lang,
-              defaultValue: 'Song is already in queue.',
-            }),
-          ),
-        );
-        return;
+        return this.i18n.t('chat.SongAlreadyInQueue', {
+          lang: channel.lang,
+          defaultValue: 'Song is already in queue.',
+        });
+      } else if (
+        requestResult.errorType == SongRequestErrorType.ALREADY_PLAYED
+      ) {
+        return this.i18n.t('chat.SongAlreadyPlayed', {
+          lang: channel.lang,
+          defaultValue: 'Song has already been played.',
+        });
       } else {
-        await chatMessage.client.sendMessage(
-          chatMessage.channelName,
-          this.messageFormatterService.formatMessage(
-            this.i18n.t('chat.SongRequestFailed', {
-              lang: channel.lang,
-              defaultValue:
-                'Queuebot error while attempting to add song to queue.',
-            }),
-          ),
-        );
-        return;
+        return this.i18n.t('chat.SongRequestFailed', {
+          lang: channel.lang,
+          defaultValue: 'Queuebot error while attempting to add song to queue.',
+        });
       }
     }
 
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.messageFormatterService.formatMessage(
-        this.i18n.t('chat.SongAddedToQueue', {
-          lang: channel.lang,
-          args: {
-            title: song.title,
-            artist: song.artist,
-          },
-        }),
-      ),
-    );
-
-    return;
+    return this.i18n.t('chat.SongAddedToQueue', {
+      lang: channel.lang,
+      args: {
+        title: song.title,
+        artist: song.artist,
+        mapper: song.mapper,
+      },
+    });
   }
 
   private getHelpMessageTranslationKey(game: Game) {

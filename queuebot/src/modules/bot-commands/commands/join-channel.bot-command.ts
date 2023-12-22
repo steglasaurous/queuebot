@@ -7,10 +7,11 @@ import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Game } from '../../data-store/entities/game.entity';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { BaseBotCommand } from './base.bot-command';
 // import { I18nTranslations } from '../../../generated/i18n.generated';
 
 @Injectable()
-export class JoinChannelBotCommand implements BotCommandInterface {
+export class JoinChannelBotCommand extends BaseBotCommand {
   private logger: Logger = new Logger(JoinChannelBotCommand.name);
 
   constructor(
@@ -19,22 +20,19 @@ export class JoinChannelBotCommand implements BotCommandInterface {
     @InjectRepository(Game) private gameRepository: Repository<Game>,
     private readonly i18n: I18nService,
     private messageFormatterService: MessageFormatterService,
-  ) {}
+  ) {
+    super();
+    this.triggers = ['!join'];
+  }
 
-  async execute(chatMessage: ChatMessage): Promise<void> {
-    this.logger.debug('Starting join channel command');
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Check if channel is in the db list, add it if necessary.
     let channelNameEntity = await this.channelRepository.findOneBy({
       channelName: chatMessage.username,
     });
     if (channelNameEntity && channelNameEntity.inChannel == true) {
       // They're already in the channel - no need to join again.
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.i18n.t('chat.AlreadyJoined'),
-      );
-
-      return;
+      return this.i18n.t('chat.AlreadyJoined', { lang: channel.lang });
     }
     if (!channelNameEntity) {
       channelNameEntity = new Channel();
@@ -49,9 +47,6 @@ export class JoinChannelBotCommand implements BotCommandInterface {
     }); // FIXME: Replace this with game detection.
 
     await this.channelRepository.save(channelNameEntity);
-    this.logger.debug('Saved channel to database', {
-      channelName: channelNameEntity.channelName,
-    });
 
     this.logger.debug('Joining channel', {
       channelName: channelNameEntity.channelName,
@@ -63,15 +58,6 @@ export class JoinChannelBotCommand implements BotCommandInterface {
     });
 
     await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.i18n.t('chat.JoinedChannel', {
-        lang: channelNameEntity.lang,
-        defaultValue: 'Joined channel #{channelName}. Enjoy!',
-        args: { channelName: channelNameEntity.channelName },
-      }),
-    );
-
-    await chatMessage.client.sendMessage(
       channelNameEntity.channelName,
       this.messageFormatterService.formatMessage(
         this.i18n.t('chat.HelloChannel', {
@@ -81,14 +67,26 @@ export class JoinChannelBotCommand implements BotCommandInterface {
       ),
     );
 
-    return Promise.resolve();
+    return this.i18n.t('chat.JoinedChannel', {
+      lang: channel.lang,
+      defaultValue: 'Joined channel #{channelName}. Enjoy!',
+      args: { channelName: channelNameEntity.channelName },
+    });
   }
 
   matchesTrigger(chatMessage: ChatMessage): boolean {
     // Should only match the !join command from the bot's channel.
     return (
       chatMessage.channelName == this.botChannelName &&
-      chatMessage.message == '!join'
+      chatMessage.message == this.triggers[0]
     );
+  }
+
+  getDescription(): string {
+    return "Broadcasters only.  Ask the bot to join your channel. This must be used in requestobot's channel to have it join your channel.";
+  }
+
+  shouldAlwaysTrigger(): boolean {
+    return true;
   }
 }

@@ -6,42 +6,38 @@ import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { Injectable } from '@nestjs/common';
+import { BaseBotCommand } from './base.bot-command';
 
 @Injectable()
-export class OffBotCommand implements BotCommandInterface {
+export class OffBotCommand extends BaseBotCommand {
   constructor(
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
-    private messageFormatter: MessageFormatterService,
-  ) {}
-  async execute(chatMessage: ChatMessage): Promise<void> {
+  ) {
+    super();
+    this.triggers = ['!requestobot off'];
+  }
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Only broadcaster and mods can use this.
     if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
       return;
     }
 
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
     if (!channel.enabled) {
       // It's already disabled.  Let the user know.
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatter.formatMessage(this.i18n.t('chat.AlreadyOff')),
-      );
-      return;
+      return this.i18n.t('chat.AlreadyOff', { lang: channel.lang });
     }
 
     channel.enabled = false;
     await this.channelRepository.save(channel);
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.messageFormatter.formatMessage(this.i18n.t('chat.BotIsOff')),
-    );
-    return;
+    return this.i18n.t('chat.BotIsOff', { lang: channel.lang });
   }
 
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!requestobot off');
+  getDescription(): string {
+    return 'This turns off all commands until you turn them back on with **!requestobot on**. This is a way of disabling the bot without removing it from your channel.';
+  }
+
+  shouldAlwaysTrigger(): boolean {
+    return true;
   }
 }

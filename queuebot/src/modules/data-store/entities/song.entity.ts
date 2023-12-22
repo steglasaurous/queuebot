@@ -28,7 +28,17 @@ export class Song {
   @Column({ nullable: true })
   downloadUrl?: string;
 
-  @ManyToOne(() => Game, (game) => game.songs)
+  /**
+   * If available, stores a reference of some sort (dependent on the source) that can
+   * be used by a downloader to determine whether or not to download the song. (ex: auto-download song on request)
+   *
+   * Most useful for Spin Rhythm where links don't contain the actual file downloaded, but the file reference is the same
+   * name as the .srtb filename, and can be used to check if the song already exists on the user's computer.
+   */
+  @Column({ nullable: true })
+  fileReference: string;
+
+  @ManyToOne(() => Game, (game) => game.songs, { eager: true })
   game: Game;
 
   @OneToMany(() => SongRequest, (songRequest) => songRequest.song)

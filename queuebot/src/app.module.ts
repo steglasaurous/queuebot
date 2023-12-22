@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { DataStoreModule } from './modules/data-store/data-store.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -12,7 +11,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { SongRequestModule } from './modules/song-request/song-request.module';
 import { WebsocketModule } from './modules/websocket/websocket.module';
+import { ApiModule } from './modules/api/api.module';
+import { ClientLauncherModule } from './modules/client-launcher/client-launcher.module';
 import * as path from 'path';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -46,8 +48,11 @@ import * as path from 'path';
     }),
     SongRequestModule,
     WebsocketModule,
+    ApiModule,
+    ClientLauncherModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

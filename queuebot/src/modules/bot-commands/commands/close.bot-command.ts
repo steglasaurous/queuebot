@@ -7,53 +7,34 @@ import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { SongRequestService } from '../../song-request/services/song-request.service';
+import { BaseBotCommand } from './base.bot-command';
 
 @Injectable()
-export class CloseBotCommand implements BotCommandInterface {
+export class CloseBotCommand extends BaseBotCommand {
   constructor(
     private i18n: I18nService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
-    private messageFormatterService: MessageFormatterService,
-  ) {}
-  async execute(chatMessage: ChatMessage): Promise<void> {
+  ) {
+    super();
+    this.triggers = ['!close'];
+  }
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Only broadcasters and mods should be allowed to do this.
     if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
       return;
     }
 
-    // Mark the channel that we're not to join it again (until asked to do so).
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
-    if (!channel.enabled) {
-      return;
-    }
-
     if (channel.queueOpen == false) {
-      await chatMessage.client.sendMessage(
-        chatMessage.channelName,
-        this.messageFormatterService.formatMessage(
-          this.i18n.t('chat.QueueAlreadyClosed'),
-        ),
-      );
-      return;
+      return this.i18n.t('chat.QueueAlreadyClosed', { lang: channel.lang });
     }
 
     channel.queueOpen = false;
     await this.channelRepository.save(channel);
 
-    await chatMessage.client.sendMessage(
-      chatMessage.channelName,
-      this.messageFormatterService.formatMessage(
-        this.i18n.t('chat.QueueClosed'),
-      ),
-    );
-
-    // Done.
-    return;
+    return this.i18n.t('chat.QueueClosed', { lang: channel.lang });
   }
 
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!close');
+  getDescription(): string {
+    return "Close the queue from requests so viewers cannot add new requests to the queue. Note that the broadcaster and mods can still add requests even if it's closed.";
   }
 }

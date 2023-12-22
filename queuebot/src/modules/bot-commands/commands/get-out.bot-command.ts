@@ -6,15 +6,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { BaseBotCommand } from './base.bot-command';
 
 @Injectable()
-export class GetOutBotCommand implements BotCommandInterface {
+export class GetOutBotCommand extends BaseBotCommand {
   constructor(
     private i18n: I18nService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private messageFormatterService: MessageFormatterService,
-  ) {}
-  async execute(chatMessage: ChatMessage): Promise<void> {
+  ) {
+    super();
+    this.triggers = ['!getout'];
+  }
+  async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     // Only broadcasters and mods should be allowed to do this.
     if (!chatMessage.userIsBroadcaster && !chatMessage.userIsMod) {
       return;
@@ -30,9 +34,6 @@ export class GetOutBotCommand implements BotCommandInterface {
     await chatMessage.client.leaveChannel(chatMessage.channelName);
 
     // Mark the channel that we're not to join it again (until asked to do so).
-    const channel = await this.channelRepository.findOneBy({
-      channelName: chatMessage.channelName,
-    });
     channel.inChannel = false;
     channel.leftOn = new Date();
     await this.channelRepository.save(channel);
@@ -41,7 +42,11 @@ export class GetOutBotCommand implements BotCommandInterface {
     return;
   }
 
-  matchesTrigger(chatMessage: ChatMessage): boolean {
-    return chatMessage.message.toLowerCase().startsWith('!getout');
+  getDescription(): string {
+    return 'Broadcaster and mods only. Have requestobot leave your channel. Once left, commands will not work until you invite the bot into your channel again.';
+  }
+
+  shouldAlwaysTrigger(): boolean {
+    return true;
   }
 }

@@ -12,14 +12,49 @@ export class LocalStrategy implements SongSearchStrategyInterface {
     private songRepository: Repository<Song>,
   ) {}
   async search(game: Game, query: string): Promise<Song[]> {
+    // We handle spin differently as it can take requests in different forms.
+    // See searchSpinRhythm() for more details
+    if (game.name == 'spin_rhythm') {
+      return this.searchSpinRhythm(game, query);
+    }
+
+    return this.searchGeneric(game, query);
+  }
+
+  private async searchGeneric(game: Game, query: string): Promise<Song[]> {
     return await this.songRepository.find({
       where: { title: Like('%' + query + '%'), game: game },
     });
   }
 
+  private async searchSpinRhythm(game: Game, query: string): Promise<Song[]> {
+    // Searches for spin can be a spinsha.re song id, a full spinsha.re URL, or just a generic query.
+
+    // spinsha.re URL
+    let songId: string = '';
+
+    const spinshareUrlMatch = query.match(/spinsha\.re\/song\/([0-9]*)$/);
+    if (spinshareUrlMatch) {
+      songId = spinshareUrlMatch[1];
+    }
+    // Straight up song id
+    const idMatch = query.match(/^[0-9]*$/);
+
+    if (idMatch) {
+      songId = idMatch[0];
+    }
+
+    if (songId != '') {
+      return this.songRepository.findBy({ songHash: songId, game: game });
+    }
+
+    return this.searchGeneric(game, query);
+  }
+
   supportsGame(game: Game): boolean {
     switch (game.name) {
       case 'audio_trip':
+      case 'spin_rhythm':
         return true;
     }
 

@@ -11,6 +11,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SongRequestAddedEvent } from '../events/song-request-added.event';
 import { SongRequestRemovedEvent } from '../events/song-request-removed.event';
 import { SongRequestQueueClearedEvent } from '../events/song-request-queue-cleared.event';
+import { SongRequestActiveEvent } from '../events/song-request-active.event';
 
 @Injectable()
 export class SongRequestService {
@@ -35,7 +36,12 @@ export class SongRequestService {
       } else {
         savedSong = song;
       }
+      this.logger.log('savedSong', JSON.stringify(savedSong));
 
+      // Search for an existing song request in the queue.
+      // If it's present as a pending request, return the 'already in queue' error.
+      // If it's present as a recently played request, return the 'was already played' error.
+      // FUTURE: Make this configurable that if the streamer wants to allow repeats after playing a song, they can do so
       const songRequest = new SongRequest();
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
@@ -45,6 +51,8 @@ export class SongRequestService {
           channel: channel,
         })) + 1; // Not sure what the performance implications are on this.  Will have to keep an eye on it for now.
       songRequest.channel = channel;
+      songRequest.isActive = false;
+      songRequest.isDone = false;
 
       try {
         const savedSongRequest =
@@ -59,6 +67,18 @@ export class SongRequestService {
         if (error.errno == 19) {
           // THis is a constraint error which we're treating as a dupe entry.  Return the appropriate error.
           errorType = SongRequestErrorType.ALREADY_IN_QUEUE;
+
+          // Find out if this is a song that's already played vs exists in the queue.
+          const existingSongRequest =
+            await this.songRequestRepository.findOneBy({
+              channel: channel,
+              song: savedSong,
+            });
+          if (existingSongRequest) {
+            if (existingSongRequest.isDone) {
+              errorType = SongRequestErrorType.ALREADY_PLAYED;
+            }
+          }
         }
         this.logger.log('saving song request threw error', { error: error });
         resolve({
@@ -70,24 +90,40 @@ export class SongRequestService {
   }
 
   async getNextRequest(channel: Channel): Promise<SongRequest> {
-    const nextRequest = await this.songRequestRepository.findOne({
-      where: { channel: channel },
-      order: { requestOrder: 'asc' },
-    });
-    if (!nextRequest) {
-      return undefined;
+    // Find currently active song, if any, and mark it played.
+    const prevActiveRequest = await this.getCurrentRequest(channel);
+    if (prevActiveRequest) {
+      prevActiveRequest.isActive = false;
+      prevActiveRequest.isDone = true;
+      await this.songRequestRepository.save(prevActiveRequest);
     }
 
-    await this.songRequestRepository.remove(nextRequest);
-    this.eventEmitter.emit(SongRequestRemovedEvent.name, {
+    const nextRequest = await this.songRequestRepository.findOne({
+      where: { channel: channel, isDone: false },
+      order: { requestOrder: 'asc' },
+    });
+
+    if (nextRequest) {
+      nextRequest.isActive = true;
+
+      await this.songRequestRepository.save(nextRequest);
+    }
+
+    this.eventEmitter.emit(SongRequestActiveEvent.name, {
       songRequest: nextRequest,
     });
     return nextRequest;
   }
 
+  async getCurrentRequest(channel: Channel): Promise<SongRequest> {
+    return await this.songRequestRepository.findOne({
+      where: { channel: channel, isActive: true },
+    });
+  }
+
   async getAllRequests(channel: Channel): Promise<SongRequest[]> {
     return await this.songRequestRepository.find({
-      where: { channel: channel },
+      where: { channel: channel, isDone: false },
       order: { requestOrder: 'asc' },
     });
   }
@@ -97,7 +133,7 @@ export class SongRequestService {
     requesterName: string,
   ): Promise<SongRequest> {
     const mostRecentRequest = await this.songRequestRepository.findOne({
-      where: { channel: channel, requesterName: requesterName },
+      where: { channel: channel, requesterName: requesterName, isDone: false },
       order: { requestOrder: 'desc' },
     });
     if (mostRecentRequest) {
@@ -115,4 +151,6 @@ export class SongRequestService {
     await this.songRequestRepository.delete({ channel: channel });
     this.eventEmitter.emit(SongRequestQueueClearedEvent.name);
   }
+
+  // FIXME: Add a cron that clears out requests that have been played that are older than 12h
 }

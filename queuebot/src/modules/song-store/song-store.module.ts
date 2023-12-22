@@ -8,6 +8,7 @@ import { SongImporterManagerService } from './services/song-importer-manager.ser
 import { LocalStrategy } from './services/song-search-strategies/local.strategy';
 import { SpinRhythmSearchStrategy } from './services/song-search-strategies/spin-rhythm-search.strategy';
 import { SONG_IMPORTERS, SONG_SEARCH_STRATEGIES } from './injection-tokens';
+import { SpinRhythmSongImporterService } from './services/song-importers/spin-rhythm-song-importer.service';
 
 @Module({
   imports: [
@@ -18,11 +19,15 @@ import { SONG_IMPORTERS, SONG_SEARCH_STRATEGIES } from './injection-tokens';
   providers: [
     SongService,
     AudioTripSongImporterService,
+    SpinRhythmSongImporterService,
     {
       provide: SONG_IMPORTERS,
-      inject: [AudioTripSongImporterService],
-      useFactory: (audioTrip: AudioTripSongImporterService) => {
-        return [audioTrip];
+      inject: [AudioTripSongImporterService, SpinRhythmSongImporterService],
+      useFactory: (
+        audioTrip: AudioTripSongImporterService,
+        spin: SpinRhythmSongImporterService,
+      ) => {
+        return [audioTrip, spin];
       },
     },
     LocalStrategy,
@@ -34,7 +39,8 @@ import { SONG_IMPORTERS, SONG_SEARCH_STRATEGIES } from './injection-tokens';
         localStrategy: LocalStrategy,
         spinRhythmStrategy: SpinRhythmSearchStrategy,
       ) => {
-        return [localStrategy, spinRhythmStrategy];
+        // Add back spinRhythmStrategy to this array to query the spinsha.re API directly.
+        return [localStrategy];
       },
     },
     SongImporterManagerService,

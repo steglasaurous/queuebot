@@ -1,11 +1,19 @@
 # Todo
-- [ ] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
-- [ ] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
+- [x] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
+- [x] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
+- [ ] Implement Twitch SSO
+- [ ] Implement broadcaster queue manager UI
+  - [ ] Queue display
+  - [ ] Next song button
+  - [ ] Remove song from queue
+
 - [ ] !remove (song #)
 - [ ] Clear out queue when switching games.
+- [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
+
+- [ ] !remove (song #)
 - [ ] !top - Move song to the top of the queue - use title? song position? Or move last added song?
 - [ ] !rollback - put the last song that was popped off the queue back on top
-- [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
 - [ ] Add queue controls to web client
 - [ ] Allow adding songs via client?
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc.

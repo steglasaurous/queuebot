@@ -7,6 +7,7 @@ export type I18nTranslations = {
         "JoinedChannel": string;
         "HelloChannel": string;
         "SongAlreadyInQueue": string;
+        "SongAlreadyPlayed": string;
         "SongRequestFailed": string;
         "SongAddedToQueue": string;
         "SelectSong": string;
@@ -34,6 +35,9 @@ export type I18nTranslations = {
         "QueueOpen": string;
         "SorryQueueIsClosed": string;
         "SearchErrorTryAgain": string;
+    };
+    "commands": {
+        "!close": string;
     };
 };
 export type I18nPath = Path<I18nTranslations>;
