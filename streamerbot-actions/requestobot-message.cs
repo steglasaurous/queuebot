@@ -11,7 +11,6 @@ public class CPHInline
 	public static string audioTripDownloadPath = "";
 	// FIXME: Set default but allow override if it's in the args.
 	public static string spinRhythmXdDownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming","LocalLow") + "\\Super Spin Digital\\Spin Rhythm XD\\Custom";
-
 	public bool Execute()
 	{
 		var incomingEvent = JObject.Parse(args["message"].ToString());
