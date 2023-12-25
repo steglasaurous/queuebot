@@ -34,6 +34,16 @@ Also note using **!req** on its own will show instructions on how to request son
 
 **!getout** - Broadcaster and mods only. Have requestobot leave your channel.  Once left, commands will not work until you invite the bot into your channel again.
 
+## Song Auto-downloader
+
+For those that use <a href="https://streamer.bot/">streamer.bot</a> you can take advantage of the auto-downloader, which
+automatically downloads songs requested that you don't already have in your game. 
+
+> NOTE: Spin Rhythm XD is the only supported game at the moment.
+
+### What you need
+
+- Streamer.bot 0.2.2 or better
 
 
 ## Feature Requests and Bugs
