@@ -15,6 +15,7 @@ import { ApiModule } from './modules/api/api.module';
 import { ClientLauncherModule } from './modules/client-launcher/client-launcher.module';
 import * as path from 'path';
 import { AuthModule } from './modules/auth/auth.module';
+import { typeORMAppConfig } from './typeorm.config';
 
 @Module({
   imports: [
@@ -23,12 +24,7 @@ import { AuthModule } from './modules/auth/auth.module';
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot(),
     BotCommandsModule,
-    TypeOrmModule.forRoot({
-      database: 'database/queuebot.db',
-      type: 'sqlite',
-      autoLoadEntities: true,
-      // logging: true,
-    }),
+    TypeOrmModule.forRoot(typeORMAppConfig),
     SongStoreModule,
     ScheduleModule.forRoot(),
     I18nModule.forRoot({

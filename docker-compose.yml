@@ -4,20 +4,31 @@ services:
   server:
     build: ./queuebot
     restart: unless-stopped
-    networks:
-      - proxynet
+#    networks:
+#      - proxynet
     env_file:
       - .env
     ports:
-      - 3000
+      - 3000:3000
     volumes:
       - queuebot_database:/server/database
       - ./queuebot/twitch_token.json:/server/twitch_token.json
 
-networks:
-  proxynet:
-    name: nextcloud-docker_proxy-tier
-    external: true
+  db:
+    container_name: postgres
+    image: postgres:16
+    restart: always
+    ports:
+      - 5432:5432 # FIXME: Remove for actual deployment
+    volumes:
+      - queuebot-pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER}
+#networks:
+#  proxynet:
+#    name: nextcloud-docker_proxy-tier
+#    external: true
 volumes:
   queuebot_database:
-
+  queuebot-pgdata:
