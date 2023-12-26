@@ -11,6 +11,6 @@ export class UserBotState {
   channel: Channel;
   @Column({ type: 'simple-json', nullable: true })
   state: object;
-  @Column()
-  timestamp: number;
+  @Column({ type: 'timestamptz' })
+  timestamp: Date;
 }

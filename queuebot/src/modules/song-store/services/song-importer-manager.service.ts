@@ -31,7 +31,7 @@ export class SongImporterManagerService implements OnApplicationBootstrap {
   // FIXME: Add handling to not trigger this all the time in dev
   //        so we're not hammering APIs for no good reason.
   onApplicationBootstrap(): any {
-    this.logger.log('Bootstrap: Executing song importers');
-    this.runImporters();
+    // this.logger.log('Bootstrap: Executing song importers');
+    // this.runImporters();
   }
 }

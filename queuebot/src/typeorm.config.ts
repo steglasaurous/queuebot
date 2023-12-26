@@ -12,6 +12,7 @@ import { UserBotState } from './modules/data-store/entities/user-bot-state.entit
 import { User } from './modules/data-store/entities/user.entity';
 import { UserAuthSource } from './modules/data-store/entities/user-auth-source.entity';
 import { Migration1703537138064 } from '../migrations/1703537138064-migration';
+import { Migration1703552537118 } from '../migrations/1703552537118-migration';
 
 export const typeORMAppConfig: DataSourceOptions = {
   type: 'postgres',
@@ -29,5 +30,5 @@ export const typeORMAppConfig: DataSourceOptions = {
     User,
     UserAuthSource,
   ],
-  migrations: [Migration1703537138064],
+  migrations: [Migration1703537138064, Migration1703552537118],
 };

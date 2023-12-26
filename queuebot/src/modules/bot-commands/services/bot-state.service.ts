@@ -34,7 +34,7 @@ export class BotStateService {
       userState = new UserBotState();
       userState.channel = channel;
       userState.requesterName = requesterName;
-      userState.timestamp = Date.now();
+      userState.timestamp = new Date();
     }
 
     return userState;
@@ -63,7 +63,7 @@ export class BotStateService {
     }
 
     userBotState.state = state;
-    userBotState.timestamp = Date.now();
+    userBotState.timestamp = new Date();
 
     return await this.userBotStateRepository.save(userBotState);
   }
