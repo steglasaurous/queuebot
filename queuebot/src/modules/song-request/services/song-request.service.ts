@@ -45,7 +45,7 @@ export class SongRequestService {
       const songRequest = new SongRequest();
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
-      songRequest.requestTimestamp = Date.now();
+      songRequest.requestTimestamp = new Date();
       songRequest.requestOrder =
         (await this.songRequestRepository.maximum('requestOrder', {
           channel: channel,
@@ -64,7 +64,7 @@ export class SongRequestService {
       } catch (error) {
         let errorType = SongRequestErrorType.SERVER_ERROR;
 
-        if (error.errno == 19) {
+        if (error.code == 23505) {
           // THis is a constraint error which we're treating as a dupe entry.  Return the appropriate error.
           errorType = SongRequestErrorType.ALREADY_IN_QUEUE;
 
@@ -79,8 +79,10 @@ export class SongRequestService {
               errorType = SongRequestErrorType.ALREADY_PLAYED;
             }
           }
+        } else {
+          this.logger.warn('Saving song request threw error', { error: error });
         }
-        this.logger.log('saving song request threw error', { error: error });
+        
         resolve({
           success: false,
           errorType: errorType,

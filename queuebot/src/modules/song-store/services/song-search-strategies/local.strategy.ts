@@ -2,7 +2,7 @@ import { SongSearchStrategyInterface } from './song-search-strategy.interface';
 import { Song } from '../../../data-store/entities/song.entity';
 import { Game } from '../../../data-store/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { And, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -22,9 +22,19 @@ export class LocalStrategy implements SongSearchStrategyInterface {
   }
 
   private async searchGeneric(game: Game, query: string): Promise<Song[]> {
-    return await this.songRepository.find({
-      where: { title: Like('%' + query + '%'), game: game },
-    });
+    // Do full-text search
+    // See https://www.postgresql.org/docs/current/textsearch-controls.html
+    return await this.songRepository.createQueryBuilder()
+    .where(
+      `"songSearch" @@ websearch_to_tsquery(:query)`,
+    )
+    .andWhere(
+      `"gameId" = :gameId`
+    )
+    .orderBy(`ts_rank("songSearch", websearch_to_tsquery(:query))`)
+    .setParameter('query', query)
+    .setParameter('gameId', game.id)
+    .getMany();
   }
 
   private async searchSpinRhythm(game: Game, query: string): Promise<Song[]> {

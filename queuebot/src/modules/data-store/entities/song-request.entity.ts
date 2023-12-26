@@ -23,8 +23,8 @@ export class SongRequest {
   @Column()
   requesterName: string;
 
-  @Column()
-  requestTimestamp: number;
+  @Column({ type: 'timestamptz' })
+  requestTimestamp: Date;
 
   @Column()
   requestOrder: number;

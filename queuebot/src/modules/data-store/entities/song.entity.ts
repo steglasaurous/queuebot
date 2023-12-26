@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -9,6 +10,10 @@ import { Game } from './game.entity';
 import { SongRequest } from './song-request.entity';
 
 @Entity()
+// Ignoring the full text search index since it's not directly supported by
+// typeorm - have to manage it manually.
+// https://orkhan.gitbook.io/typeorm/docs/indices#disabling-synchronization
+@Index('songSearchIdx', { synchronize: false })
 export class Song {
   @PrimaryGeneratedColumn()
   id: number;
@@ -43,4 +48,11 @@ export class Song {
 
   @OneToMany(() => SongRequest, (songRequest) => songRequest.song)
   requests: SongRequest[];
+
+  @Column({
+    generatedType: 'STORED',
+    asExpression: `to_tsvector('english', coalesce(title, '') || ' ' || coalesce(artist, '') || ' ' || coalesce(mapper, ''))`,
+    type: 'tsvector'
+  })
+  songSearch: string;
 }

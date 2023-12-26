@@ -11,8 +11,8 @@ import { SongRequest } from './modules/data-store/entities/song-request.entity';
 import { UserBotState } from './modules/data-store/entities/user-bot-state.entity';
 import { User } from './modules/data-store/entities/user.entity';
 import { UserAuthSource } from './modules/data-store/entities/user-auth-source.entity';
-import { Migration1703537138064 } from '../migrations/1703537138064-migration';
-import { Migration1703552537118 } from '../migrations/1703552537118-migration';
+import { Migration1703611705901 } from '../migrations/1703611705901-migration';
+import { InitialStaticDataMigration1703611705901 } from '../migrations/1703611705901-initial-static-data-migration';
 
 export const typeORMAppConfig: DataSourceOptions = {
   type: 'postgres',
@@ -30,5 +30,5 @@ export const typeORMAppConfig: DataSourceOptions = {
     User,
     UserAuthSource,
   ],
-  migrations: [Migration1703537138064, Migration1703552537118],
+  migrations: [Migration1703611705901, InitialStaticDataMigration1703611705901],
 };
