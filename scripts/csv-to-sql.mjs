@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import crypto from "node:crypto";
 
-const input = fs.readFileSync('audio_trip_ost.csv');
+const input = fs.readFileSync('spin_ost.csv');
 
 const lines = input.toString().split("\n");
 
@@ -19,14 +19,12 @@ lines.forEach((line) => {
         return;
     }
     const row = line.split(',');
-    const hash = crypto
-        .createHash('sha256')
-        .update(JSON.stringify('audio_trip' + row[0] + row[1] + row[2]))
-        .digest('hex');
+    const durationSplit = row[3].split(':').map((value) => parseInt(value));
+    const duration = durationSplit[0] * 60 + durationSplit[1];
 
-    output += "await queryRunner.query(\"INSERT INTO song (songHash, title, artist, mapper, duration, bpm, gameId) VALUES ";
+    output += `await queryRunner.query(\`INSERT INTO song ("songHash", "title", "artist", "mapper", "duration", "bpm", "gameId") VALUES `;
 
-    output += `('${hash}','${row[0].replace("'","\\'")}','${row[1]}','${row[2]}',${row[3]},${row[4].trim()},1)");\n`;
+    output += `('${row[5]}','${row[0].replace("'","''")}','${row[1]}','${row[2]}',${duration},${row[4].trim()},2)\`);\n`;
 });
 
-fs.writeFileSync('audio_trip_ost.ts',output);
+fs.writeFileSync('spin_ost.ts',output);
