@@ -10,7 +10,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
     DataStoreModule,
     SongStoreModule,
-    TypeOrmModule.forRoot({ ...typeORMAppConfig }),
+    TypeOrmModule.forRoot(typeORMAppConfig),
   ],
 })
 export class ImportWorkerModule {}

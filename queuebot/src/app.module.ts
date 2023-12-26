@@ -24,7 +24,7 @@ import { typeORMAppConfig } from './typeorm.config';
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot(),
     BotCommandsModule,
-    TypeOrmModule.forRoot({ ...typeORMAppConfig, ...{ logging: true } }),
+    TypeOrmModule.forRoot(typeORMAppConfig),
     SongStoreModule,
     ScheduleModule.forRoot(),
     I18nModule.forRoot({
