@@ -15,7 +15,6 @@ services:
       - ./queuebot/twitch_token.json:/server/twitch_token.json
 
   db:
-    container_name: postgres
     image: postgres:16
     restart: always
     ports:
