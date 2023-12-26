@@ -30,11 +30,11 @@ export class AudioTripSongImporterService implements SongImporter {
           });
 
           let lineSkipped = false;
-          parsedSheet.forEach((row) => {
+          for (const row of parsedSheet) {
             if (!lineSkipped) {
               lineSkipped = true;
             } else {
-              this.songService.saveSong(
+              await this.songService.saveSong(
                 this.songService.createSongEntity(
                   game,
                   row.Title,
@@ -47,7 +47,7 @@ export class AudioTripSongImporterService implements SongImporter {
                 ),
               );
             }
-          });
+          }
           resolve(parsedSheet.length);
         });
     });

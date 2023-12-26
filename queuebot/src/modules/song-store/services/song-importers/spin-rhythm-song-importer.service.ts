@@ -1,14 +1,13 @@
-import {SongImporter} from "./song-importer.interface";
-import {Injectable} from "@nestjs/common";
-import {HttpService} from "@nestjs/axios";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Game} from "../../../data-store/entities/game.entity";
-import {Repository} from "typeorm";
-import {SongService} from "../song.service";
+import { SongImporter } from './song-importer.interface';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Game } from '../../../data-store/entities/game.entity';
+import { Repository } from 'typeorm';
+import { SongService } from '../song.service';
 
 @Injectable()
-export class SpinRhythmSongImporterService implements SongImporter
-{
+export class SpinRhythmSongImporterService implements SongImporter {
   gameName = 'spin_rhythm';
   private spinshareSearchAllUrl = 'https://spinsha.re/api/searchAll';
 
@@ -25,7 +24,7 @@ export class SpinRhythmSongImporterService implements SongImporter
         .get(this.spinshareSearchAllUrl)
         .subscribe(async (response) => {
           for (const parsedSong of response.data.data.songs) {
-            this.songService.saveSong(
+            await this.songService.saveSong(
               this.songService.createSongEntity(
                 game,
                 parsedSong.title,
@@ -36,13 +35,11 @@ export class SpinRhythmSongImporterService implements SongImporter
                 undefined,
                 undefined,
                 parsedSong.fileReference,
-              )
+              ),
             );
           }
           resolve(response.data.data.songs.length);
         });
-
     });
-
   }
 }
