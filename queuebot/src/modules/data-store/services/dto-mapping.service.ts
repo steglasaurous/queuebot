@@ -23,7 +23,7 @@ export class DtoMappingService {
     songRequestDto.song = songDto;
     songRequestDto.requesterName = songRequest.requesterName;
     songRequestDto.requestOrder = songRequest.requestOrder;
-    songRequestDto.requestTimestamp = songRequest.requestTimestamp;
+    songRequestDto.requestTimestamp = songRequest.requestTimestamp.valueOf();
 
     return songRequestDto;
   }

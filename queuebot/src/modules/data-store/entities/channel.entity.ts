@@ -23,7 +23,7 @@ export class Channel {
   /**
    * When the bot last joined the channel (i.e. was last invited via !join command)
    */
-  @Column()
+  @Column({ type: 'timestamptz' })
   joinedOn: Date;
 
   @Column({ default: true })
@@ -32,7 +32,7 @@ export class Channel {
   /**
    * When the bot was last asked to leave via !getout
    */
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'timestamptz' })
   leftOn?: Date;
 
   @OneToMany(() => SongRequest, (songRequest) => songRequest.channel)

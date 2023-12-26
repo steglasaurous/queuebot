@@ -7,6 +7,7 @@ import {
 import { SongImporter } from './song-importers/song-importer.interface';
 import { Cron } from '@nestjs/schedule';
 import { SONG_IMPORTERS } from '../injection-tokens';
+import { Worker, isMainThread } from 'worker_threads';
 
 @Injectable()
 export class SongImporterManagerService implements OnApplicationBootstrap {
@@ -14,24 +15,39 @@ export class SongImporterManagerService implements OnApplicationBootstrap {
   constructor(@Inject(SONG_IMPORTERS) private songImporters: SongImporter[]) {}
 
   async runImporters() {
-    this.songImporters.forEach(async (importer) => {
+    for (const importer of this.songImporters) {
+      this.logger.log('Executing song importer', {
+        importerName: importer.constructor.name,
+      });
+      const songsImported = await importer.importSongs();
       this.logger.log('Song importer done', {
         importer: importer.constructor.name,
-        songsImported: await importer.importSongs(),
+        songsImported: songsImported,
       });
-    });
+    }
   }
 
   @Cron('0 0 * * * *')
   private cron() {
-    this.logger.log('Cron: Executing song importers');
-    this.runImporters();
+    if (isMainThread) {
+      this.logger.log('Cron: Executing song importers');
+      this.startImportWorker();
+    }
   }
 
   // FIXME: Add handling to not trigger this all the time in dev
   //        so we're not hammering APIs for no good reason.
   onApplicationBootstrap(): any {
-    this.logger.log('Bootstrap: Executing song importers');
-    this.runImporters();
+    if (isMainThread) {
+      this.logger.log('Bootstrap: Executing song importers');
+      this.startImportWorker();
+    }
+  }
+
+  private startImportWorker() {
+    const worker = new Worker(require.main.filename);
+    worker.on('exit', () => {
+      this.logger.log('Worker exited');
+    });
   }
 }

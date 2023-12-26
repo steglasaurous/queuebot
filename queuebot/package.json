@@ -1,6 +1,6 @@
 {
   "name": "queuebot",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
   "author": "steglasaurous",
   "private": true,
@@ -19,10 +19,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./src/typeorm.config.ts",
-    "typeorm:generate-migration": "npm run typeorm -- -d ./src/typeorm.config.ts migration:generate ./migrations/migration",
+    "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./src/typeorm-cli.config.ts",
+    "typeorm:generate-migration": "npm run typeorm -- -d ./src/typeorm-cli.config.ts migration:generate ./migrations/migration",
     "typeorm:create-migration": "npm run typeorm -- migration:create ./migrations/",
-    "typeorm:revert-migration": "npm run typeorm -- -d ./src/typeorm.config.ts migration:revert"
+    "typeorm:revert-migration": "npm run typeorm -- -d ./src/typeorm-cli.config.ts migration:revert"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
@@ -46,6 +46,7 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-steam": "^1.0.18",
+    "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.6",
