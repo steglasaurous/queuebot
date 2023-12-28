@@ -56,8 +56,7 @@ import { ModIoApiService } from './services/mod-io-api.service';
         spin: SpinRhythmSongImporterService,
         pistolWhip: PistolWhipSongImporterService,
       ) => {
-        // return [audioTrip, spin, pistolWhip];
-        return [pistolWhip];
+        return [audioTrip, spin, pistolWhip];
       },
     },
     LocalStrategy,
