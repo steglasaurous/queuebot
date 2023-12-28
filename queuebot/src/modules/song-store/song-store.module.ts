@@ -16,6 +16,7 @@ import {
 import { SpinRhythmSongImporterService } from './services/song-importers/spin-rhythm-song-importer.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PistolWhipSongImporterService } from './services/song-importers/pistol-whip-song-importer.service';
+import { ModIoApiService } from './services/mod-io-api.service';
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { PistolWhipSongImporterService } from './services/song-importers/pistol-
         spin: SpinRhythmSongImporterService,
         pistolWhip: PistolWhipSongImporterService,
       ) => {
-        return [audioTrip, spin, pistolWhip];
+        // return [audioTrip, spin, pistolWhip];
+        return [pistolWhip];
       },
     },
     LocalStrategy,
@@ -72,6 +74,7 @@ import { PistolWhipSongImporterService } from './services/song-importers/pistol-
       },
     },
     SongImporterManagerService,
+    ModIoApiService,
   ],
   exports: [SongService],
 })
