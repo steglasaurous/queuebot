@@ -28,7 +28,7 @@ export class JoinChannelsOnConnectListener {
     for (const channel of channels) {
       await chatConnectedEvent.client.joinChannel(channel.channelName);
       this.channelJoinedCounterTotal.inc({
-        labels: { join_source: 'connect' },
+        join_source: 'connect',
       });
       this.logger.log(`Joined channel ${channel.channelName}`);
     }
