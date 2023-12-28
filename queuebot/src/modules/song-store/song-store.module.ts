@@ -7,27 +7,55 @@ import { HttpModule } from '@nestjs/axios';
 import { SongImporterManagerService } from './services/song-importer-manager.service';
 import { LocalStrategy } from './services/song-search-strategies/local.strategy';
 import { SpinRhythmSearchStrategy } from './services/song-search-strategies/spin-rhythm-search.strategy';
-import { SONG_IMPORTERS, SONG_SEARCH_STRATEGIES } from './injection-tokens';
+import {
+  MOD_IO_API_KEY,
+  MOD_IO_BASE_URL,
+  SONG_IMPORTERS,
+  SONG_SEARCH_STRATEGIES,
+} from './injection-tokens';
 import { SpinRhythmSongImporterService } from './services/song-importers/spin-rhythm-song-importer.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PistolWhipSongImporterService } from './services/song-importers/pistol-whip-song-importer.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(),
     DataStoreModule,
     HttpModule.register({}),
+    ConfigModule,
   ],
   providers: [
     SongService,
+    {
+      provide: MOD_IO_BASE_URL,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return configService.get('MOD_IO_BASE_URL');
+      },
+    },
+    {
+      provide: MOD_IO_API_KEY,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return configService.get('MOD_IO_API_KEY');
+      },
+    },
     AudioTripSongImporterService,
     SpinRhythmSongImporterService,
+    PistolWhipSongImporterService,
     {
       provide: SONG_IMPORTERS,
-      inject: [AudioTripSongImporterService, SpinRhythmSongImporterService],
+      inject: [
+        AudioTripSongImporterService,
+        SpinRhythmSongImporterService,
+        PistolWhipSongImporterService,
+      ],
       useFactory: (
         audioTrip: AudioTripSongImporterService,
         spin: SpinRhythmSongImporterService,
+        pistolWhip: PistolWhipSongImporterService,
       ) => {
-        return [audioTrip, spin];
+        return [audioTrip, spin, pistolWhip];
       },
     },
     LocalStrategy,

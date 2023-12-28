@@ -42,6 +42,7 @@
     "@willsoto/nestjs-prometheus": "^6.0.0",
     "axios": "^1.5.0",
     "hbs": "^4.2.0",
+    "memory-streams": "^0.1.3",
     "neat-csv": "^7.0.0",
     "nestjs-i18n": "^10.3.2",
     "passport": "^0.6.0",
@@ -53,7 +54,8 @@
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.17",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.1.17",
@@ -64,6 +66,7 @@
     "@types/node": "20.6.1",
     "@types/passport-steam": "^1.0.2",
     "@types/supertest": "^2.0.12",
+    "@types/yauzl": "^2.10.3",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "eslint": "^8.49.0",

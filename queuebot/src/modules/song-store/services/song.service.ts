@@ -18,9 +18,6 @@ export class SongService {
   ) {}
 
   async searchSongs(query: string, game: Game): Promise<Song[]> {
-    // FUTURE IMPROVEMENTS:
-    //   Full-text search of title, artist and mapper
-    //   Modifiers like -title sometitle, -artist someartist, -mapper somemapper or in some fashion, directly by -id ?
     for (const strategy of this.searchStrategies) {
       if (strategy.supportsGame(game)) {
         return await strategy.search(game, query);
@@ -90,5 +87,15 @@ export class SongService {
     }
 
     return await this.songRepository.save(song);
+  }
+
+  async getSongBySongHash(
+    game: Game,
+    songHash: string,
+  ): Promise<Song | undefined> {
+    return await this.songRepository.findOneBy({
+      game: game,
+      songHash: songHash,
+    });
   }
 }
