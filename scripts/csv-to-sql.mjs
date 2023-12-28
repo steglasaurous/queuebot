@@ -7,9 +7,8 @@
  */
 
 import * as fs from 'fs';
-import crypto from "node:crypto";
 
-const input = fs.readFileSync('spin_ost.csv');
+const input = fs.readFileSync('pistol_whip.csv');
 
 const lines = input.toString().split("\n");
 
@@ -24,7 +23,7 @@ lines.forEach((line) => {
 
     output += `await queryRunner.query(\`INSERT INTO song ("songHash", "title", "artist", "mapper", "duration", "bpm", "gameId") VALUES `;
 
-    output += `('${row[5]}','${row[0].replace("'","''")}','${row[1]}','${row[2]}',${duration},${row[4].trim()},2)\`);\n`;
+    output += `('${row[5]}','${row[0].replace("'","''")}','${row[1]}','${row[2]}',${duration},${row[4].trim()},3)\`);\n`;
 });
 
-fs.writeFileSync('spin_ost.ts',output);
+fs.writeFileSync('pistol_whip.ts',output);
