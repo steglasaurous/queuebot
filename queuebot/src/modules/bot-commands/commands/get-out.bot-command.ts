@@ -1,4 +1,3 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { I18nService } from 'nestjs-i18n';
 import { Injectable } from '@nestjs/common';
@@ -7,6 +6,9 @@ import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { BaseBotCommand } from './base.bot-command';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Metrics } from '../models/metrics.enum';
+import { Counter, Gauge } from 'prom-client';
 
 @Injectable()
 export class GetOutBotCommand extends BaseBotCommand {
@@ -14,6 +16,12 @@ export class GetOutBotCommand extends BaseBotCommand {
     private i18n: I18nService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private messageFormatterService: MessageFormatterService,
+    @InjectMetric(Metrics.ChannelLeftCounterTotal)
+    private channelLeftCounterTotal: Counter,
+    @InjectMetric(Metrics.ChannelsJoinedTotal)
+    private channelsJoinedTotal: Gauge,
+    @InjectMetric(Metrics.ChannelsBotEnabledTotal)
+    private channelsBotEnabledTotal: Gauge,
   ) {
     super();
     this.triggers = ['!getout'];
@@ -37,6 +45,10 @@ export class GetOutBotCommand extends BaseBotCommand {
     channel.inChannel = false;
     channel.leftOn = new Date();
     await this.channelRepository.save(channel);
+
+    this.channelLeftCounterTotal.inc();
+    this.channelsJoinedTotal.dec();
+    this.channelsBotEnabledTotal.dec();
 
     // Done.
     return;

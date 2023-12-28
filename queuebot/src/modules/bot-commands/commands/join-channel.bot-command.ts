@@ -1,4 +1,3 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +7,9 @@ import { I18nService } from 'nestjs-i18n';
 import { Game } from '../../data-store/entities/game.entity';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { BaseBotCommand } from './base.bot-command';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Metrics } from '../models/metrics.enum';
+import { Counter, Gauge } from 'prom-client';
 // import { I18nTranslations } from '../../../generated/i18n.generated';
 
 @Injectable()
@@ -20,6 +22,13 @@ export class JoinChannelBotCommand extends BaseBotCommand {
     @InjectRepository(Game) private gameRepository: Repository<Game>,
     private readonly i18n: I18nService,
     private messageFormatterService: MessageFormatterService,
+    @InjectMetric(Metrics.ChannelsTotal) private channelsTotal: Gauge,
+    @InjectMetric(Metrics.ChannelJoinedCounterTotal)
+    private channelsJoinedCounterTotal: Counter,
+    @InjectMetric(Metrics.ChannelsJoinedTotal)
+    private channelsJoinedTotal: Gauge,
+    @InjectMetric(Metrics.ChannelsBotEnabledTotal)
+    private channelsBotEnabledTotal: Gauge,
   ) {
     super();
     this.triggers = ['!join'];
@@ -57,6 +66,12 @@ export class JoinChannelBotCommand extends BaseBotCommand {
       channelName: channelNameEntity.channelName,
     });
 
+    this.channelsTotal.inc();
+    this.channelsJoinedTotal.inc();
+    this.channelsJoinedCounterTotal.inc();
+    this.channelsBotEnabledTotal.inc();
+
+    // Increment channel counts / gauges here
     await chatMessage.client.sendMessage(
       channelNameEntity.channelName,
       this.messageFormatterService.formatMessage(

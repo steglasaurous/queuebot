@@ -22,6 +22,12 @@ import { OnBotCommand } from './commands/on.bot-command';
 import { ClearBotCommand } from './commands/clear.bot-command';
 import { OpenBotCommand } from './commands/open.bot-command';
 import { CloseBotCommand } from './commands/close.bot-command';
+import { MetricsModule } from '../metrics/metrics.module';
+import {
+  makeCounterProvider,
+  makeGaugeProvider,
+} from '@willsoto/nestjs-prometheus';
+import { Metrics } from './models/metrics.enum';
 
 @Module({
   imports: [
@@ -31,6 +37,7 @@ import { CloseBotCommand } from './commands/close.bot-command';
     SongStoreModule,
     SongRequestModule,
     HttpModule,
+    MetricsModule,
   ],
   providers: [
     {
@@ -102,6 +109,45 @@ import { CloseBotCommand } from './commands/close.bot-command';
     BotStateService,
     JoinChannelsOnConnectListener,
     MessageFormatterService,
+    makeGaugeProvider({
+      name: Metrics.ChannelsTotal,
+      help: 'Total channels registered in the database',
+    }),
+    makeGaugeProvider({
+      name: Metrics.ChannelsJoinedTotal,
+      help: 'Total channels the bot is currently in (joined)',
+    }),
+    makeCounterProvider({
+      name: Metrics.ChannelJoinedCounterTotal,
+      help: 'Number of times a channel was joined',
+      labelNames: ['join_source'],
+    }),
+    makeCounterProvider({
+      name: Metrics.ChannelLeftCounterTotal,
+      help: 'Number of times a channel was left',
+    }),
+    makeGaugeProvider({
+      name: Metrics.ChannelsBotEnabledTotal,
+      help: 'Number of channels where the bot is marked as enabled',
+    }),
+    makeCounterProvider({
+      name: Metrics.BotCommandsExecutedTotal,
+      help: 'Bot commands executed',
+      labelNames: ['command', 'status', 'game'],
+    }),
+    makeGaugeProvider({
+      name: Metrics.SongDatabaseTotal,
+      help: 'Total number of songs in the database',
+      labelNames: ['game'],
+    }),
+    makeGaugeProvider({
+      name: Metrics.SongRequestsTotal,
+      help: 'Total number of song requests in the database',
+      labelNames: [
+        'game',
+        'status', // queued,current,completed
+      ],
+    }),
   ],
 })
 export class BotCommandsModule {}

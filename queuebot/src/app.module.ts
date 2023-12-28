@@ -16,6 +16,7 @@ import { ClientLauncherModule } from './modules/client-launcher/client-launcher.
 import * as path from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { typeORMAppConfig } from './typeorm.config';
+import { MetricsModule } from './modules/metrics/metrics.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { typeORMAppConfig } from './typeorm.config';
     ApiModule,
     ClientLauncherModule,
     AuthModule,
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [],
