@@ -53,6 +53,7 @@ export class PistolWhipSongImporterService implements SongImporter {
               dataItem.id,
               dataItem.modfile.download.binary_url,
               dataItem.name,
+              dataItem.submitted_by.username,
             );
             songCount++;
           }
@@ -67,6 +68,7 @@ export class PistolWhipSongImporterService implements SongImporter {
     modId: number,
     downloadUrl: string,
     modName: string,
+    modSubmitter: string,
   ): Promise<void> {
     return new Promise(async (resolve) => {
       this.logger.log('Downloading ' + downloadUrl);
@@ -75,7 +77,7 @@ export class PistolWhipSongImporterService implements SongImporter {
       const workDir = fs.mkdtempSync(join(tmpdir(), 'queuebot-'));
       const zipPath = join(workDir, 'download.zip');
       await this.modIoApiService.downloadModFile(downloadUrl, zipPath);
-      
+
       // Unzip file - just need the level.pw file inside
       this.logger.log('Processing zip');
       yauzl.open(zipPath, { lazyEntries: true }, (err, zipFile) => {
@@ -94,7 +96,9 @@ export class PistolWhipSongImporterService implements SongImporter {
                     game,
                     modName,
                     levelData.songArtist,
-                    levelData.mapper,
+                    // Using the submitter username from mod.io - the song data itself does not seem to
+                    // be reliable for this
+                    modSubmitter,
                     modId.toString(),
                     downloadUrl,
                     parseInt(levelData.tempo),
@@ -109,7 +113,7 @@ export class PistolWhipSongImporterService implements SongImporter {
                 resolve();
               });
 
-              let levelDataStream = new streams.WritableStream();
+              const levelDataStream = new streams.WritableStream();
 
               readStream.pipe(levelDataStream);
             });
