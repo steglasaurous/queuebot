@@ -6,6 +6,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { MessageFormatterService } from '../services/message-formatter.service';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Metrics } from '../models/metrics.enum';
+import { Counter } from 'prom-client';
 
 @Injectable()
 export class BotCommandListener {
@@ -16,6 +19,8 @@ export class BotCommandListener {
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @Inject('BOT_CHANNEL_NAME') private botChannelName: string,
     private messageFormatterService: MessageFormatterService,
+    @InjectMetric(Metrics.BotCommandsExecutedTotal)
+    private botCommandsExecutedTotal: Counter,
   ) {
     this.botChannel = new Channel();
     this.botChannel.channelName = botChannelName;

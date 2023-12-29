@@ -62,12 +62,9 @@ export class LocalStrategy implements SongSearchStrategyInterface {
   }
 
   supportsGame(game: Game): boolean {
-    switch (game.name) {
-      case 'audio_trip':
-      case 'spin_rhythm':
-        return true;
-    }
-
-    return false;
+    // Put exceptions here. Local should be the
+    // fallback mechanism if no other
+    // strategies are in use. 
+    return true;
   }
 }

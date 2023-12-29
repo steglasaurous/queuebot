@@ -96,7 +96,7 @@ export class SongRequestBotCommand extends BaseBotCommand {
       // Only one? perfect! Let's throw it in the queue.
       return await this.addSongToQueue(channel, chatMessage, searchResults[0]);
     } else if (searchResults.length > 1) {
-      this.botStateService.setState(
+      await this.botStateService.setState(
         chatMessage.username,
         chatMessage.channelName,
         { lastQueryResults: searchResults },

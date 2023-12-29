@@ -28,6 +28,7 @@ export type I18nTranslations = {
         "BotIsOn": string;
         "RequestHelp_audio_trip": string;
         "RequestHelp_spin_rhythm": string;
+        "RequestHelp_pistol_whip": string;
         "QueueCleared": string;
         "QueueAlreadyClosed": string;
         "QueueClosed": string;

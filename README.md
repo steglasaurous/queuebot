@@ -1,7 +1,12 @@
 # RequestoBot (queuebot)
 
-A song request chat bot which manages song requests for streamers playing games that don't have their own built-in
+A song request chatbot which manages song requests for streamers playing games that don't have their own built-in
 request system.  
+
+Supported Games:
+* Audio Trip
+* Spin Rhythm XD
+* Pistol Whip
 
 ## How to use
 
@@ -102,19 +107,11 @@ Everything below here is useful if you want to contribute towards developing the
 
 ## Setup
 
-1. Create .env file with relevant credentials and place it in queuebot/.env
-
-```env
-# Client ID and Secret are for this app in particular. 
-TWITCH_APP_CLIENT_ID=client_id_here
-TWITCH_APP_CLIENT_SECRET=client_secret_here
-
-# Twitch credentials file to use for the bot to be able to interact in chat.
-# See "Getting the initial token using an OAuth code" at https://twurple.js.org/docs/auth/providers/refreshing.html
-TWITCH_TOKEN_FILE=twitch_token.json
-TWITCH_CHANNEL=steg_bot
-```
+1. Setup .env file:
+   1. For running locally (without docker), copy queuebot/env.dist to queuebot/.env and fill in the values as needed.  Note you will also need a postgres database to connect to.  You can start just the database in docker using `docker compose up db -d` to spin one up.
+   2. If running with docker, copy `queuebot/env.dist` to `.env` (in the root folder) - the docker compose config will use this to populate a .env file in the container.
 
 2. Create twitch_token.json file with twitch token credentials.  Follow process detailed here: https://twurple.js.org/docs/auth/providers/refreshing.html
 
-3. For development, run `npm run start:dev`. For production, build the docker instance (TBD)
+3. Run `npm run start:dev` to start the server.
+
