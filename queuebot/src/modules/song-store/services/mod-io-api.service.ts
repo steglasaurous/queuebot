@@ -27,9 +27,15 @@ export class ModIoApiService {
       const results: object[] = [];
       while (morePagesRemain) {
         this.logger.log('Getting page of data');
-        const result = await this.sendApiRequest(`${this.baseUrl}/games/${modIoGameId}/mods?_offset=${offset}&api_key=${this.apiKey}`);
+        const result = await this.sendApiRequest(
+          `${this.baseUrl}/games/${modIoGameId}/mods?_offset=${offset}&api_key=${this.apiKey}`,
+        );
         results.push(result);
-        this.logger.log('result', { count: result.result_count, offset: result.result_offset, total: result.result_total });
+        this.logger.log('result', {
+          count: result.result_count,
+          offset: result.result_offset,
+          total: result.result_total,
+        });
         if (result.result_count + result.result_offset >= result.result_total) {
           morePagesRemain = false;
         }
@@ -43,12 +49,10 @@ export class ModIoApiService {
 
   private sendApiRequest(url: string): Promise<any> {
     return new Promise<object>((resolve) => {
-      this.httpService
-        .get(url)
-        .subscribe(async (response) => {
-          // Check if there's more pages of results.  If we don't have them all, keep getting the next page until we're done.
-          resolve(response.data);
-        });
+      this.httpService.get(url).subscribe(async (response) => {
+        // Check if there's more pages of results.  If we don't have them all, keep getting the next page until we're done.
+        resolve(response.data);
+      });
     });
   }
 
@@ -68,7 +72,7 @@ export class ModIoApiService {
           url: binaryUrl,
           method: 'GET',
           responseType: 'stream',
-        });  
+        });
       } catch (e) {
         // If it's a 429, we'll wait to try again - this is a rate limit reached problem.
         if (e.response.status == 429) {
@@ -77,32 +81,29 @@ export class ModIoApiService {
           if (e.response.headers['retry-when']) {
             retryWhen = parseInt(e.response.headers['retry-when']) * 1000;
           }
-  
+
           this.logger.log('Received 429 - waiting to retry', {
             retryWhen: retryWhen,
           });
           this.timeoutHandles.set(
             'downloadModFile',
-            setTimeout(
-              async () => {
-                this.timeoutHandles.delete('downloadModFile');
-                resolve(await this.downloadModFile(binaryUrl, destinationPath));
-              },
-              retryWhen,
-            ),
+            setTimeout(async () => {
+              this.timeoutHandles.delete('downloadModFile');
+              resolve(await this.downloadModFile(binaryUrl, destinationPath));
+            }, retryWhen),
           );
         } else {
-          console.log('Caught an axios exception', { e });
-          throw e;  
+          this.logger.warn('Caught an axios exception', { e });
+          throw e;
         }
       }
-      
+
       if (response) {
         response.data.pipe(writer);
         writer.on('finish', () => {
           resolve(destinationPath);
-        });  
-      }      
+        });
+      }
     });
   }
 }
