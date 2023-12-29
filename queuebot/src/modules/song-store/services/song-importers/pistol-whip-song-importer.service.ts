@@ -29,11 +29,6 @@ export class PistolWhipSongImporterService implements SongImporter {
   ) {}
 
   gameName = 'pistol_whip';
-  // FIXME: CONTINUE HERE -
-  // - Implement a mod.io service that handles:
-  //   - Paginated resultss
-  //   - Manage rate limits when limit is hit, especially around downloads
-  // - Handle cases of shit data (some songs have no title or artist?)
 
   importSongs(): Promise<number> {
     return new Promise<number>(async (resolve) => {
