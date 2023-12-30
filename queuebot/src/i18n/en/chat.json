@@ -25,7 +25,7 @@
   "RequestHelp_audio_trip": "How to request songs: Goto https://atcd.club and click on 'Choreography Library' for available songs. To request, type !req title in chat.",
   "RequestHelp_spin_rhythm": "How to request songs: Goto https://spinsha.re for available songs.  To request, type !req title in chat. You can also request by spinsha.re id like !req 9559 or by URL !req https://spinsha.re/song/9559",
   "RequestHelp_pistol_whip": "How to request songs: Goto https://mod.io/g/pistol-whip for available songs.  (OST songs also available!) To request, type !req title in chat.",
-  "RequestHelp_dance_dash": "How to request songs: Goto https://mod.io/g/dance-dash for available songs.  (OST songs also available!) To request, type !req title in chat.",
+  "RequestHelp_dance_dash": "How to request songs: Goto https://mod.io/g/dancedash for available songs.  (OST songs also available!) To request, type !req title in chat.",
   "QueueCleared": "Queue cleared.",
   "QueueAlreadyClosed": "Queue is already closed.",
   "QueueClosed": "Queue is now closed.",
