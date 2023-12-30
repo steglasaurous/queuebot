@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SteamAuthController } from './steam-auth.controller';
-import { getGenericNestMock } from '../../../test/test-helper';
-import { JWT_COOKIE_NAME, JWT_EXPIRE_TIME } from '../../injection-tokens';
+import { getGenericNestMock } from '../../../../test/helpers';
+import { JWT_COOKIE_NAME, JWT_EXPIRE_TIME } from '../../../injection-tokens';
 
 describe('SteamAuthController', () => {
   let controller: SteamAuthController;

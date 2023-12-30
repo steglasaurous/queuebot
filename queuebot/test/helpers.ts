@@ -4,7 +4,6 @@ import { MockFunctionMetadata, ModuleMocker } from 'jest-mock';
 // import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 export const getGenericNestMock = (token) => {
-  console.log(token);
   const moduleMocker = new ModuleMocker(global);
 
   // if (token == WINSTON_MODULE_PROVIDER) {

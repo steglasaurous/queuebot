@@ -6,7 +6,6 @@ import { getGenericNestMock } from '../../../../test/helpers';
 import { BotStateService } from '../services/bot-state.service';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { MessageFormatterService } from '../services/message-formatter.service';
 import { AbstractChatClient } from '../../chat/services/clients/abstract-chat.client';
 import { Game } from '../../data-store/entities/game.entity';
 import { ChatMessage } from '../../chat/services/chat-message';
@@ -17,8 +16,6 @@ describe('SongRequestBotCommand', () => {
   let botStateService;
   let i18n;
   let songRequestService;
-  let messageFormatterService;
-  let channelRepository;
   let songService;
 
   const getChatMessageObject = (): ChatMessage => {
@@ -82,8 +79,6 @@ describe('SongRequestBotCommand', () => {
     botStateService = module.get<BotStateService>(BotStateService);
     i18n = module.get(I18nService);
     songRequestService = module.get(SongRequestService);
-    messageFormatterService = module.get(MessageFormatterService);
-    channelRepository = module.get(getRepositoryToken(Channel));
     songService = module.get(SongService);
   });
 
@@ -94,10 +89,6 @@ describe('SongRequestBotCommand', () => {
   // FIXME: RIght now using the built-in nest logger, we can't spy on it or mock it because it's private.
   //        I'm thinking replace with winston so we can spy on it AND log to other things like syslog.
   xit('should not do anything if the channelName cannot be found in the database', async () => {
-    channelRepository.findOneBy.mockImplementation(() => {
-      return undefined;
-    });
-
     // await botCommand.execute(getChatMessageObject());
   });
 
@@ -105,10 +96,6 @@ describe('SongRequestBotCommand', () => {
 
   it('should display a help message relevant to the current game if no search terms are present', async () => {
     const channel = getChannelObject();
-
-    channelRepository.findOneBy.mockImplementation(() => {
-      return channel;
-    });
 
     const chatMessage = getChatMessageObject();
     chatMessage.message = '!req';
@@ -129,10 +116,6 @@ describe('SongRequestBotCommand', () => {
     const channel = getChannelObject();
     channel.queueOpen = false;
 
-    channelRepository.findOneBy.mockImplementation(() => {
-      return channel;
-    });
-
     const chatMessage = getChatMessageObject();
     chatMessage.message = '!req test';
 
@@ -142,7 +125,9 @@ describe('SongRequestBotCommand', () => {
 
     const response = await botCommand.execute(channel, chatMessage);
 
-    expect(i18n.t).toHaveBeenCalledWith('chat.SorryQueueIsClosed');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SorryQueueIsClosed', {
+      lang: 'en',
+    });
 
     expect(response).toEqual('Queue Closed');
 
@@ -151,10 +136,6 @@ describe('SongRequestBotCommand', () => {
 
   it('should send an error message when search throws an error', async () => {
     const channel = getChannelObject();
-
-    channelRepository.findOneBy.mockImplementation(() => {
-      return channel;
-    });
 
     const chatMessage = getChatMessageObject();
     chatMessage.message = '!req test';
