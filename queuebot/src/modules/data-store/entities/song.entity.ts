@@ -17,12 +17,16 @@ import { SongRequest } from './song-request.entity';
 export class Song {
   @PrimaryGeneratedColumn()
   id: number;
+
+  /**
+   * A hash or any string that serves as a unique identifier for this song within a game.
+   */
   @Column({ unique: true })
   songHash: string;
   @Column()
   title: string;
-  @Column()
-  artist: string;
+  @Column({ nullable: true })
+  artist?: string;
   @Column()
   mapper: string;
   @Column({ nullable: true })
@@ -52,7 +56,7 @@ export class Song {
   @Column({
     generatedType: 'STORED',
     asExpression: `to_tsvector('english', coalesce(title, '') || ' ' || coalesce(artist, '') || ' ' || coalesce(mapper, ''))`,
-    type: 'tsvector'
+    type: 'tsvector',
   })
   songSearch: string;
 }

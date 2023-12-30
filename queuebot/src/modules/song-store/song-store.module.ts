@@ -17,6 +17,7 @@ import { SpinRhythmSongImporterService } from './services/song-importers/spin-rh
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PistolWhipSongImporterService } from './services/song-importers/pistol-whip-song-importer.service';
 import { ModIoApiService } from './services/mod-io-api.service';
+import { DanceDashSongImporterService } from './services/song-importers/dance-dash-song-importer.service';
 
 @Module({
   imports: [
@@ -44,19 +45,22 @@ import { ModIoApiService } from './services/mod-io-api.service';
     AudioTripSongImporterService,
     SpinRhythmSongImporterService,
     PistolWhipSongImporterService,
+    DanceDashSongImporterService,
     {
       provide: SONG_IMPORTERS,
       inject: [
         AudioTripSongImporterService,
         SpinRhythmSongImporterService,
         PistolWhipSongImporterService,
+        DanceDashSongImporterService,
       ],
       useFactory: (
         audioTrip: AudioTripSongImporterService,
         spin: SpinRhythmSongImporterService,
         pistolWhip: PistolWhipSongImporterService,
+        danceDash: DanceDashSongImporterService,
       ) => {
-        return [audioTrip, spin, pistolWhip];
+        return [audioTrip, spin, pistolWhip, danceDash];
       },
     },
     LocalStrategy,
