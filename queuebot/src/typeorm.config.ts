@@ -15,6 +15,7 @@ import { Migration1703611705901 } from '../migrations/1703611705901-migration';
 import { InitialStaticDataMigration1703611705901 } from '../migrations/1703611705901-initial-static-data-migration';
 import { Migration1703732675188 } from '../migrations/1703732675188-migration';
 import { Migration1703793463813 } from '../migrations/1703793463813-migration';
+import { Migration1703896119654 } from '../migrations/1703896119654-migration';
 
 export const typeORMAppConfig: DataSourceOptions = {
   type: 'postgres',
@@ -37,5 +38,6 @@ export const typeORMAppConfig: DataSourceOptions = {
     InitialStaticDataMigration1703611705901,
     Migration1703732675188,
     Migration1703793463813,
+    Migration1703896119654,
   ],
 };

@@ -12,9 +12,11 @@ import { join } from 'path';
 
 import * as streams from 'memory-streams';
 import { ModIoApiService } from '../mod-io-api.service';
+// FIXME: This class is 99% the same as pistol whip.  Refactor to either use the same class
+//        or extend from a common base class.
 
 @Injectable()
-export class PistolWhipSongImporterService implements SongImporter {
+export class DanceDashSongImporterService implements SongImporter {
   private logger: Logger = new Logger(this.constructor.name);
 
   constructor(
@@ -23,14 +25,14 @@ export class PistolWhipSongImporterService implements SongImporter {
     private modIoApiService: ModIoApiService,
   ) {}
 
-  gameName = 'pistol_whip';
+  gameName = 'dance_dash';
 
   importSongs(): Promise<number> {
     return new Promise<number>(async (resolve) => {
       const game = await this.gameRepository.findOneBy({ name: this.gameName });
       let songCount = 0;
 
-      const data = await this.modIoApiService.getModsForGame(4407);
+      const data = await this.modIoApiService.getModsForGame(5575);
       for (const dataPage of data) {
         for (const dataItem of dataPage.data) {
           const existingSong = await this.songService.getSongBySongHash(
@@ -75,7 +77,7 @@ export class PistolWhipSongImporterService implements SongImporter {
         zipFile.readEntry();
         zipFile.on('end', () => {});
         zipFile.on('entry', (entry) => {
-          if (entry.fileName == 'level.pw') {
+          if (entry.fileName == 'info.json') {
             // Read this into memory as it's small enough
             zipFile.openReadStream(entry, (err, readStream) => {
               if (err) throw err;
@@ -85,15 +87,14 @@ export class PistolWhipSongImporterService implements SongImporter {
                   this.songService.createSongEntity(
                     game,
                     modName,
-                    levelData.songArtist,
+                    levelData.SongAuthorName,
                     // Using the submitter username from mod.io - the song data itself does not seem to
                     // be reliable for this
                     modSubmitter,
                     modId.toString(),
                     downloadUrl,
-                    parseInt(levelData.tempo),
-                    parseInt(levelData.songLength),
-                    levelData.maps[0],
+                    parseInt(levelData.Bpm),
+                    parseInt(levelData.SongLength),
                   ),
                 );
                 zipFile.close();
