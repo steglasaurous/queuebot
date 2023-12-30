@@ -1,17 +1,65 @@
 # RequestoBot (queuebot)
 
 A song request chatbot which manages song requests for streamers playing games that don't have their own built-in
-request system.  
+request system.  It has an up-to-date database of song details for OSTs and custom songs for each supported game.
 
 Supported Games:
 * Audio Trip
 * Spin Rhythm XD
 * Pistol Whip
+* Dance Dash
 
-## How to use
+## Getting Started
 
 1. Goto https://twitch.tv/requestobot, click on "Chat", then type `!join` to have the bot join your channel.
 2. Commands and info on how to use the bot are detailed below, as well as on requestobot's about page.  You can find that [here](https://www.twitch.tv/requestobot/about). 
+
+## Usage
+
+1. When setting up for a game, use `!setgame` to tell requestobot which game you're playing, so it can search through the
+appropriate songs when getting requests.  For example, to set the game to Spin Rhythm XD: 
+
+```
+steglasaurous: !setgame spin rhythm xd
+requestobot: ! Game changed to Spin Rhythm XD
+```
+
+Possible games are: `audio trip`, `spin rhythm xd`, `pistol whip`, `dance dash`
+
+2. Your viewers can use `!req` to request songs.  For example: 
+
+```
+steglasaurous: !req esoteria
+requestobot: ! Esoteria by Geoplex (Dama) added to the queue.
+```
+
+Using `!req` by itself will show instructions on how to request songs appropriate to the current game. Here's an example
+when the game is set to Spin Rhythm XD:
+
+```
+steglasaurous: !req
+requestobot: ! How to request songs: Goto https://spinsha.re for available songs.  To request, type !req title in chat. You can also request by spinsha.re id like !req 9559 or by URL !req https://spinsha.re/song/9559
+```
+
+3. To get the next song that's on the queue, use `!nextsong`.  This will show what the next request is (and by whom), and will advance the queue forward.  Example:
+
+```
+steglasaurous: !nextsong
+requestobot: ! Esoteria by Geoplex (Dama) requested by @steglasaurous is next!
+```
+
+If the queue is empty, the bot will let you know:
+
+```
+steglasaurous: !nextsong
+requestobot: ! No requests in queue.
+```
+
+Note that this command can only be used by the broadcaster or moderators.
+
+There are plenty of other commands available - see below for the complete list.
+
+Happy streaming!
 
 ## Command List
 
