@@ -35,7 +35,9 @@ export class GetOutBotCommand extends BaseBotCommand {
     // Signal that we're gonna GTFO
     await chatMessage.client.sendMessage(
       chatMessage.channelName,
-      this.messageFormatterService.formatMessage(this.i18n.t('chat.ImOut')),
+      this.messageFormatterService.formatMessage(
+        this.i18n.t('chat.ImOut', { lang: channel.lang }),
+      ),
     );
 
     // Leave the channel

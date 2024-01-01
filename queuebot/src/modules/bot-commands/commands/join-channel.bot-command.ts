@@ -10,7 +10,6 @@ import { BaseBotCommand } from './base.bot-command';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import { Metrics } from '../models/metrics.enum';
 import { Counter, Gauge } from 'prom-client';
-// import { I18nTranslations } from '../../../generated/i18n.generated';
 
 @Injectable()
 export class JoinChannelBotCommand extends BaseBotCommand {
