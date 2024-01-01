@@ -8,6 +8,7 @@ import { AbstractChatClient } from '../../chat/services/clients/abstract-chat.cl
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { I18nService } from 'nestjs-i18n';
+import { MessageFormatterService } from '../services/message-formatter.service';
 
 describe('Join channel bot command', () => {
   const channelRepositoryMock = {
@@ -16,6 +17,7 @@ describe('Join channel bot command', () => {
   };
   let service: JoinChannelBotCommand;
   let i18n;
+  let messageFormatterService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -52,6 +54,11 @@ describe('Join channel bot command', () => {
 
     service = module.get(JoinChannelBotCommand);
     i18n = module.get(I18nService);
+    messageFormatterService = module.get(MessageFormatterService);
+
+    i18n.t.mockImplementation((key: string) => {
+      return key;
+    });
   });
 
   afterEach(() => {
@@ -65,6 +72,7 @@ describe('Join channel bot command', () => {
   it('should join a new channel', async () => {
     channelRepositoryMock.findOneBy.mockReturnValue(undefined);
     const channel = new Channel();
+    channel.lang = 'en';
 
     const chatMessage = {
       userIsBroadcaster: false,
@@ -76,9 +84,9 @@ describe('Join channel bot command', () => {
       } as unknown as AbstractChatClient,
     } as unknown as ChatMessage;
 
-    i18n.t
-      .mockReturnValueOnce('chat.HelloChannel')
-      .mockReturnValueOnce('chat.JoinedChannel');
+    messageFormatterService.formatMessage.mockReturnValueOnce(
+      'chat.HelloChannel',
+    );
 
     const response = await service.execute(channel, chatMessage);
     const channelSaveActual = channelRepositoryMock.save.mock.calls[0][0];
@@ -87,11 +95,104 @@ describe('Join channel bot command', () => {
     expect(channelSaveActual.joinedOn).toBeInstanceOf(Date);
     expect(channelSaveActual.queueOpen).toBeTruthy();
     expect(channelSaveActual.game).toBeInstanceOf(Game);
-    expect(chatMessage.client.joinChannel).toBeCalledWith(chatMessage.username);
-
-    expect(chatMessage.client.sendMessage).toBeCalledWith(
+    expect(chatMessage.client.joinChannel).toHaveBeenCalledWith(
+      chatMessage.username,
+    );
+    expect(chatMessage.client.sendMessage).toHaveBeenCalledWith(
       chatMessage.username,
       'chat.HelloChannel',
     );
+
+    expect(response).toEqual('chat.JoinedChannel');
+    expect(i18n.t.mock.calls[1][1]).toEqual({
+      lang: 'en',
+      args: { channelName: chatMessage.username },
+    });
+  });
+
+  it('should respond with an already joined message if the bot is already in the channel', async () => {
+    const userChannel = new Channel();
+    userChannel.channelName = 'steglasaurous';
+    userChannel.inChannel = true;
+
+    channelRepositoryMock.findOneBy.mockReturnValue(
+      Promise.resolve(userChannel),
+    );
+    const channel = new Channel();
+    channel.lang = 'en';
+
+    const chatMessage = {
+      userIsBroadcaster: false,
+      userIsMod: false,
+      username: 'steglasaurous',
+      client: {
+        sendMessage: jest.fn(),
+        joinChannel: jest.fn(),
+      } as unknown as AbstractChatClient,
+    } as unknown as ChatMessage;
+
+    const response = await service.execute(channel, chatMessage);
+    expect(i18n.t).toHaveBeenCalledWith('chat.AlreadyJoined', { lang: 'en' });
+    expect(response).toEqual('chat.AlreadyJoined');
+  });
+
+  it("should re-join a channel if it's in the database but not in the channel", async () => {
+    const userChannel = new Channel();
+    userChannel.inChannel = false;
+    userChannel.channelName = 'steglasaurous';
+
+    channelRepositoryMock.findOneBy.mockReturnValue(
+      Promise.resolve(userChannel),
+    );
+
+    const channel = new Channel();
+    channel.lang = 'en';
+
+    const chatMessage = {
+      userIsBroadcaster: false,
+      userIsMod: false,
+      username: 'steglasaurous',
+      client: {
+        sendMessage: jest.fn(),
+        joinChannel: jest.fn(),
+      } as unknown as AbstractChatClient,
+    } as unknown as ChatMessage;
+
+    messageFormatterService.formatMessage.mockReturnValueOnce(
+      'chat.HelloChannel',
+    );
+
+    const response = await service.execute(channel, chatMessage);
+    const channelSaveActual = channelRepositoryMock.save.mock.calls[0][0];
+    expect(channelSaveActual.channelName).toEqual(chatMessage.username);
+    expect(channelSaveActual.inChannel).toBeTruthy();
+    expect(channelSaveActual.joinedOn).toBeInstanceOf(Date);
+    expect(channelSaveActual.queueOpen).toBeTruthy();
+    expect(channelSaveActual.game).toBeInstanceOf(Game);
+    expect(chatMessage.client.joinChannel).toHaveBeenCalledWith(
+      chatMessage.username,
+    );
+    expect(chatMessage.client.sendMessage).toHaveBeenCalledWith(
+      chatMessage.username,
+      'chat.HelloChannel',
+    );
+
+    expect(response).toEqual('chat.JoinedChannel');
+    expect(i18n.t.mock.calls[1][1]).toEqual({
+      lang: 'en',
+      args: { channelName: chatMessage.username },
+    });
+  });
+
+  it("should only trigger if the message is in the bot's own channel", () => {
+    const chatMessage = {
+      channelName: 'BOT_CHANNEL_NAME',
+      message: '!join',
+    } as unknown as ChatMessage;
+    expect(service.matchesTrigger(chatMessage)).toBeTruthy();
+  });
+
+  it('should always be allowed to trigger, regardless if the bot is enabled or not', () => {
+    expect(service.shouldAlwaysTrigger()).toBeTruthy();
   });
 });

@@ -76,14 +76,12 @@ export class JoinChannelBotCommand extends BaseBotCommand {
       this.messageFormatterService.formatMessage(
         this.i18n.t('chat.HelloChannel', {
           lang: channelNameEntity.lang,
-          defaultValue: 'Queuebot ready for action.',
         }),
       ),
     );
 
     return this.i18n.t('chat.JoinedChannel', {
       lang: channel.lang,
-      defaultValue: 'Joined channel #{channelName}. Enjoy!',
       args: { channelName: channelNameEntity.channelName },
     });
   }
