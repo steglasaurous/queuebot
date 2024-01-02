@@ -17,7 +17,7 @@ import { GetOutBotCommand } from './commands/get-out.bot-command';
 import { MessageFormatterService } from './services/message-formatter.service';
 import { SetGameBotCommand } from './commands/set-game.bot-command';
 import { HttpModule } from '@nestjs/axios';
-import { OffBotCommand } from './commands/off.bot.command';
+import { OffBotCommand } from './commands/off.bot-command';
 import { OnBotCommand } from './commands/on.bot-command';
 import { ClearBotCommand } from './commands/clear.bot-command';
 import { OpenBotCommand } from './commands/open.bot-command';
