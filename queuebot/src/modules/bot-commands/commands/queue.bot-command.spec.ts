@@ -109,4 +109,11 @@ describe('Open bot command', () => {
       args: { songsRemaining: 1 },
     });
   });
+
+  it('should indicate the queue is empty', async () => {
+    songRequestService.getAllRequests.mockReturnValue([]);
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.QueueEmpty');
+  });
 });
