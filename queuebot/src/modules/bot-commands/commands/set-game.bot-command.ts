@@ -1,4 +1,3 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
@@ -7,12 +6,13 @@ import { Game } from '../../data-store/entities/game.entity';
 import { MessageFormatterService } from '../services/message-formatter.service';
 import { I18nService } from 'nestjs-i18n';
 import { BaseBotCommand } from './base.bot-command';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class SetGameBotCommand extends BaseBotCommand {
   constructor(
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(Game) private gameRepository: Repository<Game>,
-    private messageFormatter: MessageFormatterService,
     private i18n: I18nService,
   ) {
     super();
@@ -32,6 +32,7 @@ export class SetGameBotCommand extends BaseBotCommand {
       .replace('!setgame', '')
       .trim();
     if (!inputGameName) {
+      // FIXME: change this to show the currently set game
       return this.i18n.t('chat.NoGameSpecified');
     }
 
@@ -49,6 +50,7 @@ export class SetGameBotCommand extends BaseBotCommand {
     channel.game = gameSearchResults[0];
     await this.channelRepository.save(channel);
     return this.i18n.t('chat.GameChanged', {
+      lang: channel.lang,
       args: { gameName: channel.game.displayName },
     });
   }
