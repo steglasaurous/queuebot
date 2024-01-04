@@ -2,13 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SongRequestBotCommand } from './song-request.bot-command';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+  getSampleSong,
+} from '../../../../test/helpers';
 import { BotStateService } from '../services/bot-state.service';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { AbstractChatClient } from '../../chat/services/clients/abstract-chat.client';
-import { Game } from '../../data-store/entities/game.entity';
-import { ChatMessage } from '../../chat/services/chat-message';
 import { SongService } from '../../song-store/services/song.service';
 
 describe('SongRequestBotCommand', () => {
@@ -19,40 +21,6 @@ describe('SongRequestBotCommand', () => {
   let songService;
   let channel;
   let chatMessage;
-
-  const getChatMessageObject = (): ChatMessage => {
-    return {
-      channelName: 'testchannel',
-      client: {
-        sendMessage: jest.fn(),
-      } as unknown as AbstractChatClient,
-      message: '!req somesong',
-      id: '1',
-      date: new Date(),
-      color: '',
-      emotes: new Map<string, string[]>(),
-      userIsBroadcaster: false,
-      userIsMod: false,
-      userIsSubscriber: false,
-      userIsVip: false,
-      username: 'testuser',
-    } as ChatMessage;
-  };
-
-  const getChannelObject = (): Channel => {
-    const game = new Game();
-    game.id = 1;
-    game.name = 'spin';
-
-    const channel = new Channel();
-    channel.enabled = true;
-    channel.queueOpen = true;
-    channel.channelName = 'testchannel';
-    channel.game = game;
-    channel.lang = 'en';
-
-    return channel;
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -87,33 +55,8 @@ describe('SongRequestBotCommand', () => {
     songRequestService = module.get(SongRequestService);
     songService = module.get(SongService);
 
-    const game = new Game();
-    game.id = 1;
-    game.name = 'spin';
-
-    channel = new Channel();
-    channel.enabled = true;
-    channel.queueOpen = true;
-    channel.channelName = 'testchannel';
-    channel.game = game;
-    channel.lang = 'en';
-
-    chatMessage = {
-      channelName: 'testchannel',
-      client: {
-        sendMessage: jest.fn(),
-      } as unknown as AbstractChatClient,
-      message: '!req somesong',
-      id: '1',
-      date: new Date(),
-      color: '',
-      emotes: new Map<string, string[]>(),
-      userIsBroadcaster: false,
-      userIsMod: false,
-      userIsSubscriber: false,
-      userIsVip: false,
-      username: 'testuser',
-    } as ChatMessage;
+    channel = getMockChannel();
+    chatMessage = getMockChatMessage();
   });
 
   it('should be defined', () => {
@@ -173,8 +116,23 @@ describe('SongRequestBotCommand', () => {
     expect(i18n.t).toHaveBeenCalledWith('chat.NoSongsFound', { lang: 'en' });
   });
 
-  xit('should add song to the queue if only one result is found', async () => {
-    songService.searchSongs.mockReturnValue([]);
+  it('should add song to the queue if only one result is found', async () => {
+    const sampleSong = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([sampleSong]);
+    songRequestService.addRequest.mockReturnValue({
+      success: true,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAddedToQueue');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAddedToQueue', {
+      lang: 'en',
+      args: {
+        title: sampleSong.title,
+        artist: sampleSong.artist,
+        mapper: sampleSong.mapper,
+      },
+    });
   });
   xit('should send a message with multiple results, storing the results for later selection', async () => {});
   xit('should show x more songs if there are more than 5 songs in the results', async () => {});
