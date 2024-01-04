@@ -12,11 +12,13 @@ import { ChatMessage } from '../../chat/services/chat-message';
 import { SongService } from '../../song-store/services/song.service';
 
 describe('SongRequestBotCommand', () => {
-  let botCommand: SongRequestBotCommand;
+  let service: SongRequestBotCommand;
   let botStateService;
   let i18n;
   let songRequestService;
   let songService;
+  let channel;
+  let chatMessage;
 
   const getChatMessageObject = (): ChatMessage => {
     return {
@@ -24,7 +26,7 @@ describe('SongRequestBotCommand', () => {
       client: {
         sendMessage: jest.fn(),
       } as unknown as AbstractChatClient,
-      message: '',
+      message: '!req somesong',
       id: '1',
       date: new Date(),
       color: '',
@@ -75,91 +77,105 @@ describe('SongRequestBotCommand', () => {
       })
       .compile();
 
-    botCommand = module.get<SongRequestBotCommand>(SongRequestBotCommand);
+    service = module.get<SongRequestBotCommand>(SongRequestBotCommand);
     botStateService = module.get<BotStateService>(BotStateService);
     i18n = module.get(I18nService);
+    i18n.t.mockImplementation((key: string) => {
+      return key;
+    });
+
     songRequestService = module.get(SongRequestService);
     songService = module.get(SongService);
+
+    const game = new Game();
+    game.id = 1;
+    game.name = 'spin';
+
+    channel = new Channel();
+    channel.enabled = true;
+    channel.queueOpen = true;
+    channel.channelName = 'testchannel';
+    channel.game = game;
+    channel.lang = 'en';
+
+    chatMessage = {
+      channelName: 'testchannel',
+      client: {
+        sendMessage: jest.fn(),
+      } as unknown as AbstractChatClient,
+      message: '!req somesong',
+      id: '1',
+      date: new Date(),
+      color: '',
+      emotes: new Map<string, string[]>(),
+      userIsBroadcaster: false,
+      userIsMod: false,
+      userIsSubscriber: false,
+      userIsVip: false,
+      username: 'testuser',
+    } as ChatMessage;
   });
 
   it('should be defined', () => {
-    expect(botCommand).toBeDefined();
+    expect(service).toBeDefined();
   });
 
-  // FIXME: RIght now using the built-in nest logger, we can't spy on it or mock it because it's private.
-  //        I'm thinking replace with winston so we can spy on it AND log to other things like syslog.
-  xit('should not do anything if the channelName cannot be found in the database', async () => {
-    // await botCommand.execute(getChatMessageObject());
+  it('should return a description', () => {
+    expect(service.getDescription()).toBeDefined();
   });
-
-  xit('should not respond if the bot is disabled in the channel', async () => {});
 
   it('should display a help message relevant to the current game if no search terms are present', async () => {
-    const channel = getChannelObject();
-
-    const chatMessage = getChatMessageObject();
     chatMessage.message = '!req';
 
-    i18n.t.mockImplementation(() => {
-      return 'SPIN HELP';
+    const response = await service.execute(channel, chatMessage);
+
+    expect(response).toEqual('chat.RequestHelp_spin');
+    expect(i18n.t).toHaveBeenCalledWith('chat.RequestHelp_spin', {
+      lang: 'en',
     });
-
-    const response = await botCommand.execute(channel, chatMessage);
-
-    expect(i18n.t).toHaveBeenCalledWith('chat.RequestHelp_spin');
-    expect(response).toEqual('SPIN HELP');
 
     return Promise.resolve();
   });
 
   it('should return a message if the queue is closed', async () => {
-    const channel = getChannelObject();
     channel.queueOpen = false;
-
-    const chatMessage = getChatMessageObject();
     chatMessage.message = '!req test';
 
-    i18n.t.mockImplementation(() => {
-      return 'Queue Closed';
-    });
-
-    const response = await botCommand.execute(channel, chatMessage);
-
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SorryQueueIsClosed');
     expect(i18n.t).toHaveBeenCalledWith('chat.SorryQueueIsClosed', {
       lang: 'en',
     });
-
-    expect(response).toEqual('Queue Closed');
 
     return Promise.resolve();
   });
 
   it('should send an error message when search throws an error', async () => {
-    const channel = getChannelObject();
-
-    const chatMessage = getChatMessageObject();
     chatMessage.message = '!req test';
-
-    i18n.t.mockImplementation(() => {
-      return 'Search Error';
-    });
-
     songService.searchSongs.mockImplementation(() => {
       throw new Error('search failed');
     });
 
-    const response = await botCommand.execute(channel, chatMessage);
-
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SearchErrorTryAgain');
     expect(i18n.t).toHaveBeenCalledWith('chat.SearchErrorTryAgain', {
       lang: 'en',
     });
 
-    expect(response).toEqual('Search Error');
-
     return Promise.resolve();
   });
 
-  xit('should add song to the queue if only one result is found', async () => {});
+  it('should return no songs found if search returned with no results', async () => {
+    songService.searchSongs.mockReturnValue([]);
+    const response = await service.execute(channel, chatMessage);
+
+    expect(response).toEqual('chat.NoSongsFound');
+    expect(i18n.t).toHaveBeenCalledWith('chat.NoSongsFound', { lang: 'en' });
+  });
+
+  xit('should add song to the queue if only one result is found', async () => {
+    songService.searchSongs.mockReturnValue([]);
+  });
   xit('should send a message with multiple results, storing the results for later selection', async () => {});
   xit('should show x more songs if there are more than 5 songs in the results', async () => {});
   xit('should add a song from a previous search by # to the request queue', async () => {});

@@ -3,7 +3,6 @@ import { getGenericNestMock } from '../../../../test/helpers';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { I18nService } from 'nestjs-i18n';
-import { OpenBotCommand } from './open.bot-command';
 import { SetGameBotCommand } from './set-game.bot-command';
 import { Game } from '../../data-store/entities/game.entity';
 
@@ -13,7 +12,7 @@ describe('Set game bot command', () => {
     findOneBy: jest.fn(),
   };
   const gameRepositoryMock = {
-    findBy: jest.fn(),
+    findOneBy: jest.fn(),
   };
 
   let service: SetGameBotCommand;
@@ -51,6 +50,9 @@ describe('Set game bot command', () => {
     channel = new Channel();
     channel.lang = 'en';
     channel.queueOpen = false;
+    channel.game = new Game();
+    channel.game.name = 'spin rhythm xd';
+    channel.game.displayName = 'Spin Rhythm XD';
 
     chatMessage = {
       userIsBroadcaster: true,
@@ -73,7 +75,7 @@ describe('Set game bot command', () => {
     game.name = 'somegame';
     game.displayName = 'Some Game';
 
-    gameRepositoryMock.findBy.mockReturnValue([game]);
+    gameRepositoryMock.findOneBy.mockReturnValue(game);
 
     const response = await service.execute(channel, chatMessage);
     expect(response).toEqual('chat.GameChanged');
@@ -83,11 +85,22 @@ describe('Set game bot command', () => {
     });
   });
 
-  it('should show the currently set game', async () => {});
+  it('should show the currently set game', async () => {
+    chatMessage.message = '!setgame';
 
-  it('should indicate the game name matched too many games', async () => {});
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.CurrentGame');
+    expect(i18n.t).toHaveBeenCalledWith('chat.CurrentGame', {
+      lang: 'en',
+      args: { gameName: channel.game.displayName },
+    });
+  });
 
-  it('should indicate the game searched is unsupported or not known', async () => {});
+  it('should indicate the game searched is unsupported or not known', async () => {
+    chatMessage.message = '!setgame nogame';
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.UnsupportedGame');
+  });
 
   it('should not respond if the user is not a broadcaster or moderator', async () => {
     chatMessage.userIsBroadcaster = false;

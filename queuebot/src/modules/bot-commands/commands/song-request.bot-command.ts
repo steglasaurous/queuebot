@@ -38,7 +38,9 @@ export class SongRequestBotCommand extends BaseBotCommand {
     if (chatMessage.message.indexOf(' ') == -1) {
       // No search term.  Display help.
       if (channel.game) {
-        return this.i18n.t(this.getHelpMessageTranslationKey(channel.game));
+        return this.i18n.t(this.getHelpMessageTranslationKey(channel.game), {
+          lang: 'en',
+        });
       }
     }
 
