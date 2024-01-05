@@ -118,6 +118,7 @@ export class SongRequestBotCommand extends BaseBotCommand {
       }
       if (searchResults.length > songLimit) {
         outputMessage += this.i18n.t('chat.AndMore', {
+          lang: channel.lang,
           args: { songsRemaining: searchResults.length - songLimit },
         });
       }
