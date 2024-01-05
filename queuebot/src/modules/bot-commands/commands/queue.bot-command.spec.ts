@@ -1,5 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+  getSampleSong,
+  getSampleSongRequests,
+} from '../../../../test/helpers';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { I18nService } from 'nestjs-i18n';
@@ -22,63 +28,22 @@ describe('Open bot command', () => {
       providers: [QueueBotCommand],
     })
       .useMocker((token) => {
-        switch (token) {
-          case I18nService:
-            return {
-              t: jest.fn(),
-            };
-          default:
-            return getGenericNestMock(token);
-        }
+        return getGenericNestMock(token);
       })
       .compile();
 
     service = module.get(QueueBotCommand);
     i18n = module.get(I18nService);
-    i18n.t.mockImplementation((key: string) => {
-      return key;
-    });
     songRequestService = module.get(SongRequestService);
 
-    channel = new Channel();
-    channel.lang = 'en';
+    channel = getMockChannel();
 
-    chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-      username: 'steglasaurous',
-    } as unknown as ChatMessage;
-    lastSongId = 1;
+    chatMessage = getMockChatMessage();
   });
 
   afterEach(() => {
     jest.resetAllMocks();
   });
-
-  const getSampleSong = (): Song => {
-    const song = new Song();
-    song.id = lastSongId;
-    song.title = 'title_' + lastSongId;
-    song.artist = 'artist_' + lastSongId;
-    song.mapper = 'mapper_' + lastSongId;
-    lastSongId++;
-
-    return song;
-  };
-
-  const getSampleSongRequests = (count: number): SongRequest[] => {
-    const output: SongRequest[] = [];
-
-    for (let i = 0; i < count; i++) {
-      const songRequest = new SongRequest();
-      songRequest.requestOrder = i;
-      songRequest.song = getSampleSong();
-
-      output.push(songRequest);
-    }
-
-    return output;
-  };
 
   it('should return a description of the command', () => {
     expect(service.getDescription().length).toBeGreaterThan(1);

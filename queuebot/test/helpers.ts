@@ -62,6 +62,8 @@ export const getMockChatMessage = (): ChatMessage => {
     channelName: 'testchannel',
     client: {
       sendMessage: jest.fn(),
+      leaveChannel: jest.fn(),
+      joinChannel: jest.fn(),
     } as unknown as AbstractChatClient,
     message: '!req somesong',
     id: '1',
@@ -103,7 +105,7 @@ export const getSampleSongRequests = (count: number): SongRequest[] => {
   for (let i = 0; i < count; i++) {
     const songRequest = new SongRequest();
     songRequest.requestOrder = i;
-    songRequest.song = getSampleSong(i);
+    songRequest.song = getSampleSong(i + 1);
 
     output.push(songRequest);
   }

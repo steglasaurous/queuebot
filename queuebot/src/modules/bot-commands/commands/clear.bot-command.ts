@@ -26,6 +26,6 @@ export class ClearBotCommand extends BaseBotCommand {
     }
 
     await this.songRequestService.clearAllRequests(channel);
-    return this.i18n.t('chat.QueueCleared');
+    return this.i18n.t('chat.QueueCleared', { lang: channel.lang });
   }
 }

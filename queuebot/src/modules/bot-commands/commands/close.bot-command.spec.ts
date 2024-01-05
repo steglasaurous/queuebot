@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+} from '../../../../test/helpers';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { I18nService } from 'nestjs-i18n';
@@ -8,6 +12,9 @@ import { CloseBotCommand } from './close.bot-command';
 describe('Close queue bot command', () => {
   let service: CloseBotCommand;
   let i18nMock;
+  let channel;
+  let chatMessage;
+
   const channelRepositoryMock = {
     save: jest.fn(),
   };
@@ -27,8 +34,9 @@ describe('Close queue bot command', () => {
       .compile();
 
     service = module.get(CloseBotCommand);
-
     i18nMock = module.get(I18nService);
+    channel = getMockChannel();
+    chatMessage = getMockChatMessage();
   });
 
   afterEach(() => {
@@ -40,76 +48,58 @@ describe('Close queue bot command', () => {
   });
 
   it('should close the queue if it is open, and the user is a broadcaster', async () => {
-    const channel = new Channel();
     channel.queueOpen = true;
     channel.lang = 'en';
+    chatMessage.userIsBroadcaster = true;
 
-    const chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-    } as unknown as ChatMessage;
-    i18nMock.t.mockReturnValue('chat.QueueClosed');
     const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.QueueClosed');
     expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueClosed', { lang: 'en' });
     expect(channelRepositoryMock.save).toHaveBeenCalled();
     expect(channelRepositoryMock.save.mock.calls[0][0].queueOpen).toEqual(
       false,
     );
-
-    expect(response).toEqual('chat.QueueClosed');
   });
 
   it('should close the queue if it is open, and the user is a moderator', async () => {
-    const channel = new Channel();
     channel.queueOpen = true;
     channel.lang = 'en';
 
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: true,
-    } as unknown as ChatMessage;
-    i18nMock.t.mockReturnValue('chat.QueueClosed');
+    chatMessage.userIsBroadcaster = false;
+    chatMessage.userIsMod = true;
+
     const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.QueueClosed');
     expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueClosed', { lang: 'en' });
     expect(channelRepositoryMock.save).toHaveBeenCalled();
     expect(channelRepositoryMock.save.mock.calls[0][0].queueOpen).toEqual(
       false,
     );
-
-    expect(response).toEqual('chat.QueueClosed');
   });
 
   it('should respond that the queue is already closed', async () => {
-    const channel = new Channel();
     channel.queueOpen = false;
     channel.lang = 'en';
 
-    const chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-    } as unknown as ChatMessage;
-    i18nMock.t.mockReturnValue('chat.QueueAlreadyClosed');
+    chatMessage.userIsBroadcaster = true;
+
     const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.QueueAlreadyClosed');
     expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueAlreadyClosed', {
       lang: 'en',
     });
     expect(channelRepositoryMock.save).not.toHaveBeenCalled();
-
-    expect(response).toEqual('chat.QueueAlreadyClosed');
   });
 
   it('should not respond if users is not a broadcaster or moderator', async () => {
-    const channel = new Channel();
     channel.queueOpen = false;
     channel.lang = 'en';
 
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: false,
-    } as unknown as ChatMessage;
+    chatMessage.userIsBroadcaster = false;
+    chatMessage.userIsMod = false;
 
     const response = await service.execute(channel, chatMessage);
-    expect(channelRepositoryMock.save).not.toHaveBeenCalled();
     expect(response).toEqual(undefined);
+    expect(channelRepositoryMock.save).not.toHaveBeenCalled();
   });
 });

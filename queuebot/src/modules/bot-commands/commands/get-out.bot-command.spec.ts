@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+} from '../../../../test/helpers';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { I18nService } from 'nestjs-i18n';
@@ -17,6 +21,8 @@ describe('Get out bot command', () => {
   let channelLeftCounterTotal;
   let channelsJoinedTotal;
   let channelsBotEnabledTotal;
+  let channel;
+  let chatMessage;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,7 +32,6 @@ describe('Get out bot command', () => {
         switch (token) {
           case 'ChannelRepository':
             return channelRepositoryMock;
-          // FIXME: Add prom metrics
           case getToken(Metrics.ChannelLeftCounterTotal):
           case getToken(Metrics.ChannelsJoinedTotal):
           case getToken(Metrics.ChannelsBotEnabledTotal):
@@ -51,6 +56,8 @@ describe('Get out bot command', () => {
     channelsBotEnabledTotal = module.get(
       getToken(Metrics.ChannelsBotEnabledTotal),
     );
+    channel = getMockChannel();
+    chatMessage = getMockChatMessage();
   });
 
   afterEach(() => {
@@ -62,22 +69,14 @@ describe('Get out bot command', () => {
   });
 
   it('should close the queue if it is open, and the user is a broadcaster', async () => {
-    const channel = new Channel();
     channel.inChannel = true;
     channel.lang = 'en';
 
-    const chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-      client: {
-        sendMessage: jest.fn(),
-        leaveChannel: jest.fn(),
-      } as unknown as AbstractChatClient,
-    } as unknown as ChatMessage;
+    chatMessage.userIsBroadcaster = true;
 
-    i18nMock.t.mockReturnValue('chat.ImOut');
     const response = await service.execute(channel, chatMessage);
 
+    expect(response).toEqual(undefined);
     expect(i18nMock.t).toHaveBeenCalledWith('chat.ImOut', { lang: 'en' });
     expect(channelRepositoryMock.save).toHaveBeenCalled();
     expect(channelRepositoryMock.save.mock.calls[0][0].inChannel).toEqual(
@@ -88,22 +87,13 @@ describe('Get out bot command', () => {
     );
     expect(channelLeftCounterTotal.inc).toHaveBeenCalled();
     expect(channelsJoinedTotal.dec).toHaveBeenCalled();
-    expect(channelsBotEnabledTotal.dec).toHaveBeenCalled();
 
-    expect(response).toEqual(undefined);
+    expect(channelsBotEnabledTotal.dec).toHaveBeenCalled();
   });
 
   it('should ignore the command if user is not a broadcaster or mod', async () => {
-    const channel = new Channel();
-
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: false,
-      client: {
-        sendMessage: jest.fn(),
-        leaveChannel: jest.fn(),
-      } as unknown as AbstractChatClient,
-    } as unknown as ChatMessage;
+    chatMessage.userIsBroadcaster = false;
+    chatMessage.userIsMod = false;
 
     await service.execute(channel, chatMessage);
     expect(chatMessage.client.sendMessage).not.toHaveBeenCalled();

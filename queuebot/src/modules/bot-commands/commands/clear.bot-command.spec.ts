@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+} from '../../../../test/helpers';
 import { ClearBotCommand } from './clear.bot-command';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { Channel } from '../../data-store/entities/channel.entity';
@@ -10,6 +14,10 @@ describe('Clear bot command', () => {
   let service: ClearBotCommand;
   let songRequestServiceMock;
   let i18nMock;
+
+  let channel;
+  let chatMessage;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [ClearBotCommand],
@@ -22,6 +30,8 @@ describe('Clear bot command', () => {
     service = module.get(ClearBotCommand);
     songRequestServiceMock = module.get(SongRequestService);
     i18nMock = module.get(I18nService);
+    channel = getMockChannel();
+    chatMessage = getMockChatMessage();
   });
 
   it('should return a description of the command', () => {
@@ -29,46 +39,39 @@ describe('Clear bot command', () => {
   });
 
   it('should clear the queue if user is a broadcaster', async () => {
-    const channel = new Channel();
-    const chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-    } as unknown as ChatMessage;
-    i18nMock.t.mockReturnValue('chat.QueueCleared');
+    chatMessage.userIsBroadcaster = true;
+
     const response = await service.execute(channel, chatMessage);
-    expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueCleared');
+    expect(response).toEqual('chat.QueueCleared');
+    expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueCleared', {
+      lang: 'en',
+    });
     expect(songRequestServiceMock.clearAllRequests).toHaveBeenCalledWith(
       channel,
     );
-    expect(response).toEqual('chat.QueueCleared');
   });
 
   it('should clear the queue if user is a moderator', async () => {
-    const channel = new Channel();
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: true,
-    } as unknown as ChatMessage;
-    i18nMock.t.mockReturnValue('chat.QueueCleared');
+    chatMessage.userIsBroadcaster = false;
+    chatMessage.userIsMod = true;
+
     const response = await service.execute(channel, chatMessage);
-    expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueCleared');
+    expect(response).toEqual('chat.QueueCleared');
+    expect(i18nMock.t).toHaveBeenCalledWith('chat.QueueCleared', {
+      lang: 'en',
+    });
     expect(songRequestServiceMock.clearAllRequests).toHaveBeenCalledWith(
       channel,
     );
-    expect(response).toEqual('chat.QueueCleared');
   });
 
   it('should not respond if the user is not a broadcaster or a moderator', async () => {
-    const channel = new Channel();
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: false,
-    } as unknown as ChatMessage;
+    chatMessage.userIsBroadcaster = false;
+    chatMessage.userIdMod = false;
 
     const response = await service.execute(channel, chatMessage);
+    expect(response).not.toBeDefined();
     expect(i18nMock.t).not.toHaveBeenCalled();
     expect(songRequestServiceMock.clearAllRequests).not.toHaveBeenCalled();
-
-    expect(response).not.toBeDefined();
   });
 });

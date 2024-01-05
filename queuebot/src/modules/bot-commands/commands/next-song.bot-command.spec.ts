@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+} from '../../../../test/helpers';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { I18nService } from 'nestjs-i18n';
@@ -30,10 +34,6 @@ describe('Next song bot command', () => {
         switch (token) {
           case 'ChannelRepository':
             return channelRepositoryMock;
-          case I18nService:
-            return {
-              t: jest.fn(),
-            };
           default:
             return getGenericNestMock(token);
         }
@@ -42,19 +42,12 @@ describe('Next song bot command', () => {
 
     service = module.get(NextSongBotCommand);
     i18n = module.get(I18nService);
-    i18n.t.mockImplementation((key: string) => {
-      return key;
-    });
     songRequestService = module.get(SongRequestService);
 
-    channel = new Channel();
-    channel.lang = 'en';
+    channel = getMockChannel();
 
-    chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-      username: 'steglasaurous',
-    } as unknown as ChatMessage;
+    chatMessage = getMockChatMessage();
+    chatMessage.userIsBroadcaster = true;
 
     song = new Song();
     song.title = 'songTitle';

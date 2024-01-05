@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+} from '../../../../test/helpers';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { I18nService } from 'nestjs-i18n';
@@ -31,10 +35,6 @@ describe('Set game bot command', () => {
             return channelRepositoryMock;
           case 'GameRepository':
             return gameRepositoryMock;
-          case I18nService:
-            return {
-              t: jest.fn(),
-            };
           default:
             return getGenericNestMock(token);
         }
@@ -43,23 +43,16 @@ describe('Set game bot command', () => {
 
     service = module.get(SetGameBotCommand);
     i18n = module.get(I18nService);
-    i18n.t.mockImplementation((key: string) => {
-      return key;
-    });
 
-    channel = new Channel();
-    channel.lang = 'en';
+    channel = getMockChannel();
     channel.queueOpen = false;
     channel.game = new Game();
     channel.game.name = 'spin rhythm xd';
     channel.game.displayName = 'Spin Rhythm XD';
 
-    chatMessage = {
-      userIsBroadcaster: true,
-      userIsMod: false,
-      username: 'steglasaurous',
-      message: '!setgame audio trip',
-    } as unknown as ChatMessage;
+    chatMessage = getMockChatMessage();
+    chatMessage.userIsBroadcaster = true;
+    chatMessage.message = '!setgame audio trip';
   });
 
   afterEach(() => {

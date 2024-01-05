@@ -1,10 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getToken } from '@willsoto/nestjs-prometheus';
 import { Metrics } from '../models/metrics.enum';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+} from '../../../../test/helpers';
 import { JoinChannelBotCommand } from './join-channel.bot-command';
 import { Game } from '../../data-store/entities/game.entity';
-import { AbstractChatClient } from '../../chat/services/clients/abstract-chat.client';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { I18nService } from 'nestjs-i18n';
@@ -18,6 +21,8 @@ describe('Join channel bot command', () => {
   let service: JoinChannelBotCommand;
   let i18n;
   let messageFormatterService;
+  let channel;
+  let chatMessage;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,10 +45,6 @@ describe('Join channel bot command', () => {
               inc: jest.fn(),
               dec: jest.fn(),
             };
-          case I18nService:
-            return {
-              t: jest.fn(),
-            };
           case 'BOT_CHANNEL_NAME':
             return token;
           default:
@@ -55,10 +56,11 @@ describe('Join channel bot command', () => {
     service = module.get(JoinChannelBotCommand);
     i18n = module.get(I18nService);
     messageFormatterService = module.get(MessageFormatterService);
+    channel = getMockChannel();
+    channel.channelName = 'BOT_CHANNEL_NAME';
 
-    i18n.t.mockImplementation((key: string) => {
-      return key;
-    });
+    chatMessage = getMockChatMessage();
+    chatMessage.channelName = 'BOT_CHANNEL_NAME';
   });
 
   afterEach(() => {
@@ -71,18 +73,7 @@ describe('Join channel bot command', () => {
 
   it('should join a new channel', async () => {
     channelRepositoryMock.findOneBy.mockReturnValue(undefined);
-    const channel = new Channel();
     channel.lang = 'en';
-
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: false,
-      username: 'steglasaurous',
-      client: {
-        sendMessage: jest.fn(),
-        joinChannel: jest.fn(),
-      } as unknown as AbstractChatClient,
-    } as unknown as ChatMessage;
 
     messageFormatterService.formatMessage.mockReturnValueOnce(
       'chat.HelloChannel',
@@ -118,18 +109,6 @@ describe('Join channel bot command', () => {
     channelRepositoryMock.findOneBy.mockReturnValue(
       Promise.resolve(userChannel),
     );
-    const channel = new Channel();
-    channel.lang = 'en';
-
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: false,
-      username: 'steglasaurous',
-      client: {
-        sendMessage: jest.fn(),
-        joinChannel: jest.fn(),
-      } as unknown as AbstractChatClient,
-    } as unknown as ChatMessage;
 
     const response = await service.execute(channel, chatMessage);
     expect(i18n.t).toHaveBeenCalledWith('chat.AlreadyJoined', { lang: 'en' });
@@ -139,24 +118,11 @@ describe('Join channel bot command', () => {
   it("should re-join a channel if it's in the database but not in the channel", async () => {
     const userChannel = new Channel();
     userChannel.inChannel = false;
-    userChannel.channelName = 'steglasaurous';
+    userChannel.channelName = 'testuser';
 
     channelRepositoryMock.findOneBy.mockReturnValue(
       Promise.resolve(userChannel),
     );
-
-    const channel = new Channel();
-    channel.lang = 'en';
-
-    const chatMessage = {
-      userIsBroadcaster: false,
-      userIsMod: false,
-      username: 'steglasaurous',
-      client: {
-        sendMessage: jest.fn(),
-        joinChannel: jest.fn(),
-      } as unknown as AbstractChatClient,
-    } as unknown as ChatMessage;
 
     messageFormatterService.formatMessage.mockReturnValueOnce(
       'chat.HelloChannel',
