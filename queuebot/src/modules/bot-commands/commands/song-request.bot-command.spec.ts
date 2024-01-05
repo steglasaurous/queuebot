@@ -13,6 +13,7 @@ import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { SongService } from '../../song-store/services/song.service';
 import { UserBotState } from '../../data-store/entities/user-bot-state.entity';
+import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 
 describe('SongRequestBotCommand', () => {
   let service: SongRequestBotCommand;
@@ -189,6 +190,73 @@ describe('SongRequestBotCommand', () => {
       },
     });
   });
-  xit('should match multiple triggers', () => {});
-  xit('should send a message that the song is already in the queue', async () => {});
+
+  it('should return no songs found if an incorrect # is requested from a previous search', async () => {
+    const songResults = [getSampleSong(1), getSampleSong(2)];
+    const botState: UserBotState = {
+      id: 1,
+      requesterName: 'someuser',
+      channel: channel,
+      state: { lastQueryResults: songResults },
+      timestamp: new Date(),
+    };
+
+    botStateService.getState.mockReturnValue(botState);
+    songRequestService.addRequest.mockReturnValue({
+      success: true,
+    });
+
+    chatMessage.message = '!req #8';
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.NoSongsFound');
+    expect(i18n.t).toHaveBeenCalledWith('chat.NoSongsFound', {
+      lang: 'en',
+    });
+  });
+
+  it('should send a message that the song is already in the queue', async () => {
+    const song = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([song]);
+    songRequestService.addRequest.mockReturnValue({
+      success: false,
+      errorType: SongRequestErrorType.ALREADY_IN_QUEUE,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAlreadyInQueue');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAlreadyInQueue', {
+      lang: 'en',
+    });
+  });
+
+  it('should respond that the song has already been played', async () => {
+    const song = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([song]);
+    songRequestService.addRequest.mockReturnValue({
+      success: false,
+      errorType: SongRequestErrorType.ALREADY_PLAYED,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAlreadyPlayed');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAlreadyPlayed', {
+      lang: 'en',
+    });
+  });
+
+  it('should report an error if adding a song request failed for an uncaught reason', async () => {
+    const song = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([song]);
+    songRequestService.addRequest.mockReturnValue({
+      success: false,
+      errorType: SongRequestErrorType.SERVER_ERROR,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongRequestFailed');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongRequestFailed', {
+      lang: 'en',
+    });
+  });
 });
