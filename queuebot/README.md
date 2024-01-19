@@ -1,3 +1,8 @@
+# Authentication
+
+1. Goto /auth/twitch, login to twitch.
+
+
 # Todo
 - [x] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
 - [x] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
@@ -18,25 +23,9 @@
 - [ ] Allow adding songs via client?
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc.
 
-- [x] For multiple search results, include artist and mapper
-- [x] Add !clear to clean out the queue
-- [x] Add !open to open queue, !close to close queue, display appropriate message for requesters when queue is closed.
-- [x] Create docker container config
-- [x] Implement !getout to kick the bot out (or similar command)
-- [x] !oops - Remove last song requested by user
-- [x] !nextsong - Pop the newest song off the queue
-- [x] Implement proper ordering of the queue
-- [x] !queue - List songs in queue
-- [x] Create a dedicated queuebot twitch account
-- [x] Load up entries for Audio Trip OSTs
-- [x] Look into why database wasn't persisted between rebuilds (docker volume)
-- [x] Add exclamation in front of all messages so TTS doesn't read them by default.
-
 Websocket gateway to expose queue state and changes for clients and 3rd party apps
 
-
 Connect:
-Option 1: Build it into a namespace
 `wss://requestobot.steglasaurous.com/queue/{channelName}`
 
 On connect: Emit entire contents of queue, including download links of each song
