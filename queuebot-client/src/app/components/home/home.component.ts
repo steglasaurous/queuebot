@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {QueueListComponent} from "../queue-list/queue-list.component";
+import { QueueListComponent } from '../queue-list/queue-list.component';
 
 @Component({
   selector: 'app-home',
