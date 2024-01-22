@@ -12,6 +12,12 @@ queuebot-client/dist: queuebot-client/node_modules
 queuebot-client/node_modules: queuebot-client/package.json queuebot-client/package-lock.json
 	cd queuebot-client && npm ci
 
-start-server: queuebot/dist
-	cd queuebot && npm run start
+start-server: queuebot/dist queuebot/.env
+	cd queuebot && npm run typeorm:run-migrations && npm run start
+
+queuebot/.env: .env
+	cp .env queuebot/.env
+
+clean:
+	rm -rf queuebot/node_modules queuebot-client/node_modules queuebot/dist queuebot-client/dist
 

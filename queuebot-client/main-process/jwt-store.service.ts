@@ -1,21 +1,21 @@
-import { Inject, Injectable } from '@angular/core';
 import * as jsonwebtoken from 'jsonwebtoken';
 import { JwtPayload } from 'jsonwebtoken';
-import { environment } from '../../environments/environment';
-import { JWT_PUBLIC_KEY } from '../app.config';
+import * as Store from 'electron-store';
+import * as fs from 'fs';
 
-@Injectable({
-  providedIn: 'root',
-})
 export class JwtStoreService {
   constructor(
-    @Inject(JWT_PUBLIC_KEY) private jwtPublicKey = environment.jwtPublicKey,
+    private jwtPublicKey: string,
+    private jwtFilePath: string,
   ) {}
 
   getJwt(): string | null {
     // Check the JWT is still valid. If it's expired, then it's not useful.  We should toss it and
     // return null, which should lead to re-authenticating.
-    const jwt = window.localStorage.getItem('user-jwt');
+    if (!fs.existsSync(this.jwtFilePath)) {
+      return null;
+    }
+    const jwt = fs.readFileSync(this.jwtFilePath).toString();
     if (!jwt) {
       return null;
     }
@@ -45,7 +45,7 @@ export class JwtStoreService {
       return false;
     }
 
-    window.localStorage.setItem('user-jwt', jwt);
+    fs.writeFileSync(this.jwtFilePath, jwt);
 
     return true;
   }
