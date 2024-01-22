@@ -98,7 +98,16 @@ describe('Bot command listener', () => {
     expect(mockChannelRepository.findOneBy).not.toHaveBeenCalled();
   });
 
-  xit('should run the command in the context of the bot channel if the channel was not in the database', async () => {});
+  xit('should run the command in the context of the bot channel if the channel was not in the database', async () => {
+    mockBotCommand.matchesTrigger.mockReturnValue(true);
+    mockChannelRepository.findOneBy.mockReturnValue(undefined);
+    mockBotCommand.execute.mockReturnValue('sampleResponse');
+    mockBotCommand.shouldAlwaysTrigger.mockReturnValue(false);
+    chatEvent.chatMessage.channelName = 'BOT_CHANNEL_NAME';
+
+    await service.handle(chatEvent);
+    // FIXME: CONTINUE HERE
+  });
   xit('should do nothing if the channel was not found in the database, and was not from the bot channel', async () => {});
   xit('should do nothing if the bot is disabled and the command should not always trigger', async () => {});
   xit('should execute the command if shouldAlwaysTrigger is true, even if the channel is disabled', async () => {});

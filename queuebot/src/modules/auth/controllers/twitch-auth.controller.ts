@@ -81,6 +81,8 @@ export class TwitchAuthController {
     );
 
     response.cookie(this.jwtCookieName, this.authService.getJwt(user));
-    response.redirect('/launch');
+    // Do electron redirect here.
+    response.redirect('requestobot://jwt=' + this.authService.getJwt(user));
+    // response.redirect('/launch');
   }
 }
