@@ -19,6 +19,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { DataStoreModule } from '../data-store/data-store.module';
 import { TwitchAuthController } from './controllers/twitch-auth.controller';
 import { HttpModule } from '@nestjs/axios';
+import { AuthCodeController } from './controllers/auth-code.controller';
 
 @Module({
   imports: [
@@ -84,6 +85,11 @@ import { HttpModule } from '@nestjs/axios';
       },
     },
   ],
-  controllers: [SteamAuthController, AuthController, TwitchAuthController],
+  controllers: [
+    SteamAuthController,
+    AuthController,
+    TwitchAuthController,
+    AuthCodeController,
+  ],
 })
 export class AuthModule {}
