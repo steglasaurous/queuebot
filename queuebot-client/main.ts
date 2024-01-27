@@ -37,6 +37,10 @@ let win: BrowserWindow | null;
 //   dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
 // });
 
+function bootstrap() {
+  // FIXME: Continue here - do create window and setup preloads, services, etc.
+}
+
 function createWindow() {
   win = new BrowserWindow({ width: 800, height: 600 });
 

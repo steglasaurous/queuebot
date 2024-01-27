@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
         // Username comes back as result.username
         // Need to grab the username and persist it to some kind of store or service.
         // Could consider ngrx..  otherwise our own service that stores shit?
+        // Use electron-store or similar?  Or just a plain json file managed in the main process.
         // FIXME: CONTINUE HERE
         this.router.navigate(['/home']);
       }
