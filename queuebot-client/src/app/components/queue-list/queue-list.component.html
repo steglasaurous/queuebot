@@ -1,1 +1,21 @@
-<p>queue-list works!</p>
+LIST
+
+
+<div cdkDropList (cdkDropListDropped)="drop($event)">
+  <div cdkDrag class="requestLine" *ngFor="let queueItem of songRequests; index as i"
+       [ngClass]="{ activeRequest: queueItem.isActive }">
+    <div class="requestLineDrag">_ _ _</div>
+    <div class="songDetails">
+      <div class="songTitle">{{ queueItem.song.title }}</div>
+      <div class="songArtist">{{ queueItem.song.artist }}</div>
+      <div class="songMapper">({{ queueItem.song.mapper }})</div>
+    </div>
+    <div class="songLength">{{ queueItem.song.duration }}</div>
+    <div class="requester">{{ queueItem.requesterName }}</div>
+    <div class="localState"> --</div>
+    <div class="controls">
+      <div class="markPlayed">Played</div>
+      <div class="deleteRequest">Delete</div>
+    </div>
+  </div>
+</div>

@@ -3,18 +3,20 @@ import { QueueListComponent } from '../queue-list/queue-list.component';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [QueueListComponent, HttpClientModule],
-  providers: [QueuebotApiService],
+  imports: [QueueListComponent],
+  providers: [],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
   constructor(
     private queuebotApiService: QueuebotApiService,
+    private settingsService: SettingsService,
     private router: Router,
   ) {}
   ngOnInit() {
@@ -24,6 +26,7 @@ export class LoginComponent implements OnInit {
   submitAuthCode(value: string) {
     this.queuebotApiService.getAuthCodeResult(value).subscribe((result) => {
       if (result.status == 'OK') {
+        this.settingsService.setValue('username', result.username);
         // Username comes back as result.username
         // Need to grab the username and persist it to some kind of store or service.
         // Could consider ngrx..  otherwise our own service that stores shit?

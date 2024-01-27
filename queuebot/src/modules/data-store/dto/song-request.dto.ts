@@ -6,4 +6,6 @@ export class SongRequestDto {
   requesterName: string;
   requestTimestamp: number;
   requestOrder: number;
+  isActive: boolean;
+  isDone: boolean;
 }

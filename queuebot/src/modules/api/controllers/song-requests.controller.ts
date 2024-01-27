@@ -47,4 +47,14 @@ export class SongRequestsController {
       return this.dtoMappingService.songRequestToDto(songRequest);
     });
   }
+
+  async changeOrder(
+    @Param('channelName') channelName: string,
+    previousIndex: number,
+    newIndex: number,
+  ) {
+    // FIXME: Implement this
+    // How to get params in a PUT?
+    // Put a guard on this to ensure the user has access to make this change
+  }
 }

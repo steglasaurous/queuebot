@@ -6,12 +6,13 @@
 # Todo
 - [x] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
 - [x] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
-- [ ] Implement Twitch SSO
+- [x] Implement Twitch SSO
 - [ ] Implement broadcaster queue manager UI
   - [ ] Queue display
+  - [ ] Implement websocket connection to queuebot for new song notifications
+  - [ ] Implement drag-and-drop queue reordering
   - [ ] Next song button
   - [ ] Remove song from queue
-
 - [ ] !remove (song #)
 - [ ] Clear out queue when switching games.
 - [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
@@ -22,6 +23,11 @@
 - [ ] Add queue controls to web client
 - [ ] Allow adding songs via client?
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc.
+
+- [ ] Importers: Only report new songs imported, vs total songs
+- [ ] Spin rhythm importer: Implement song downloader to read duration and BPM data (or use API?)
+
+- [ ] Idea: Allow adding search filters by difficulty, so streamer can limit difficulty level being requested.
 
 Websocket gateway to expose queue state and changes for clients and 3rd party apps
 

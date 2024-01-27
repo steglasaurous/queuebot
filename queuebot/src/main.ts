@@ -12,7 +12,10 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.useWebSocketAdapter(new WsAdapter(app));
     const config = await app.get(ConfigService);
-    app.enableCors();
+    app.enableCors({
+      credentials: true,
+      origin: 'http://localhost:4200',
+    });
     await app.listen(config.get('PORT') ?? 3000);
   } else {
     // This is VERY simplistic for now - if started as a worker, assume it's to

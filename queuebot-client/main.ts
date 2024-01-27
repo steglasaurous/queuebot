@@ -2,6 +2,8 @@ import { app, BrowserWindow, dialog, shell } from 'electron';
 
 import * as path from 'path';
 import * as url from 'url';
+import { SettingsStoreService } from './main-process/settings-store.service';
+import ipcMain = Electron.ipcMain;
 
 let win: BrowserWindow | null;
 
@@ -38,11 +40,27 @@ let win: BrowserWindow | null;
 // });
 
 function bootstrap() {
-  // FIXME: Continue here - do create window and setup preloads, services, etc.
+  const settingsService = new SettingsStoreService(
+    path.join(__dirname, 'settings.json'),
+  );
+  ipcMain.on('settings.setValue', (event, key, value) => {
+    settingsService.setValue(key, value);
+  });
+  ipcMain.on('settings.getValue', (event, key) => {
+    return settingsService.getValue(key);
+  });
+
+  createWindow();
 }
 
 function createWindow() {
-  win = new BrowserWindow({ width: 800, height: 600 });
+  win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, '/main-process/preload.js'),
+    },
+  });
 
   win.loadURL(
     url.format({
@@ -68,7 +86,7 @@ function createWindow() {
   // });
 }
 
-app.on('ready', createWindow);
+app.on('ready', bootstrap);
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();

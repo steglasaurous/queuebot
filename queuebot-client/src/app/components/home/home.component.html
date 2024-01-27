@@ -1,4 +1,4 @@
-<h1>Ready</h1>
+<h1>{{  channelName }}</h1>
 <div>
-  <app-queue-list></app-queue-list>
+  <app-queue-list *ngIf="channelName != ''" [channelName]="channelName"></app-queue-list>
 </div>

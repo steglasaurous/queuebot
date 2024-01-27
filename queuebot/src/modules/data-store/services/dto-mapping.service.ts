@@ -24,6 +24,8 @@ export class DtoMappingService {
     songRequestDto.requesterName = songRequest.requesterName;
     songRequestDto.requestOrder = songRequest.requestOrder;
     songRequestDto.requestTimestamp = songRequest.requestTimestamp.valueOf();
+    songRequestDto.isActive = songRequest.isActive;
+    songRequestDto.isDone = songRequest.isDone;
 
     return songRequestDto;
   }
