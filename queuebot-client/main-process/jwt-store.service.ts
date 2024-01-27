@@ -1,7 +1,8 @@
 import * as jsonwebtoken from 'jsonwebtoken';
 import { JwtPayload } from 'jsonwebtoken';
-import * as Store from 'electron-store';
 import * as fs from 'fs';
+
+// FIXME: I might not need this anymore, but depends.  So far, I probably don't need anything out of the JWT per-se.
 
 export class JwtStoreService {
   constructor(

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../../data-store/entities/user.entity';
 import * as crypto from 'crypto';
+import { UserJwt } from '../models/user-jwt';
 
 interface AuthCodeJwt {
   authCode: string;
@@ -42,7 +43,7 @@ export class AuthService {
     return undefined;
   }
   getJwt(user: User) {
-    const payload = {
+    const payload: UserJwt = {
       username: user.username,
       displayName: user.displayName,
       sub: user.id,

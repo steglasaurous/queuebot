@@ -2,6 +2,8 @@ import { Controller, Get, Inject, Param, Res } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { Response } from 'express';
 import { JWT_COOKIE_NAME } from '../../../injection-tokens';
+import * as jsonwebtoken from 'jsonwebtoken';
+import { UserJwt } from '../models/user-jwt';
 
 @Controller('auth-code/:authCode')
 export class AuthCodeController {
@@ -22,6 +24,11 @@ export class AuthCodeController {
     }
 
     res.cookie(this.jwtCookieName, jwt);
-    res.send({ status: 'OK' });
+    // Put the user's channel name in the result so it can be used for default channel, etc, in clients.
+    const decodedJwt: jsonwebtoken.JwtPayload & UserJwt = jsonwebtoken.decode(
+      jwt,
+    ) as jsonwebtoken.JwtPayload & UserJwt;
+
+    res.send({ status: 'OK', username: decodedJwt.username });
   }
 }
