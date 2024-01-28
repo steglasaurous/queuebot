@@ -54,18 +54,19 @@ function bootstrap() {
     path.join(__dirname, 'settings.json'),
   );
 
-  ipcMain.on(IPC_SETTINGS_SET_VALUE, (event, key, value) => {
+  ipcMain.handle(IPC_SETTINGS_SET_VALUE, (event, key, value) => {
     settingsService.setValue(key, value);
   });
 
-  ipcMain.on(IPC_SETTINGS_GET_VALUE, (event, key) => {
+  ipcMain.handle(IPC_SETTINGS_GET_VALUE, (event, key) => {
     return settingsService.getValue(key);
   });
 
-  ipcMain.on(IPC_OPEN_TWITCH_LOGIN, async (event) => {
+  ipcMain.handle(IPC_OPEN_TWITCH_LOGIN, (event, args) => {
     console.log('Opening external');
-    await shell.openExternal(LOGIN_URL);
-    console.log('opened it');
+    shell.openExternal(LOGIN_URL).then(() => {
+      console.log('opened it');
+    });
   });
 
   createWindow();

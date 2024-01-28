@@ -8,7 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "electron-tsc": "tsc main-process/main.ts main-process/constants.ts main-process/preload.ts main-process/settings-store.service.ts  && ng build --base-href ./ && electron ."
+    "electron-tsc": "tsc main-process/main.ts main-process/constants.ts main-process/preload.ts main-process/settings-store.service.ts  && ng build --base-href ./ --configuration=development && electron ."
   },
   "private": true,
   "dependencies": {
