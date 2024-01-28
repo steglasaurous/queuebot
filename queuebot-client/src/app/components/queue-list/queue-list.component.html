@@ -1,5 +1,11 @@
-LIST
-
+<div class="list-heading">
+  <div class="requestLineDragHeading"></div>
+  <div class="songDetailsHeading">Song</div>
+  <div class="songLengthHeading">Length</div>
+  <div class="requesterHeading">Requester</div>
+  <div class="localStateHeading">Local</div>
+  <div class="controlsHeading"></div>
+</div>
 
 <div cdkDropList (cdkDropListDropped)="drop($event)">
   <div cdkDrag class="requestLine" *ngFor="let queueItem of songRequests; index as i"
@@ -14,8 +20,8 @@ LIST
     <div class="requester">{{ queueItem.requesterName }}</div>
     <div class="localState"> --</div>
     <div class="controls">
-      <div class="markPlayed">Played</div>
-      <div class="deleteRequest">Delete</div>
+      <div class="markPlayed"><button><mat-icon>done</mat-icon></button></div>
+      <div class="deleteRequest"><button><mat-icon>delete</mat-icon></button></div>
     </div>
   </div>
 </div>

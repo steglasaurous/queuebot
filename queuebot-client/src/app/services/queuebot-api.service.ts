@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { QueueDto } from '../models/queue.dto';
 import { Observable } from 'rxjs';
 import { QUEUEBOT_API_BASE_URL } from '../app.config';
 import { SongRequestDto } from '../models/song-request.dto';
+import { ChannelDto } from '../models/channel.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +20,13 @@ export class QueuebotApiService {
   getSongRequestQueue(channel: string): Observable<SongRequestDto[]> {
     return this.httpClient.get<SongRequestDto[]>(
       `${this.apiBaseUrl}/api/channels/${channel}/song-requests`,
+      { withCredentials: true },
+    );
+  }
+
+  getChannel(channel: string): Observable<ChannelDto> {
+    return this.httpClient.get<ChannelDto>(
+      `${this.apiBaseUrl}/api/channels/${channel}`,
       { withCredentials: true },
     );
   }

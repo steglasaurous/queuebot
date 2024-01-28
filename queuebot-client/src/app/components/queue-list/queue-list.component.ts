@@ -9,11 +9,12 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { WebsocketService } from '../../services/websocket.service';
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-queue-list',
   standalone: true,
-  imports: [HttpClientModule, CommonModule, DragDropModule],
+  imports: [HttpClientModule, CommonModule, DragDropModule, MatIcon],
   providers: [],
   templateUrl: './queue-list.component.html',
   styleUrl: './queue-list.component.scss',

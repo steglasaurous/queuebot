@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { SongRequest } from '../entities/song-request.entity';
 import { SongRequestDto } from '../dto/song-request.dto';
 import { SongDto } from '../dto/song.dto';
+import { Channel } from '../entities/channel.entity';
+import { GameDto } from '../dto/game.dto';
+import { ChannelDto } from '../dto/channel.dto';
 
 @Injectable()
 export class DtoMappingService {
@@ -28,5 +31,23 @@ export class DtoMappingService {
     songRequestDto.isDone = songRequest.isDone;
 
     return songRequestDto;
+  }
+
+  public channelToDto(channel: Channel): ChannelDto {
+    const gameDto = new GameDto();
+    gameDto.id = channel.game.id;
+    gameDto.name = channel.game.name;
+    gameDto.displayName = channel.game.displayName;
+    gameDto.setGameName = channel.game.setGameName;
+    gameDto.twitchCategoryId = channel.game.twitchCategoryId;
+
+    const channelDto = new ChannelDto();
+    channelDto.game = gameDto;
+    channelDto.channelName = channel.channelName;
+    channelDto.inChannel = channel.inChannel;
+    channelDto.enabled = channel.enabled;
+    channelDto.queueOpen = channel.queueOpen;
+
+    return channelDto;
   }
 }
