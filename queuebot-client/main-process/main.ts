@@ -17,37 +17,37 @@ export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
 
 let win: BrowserWindow | null;
 
-// if (process.defaultApp) {
-//   if (process.argv.length >= 2) {
-//     app.setAsDefaultProtocolClient('requestobot', process.execPath, [
-//       path.resolve(process.argv[1]),
-//     ]);
-//   }
-// } else {
-//   app.setAsDefaultProtocolClient('requestobot');
-// }
-//
-// // Windows and Linux
-// const gotTheLock = app.requestSingleInstanceLock();
-// if (!gotTheLock) {
-//   app.quit();
-// } else {
-//   app.on('second-instance', (event, commandLine, workingDirectory) => {
-//     if (win) {
-//       if (win.isMinimized()) {
-//         win.restore();
-//       }
-//       win.focus();
-//     }
-//
-//     dialog.showErrorBox('Welcome back', `Here you go: ${commandLine.pop()}`);
-//   });
-// }
-//
-// // MacOS
-// app.on('open-url', (event, url) => {
-//   dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
-// });
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('requestobot', process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('requestobot');
+}
+
+// Windows and Linux
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (win) {
+      if (win.isMinimized()) {
+        win.restore();
+      }
+      win.focus();
+    }
+
+    dialog.showErrorBox('Welcome back', `Here you go: ${commandLine.pop()}`);
+  });
+}
+
+// MacOS
+app.on('open-url', (event, url) => {
+  dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
+});
 
 function bootstrap() {
   const settingsService = new SettingsStoreService(
@@ -89,7 +89,7 @@ function createWindow() {
     }),
   );
 
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
 
   win.on('closed', () => {
     win = null;
