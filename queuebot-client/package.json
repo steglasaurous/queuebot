@@ -1,14 +1,14 @@
 {
   "name": "queuebot-client",
   "version": "0.0.0",
-  "main": "main.js",
+  "main": "main-process/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "electron-tsc": "tsc main.ts && ng build --base-href ./ && electron ."
+    "electron-tsc": "tsc main-process/main.ts main-process/constants.ts main-process/preload.ts main-process/settings-store.service.ts  && ng build --base-href ./ && electron ."
   },
   "private": true,
   "dependencies": {

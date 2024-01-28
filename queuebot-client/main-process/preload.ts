@@ -1,10 +1,24 @@
-import { contextBridge } from 'electron';
-import { SettingsStoreService } from './settings-store.service';
-import * as path from 'path';
-import ipcRenderer = Electron.ipcRenderer;
+import { contextBridge, ipcRenderer } from 'electron';
+// import {
+//   IPC_OPEN_TWITCH_LOGIN,
+//   IPC_SETTINGS_GET_VALUE,
+//   IPC_SETTINGS_SET_VALUE,
+// } from './constants';
+
+// FIXME: Doing the import above fails - would be ideal to keep these in one place
+const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
+const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
+const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 
 contextBridge.exposeInMainWorld('settings', {
   setValue: (key: string, value: string) =>
-    ipcRenderer.invoke('settings.setValue', key, value),
-  getValue: (key: string) => ipcRenderer.invoke('settings.getValue', key),
+    ipcRenderer.invoke(IPC_SETTINGS_SET_VALUE, key, value),
+  getValue: (key: string) => ipcRenderer.invoke(IPC_SETTINGS_GET_VALUE, key),
+  openTwitchLogin: () => ipcRenderer.invoke(IPC_OPEN_TWITCH_LOGIN),
 });
+
+// For some reason, this errors out with "
+// contextBridge.exposeInMainWorld('login', {
+//   openTwitchLogin: () => ipcRenderer.invoke(IPC_OPEN_TWITCH_LOGIN),
+// });
+//

@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
-import { QueueDto } from '../../models/queue.dto';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { SongRequestDto } from '../../models/song-request.dto';
@@ -9,6 +8,7 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-queue-list',
@@ -23,7 +23,10 @@ export class QueueListComponent implements OnInit {
   channelName: string = '';
 
   songRequests: SongRequestDto[] = [];
-  constructor(private queuebotApiService: QueuebotApiService) {}
+  constructor(
+    private queuebotApiService: QueuebotApiService,
+    private websocketService: WebsocketService,
+  ) {}
 
   ngOnInit() {
     // Retrieve the latest queue data
@@ -34,6 +37,29 @@ export class QueueListComponent implements OnInit {
           console.log('Got queue', result);
           this.songRequests = result;
         });
+
+      if (!this.websocketService.isConnected) {
+        this.websocketService.connect({
+          next: () => {
+            this.websocketService.sendMessage({
+              event: 'subscribe',
+              data: {
+                channelName: this.channelName,
+              },
+            });
+          },
+          error: () => {},
+          complete: () => {},
+        });
+      }
+
+      this.websocketService.messages$.subscribe((message) => {
+        console.log(message);
+        if (message.event == 'songRequestAdded') {
+          console.log('Adding new song');
+          this.songRequests.push(message.data as SongRequestDto);
+        }
+      });
     }
   }
 

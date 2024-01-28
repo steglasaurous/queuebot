@@ -1,6 +1,6 @@
 <div>
   <div>
-    <a href="http://localhost:3000/auth/twitch" target="_blank">Login to Twitch</a>
+    <button (click)="openLoginPage()">Login to Twitch</button>
   </div>
   <input type="text" name="authcode" #authcode /><button (click)="submitAuthCode(authcode.value)">Submit</button>
 </div>

@@ -1,9 +1,19 @@
-import { app, BrowserWindow, dialog, shell } from 'electron';
+import { app, BrowserWindow, dialog, shell, ipcMain } from 'electron';
 
 import * as path from 'path';
 import * as url from 'url';
-import { SettingsStoreService } from './main-process/settings-store.service';
-import ipcMain = Electron.ipcMain;
+import { SettingsStoreService } from './settings-store.service';
+// import {
+//   IPC_OPEN_TWITCH_LOGIN,
+//   IPC_SETTINGS_GET_VALUE,
+//   IPC_SETTINGS_SET_VALUE,
+//   LOGIN_URL,
+// } from './constants';
+
+export const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
+export const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
+export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
+export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
 
 let win: BrowserWindow | null;
 
@@ -43,11 +53,19 @@ function bootstrap() {
   const settingsService = new SettingsStoreService(
     path.join(__dirname, 'settings.json'),
   );
-  ipcMain.on('settings.setValue', (event, key, value) => {
+
+  ipcMain.on(IPC_SETTINGS_SET_VALUE, (event, key, value) => {
     settingsService.setValue(key, value);
   });
-  ipcMain.on('settings.getValue', (event, key) => {
+
+  ipcMain.on(IPC_SETTINGS_GET_VALUE, (event, key) => {
     return settingsService.getValue(key);
+  });
+
+  ipcMain.on(IPC_OPEN_TWITCH_LOGIN, async (event) => {
+    console.log('Opening external');
+    await shell.openExternal(LOGIN_URL);
+    console.log('opened it');
   });
 
   createWindow();
@@ -58,17 +76,19 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '/main-process/preload.js'),
+      preload: path.join(__dirname, '/preload.js'),
     },
   });
 
   win.loadURL(
     url.format({
-      pathname: path.join(__dirname, '/dist/browser/index.html'),
+      pathname: path.join(__dirname, '/../dist/browser/index.html'),
       protocol: 'file:',
       slashes: true,
     }),
   );
+
+  win.webContents.openDevTools();
 
   win.on('closed', () => {
     win = null;

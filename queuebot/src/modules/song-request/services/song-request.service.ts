@@ -57,10 +57,11 @@ export class SongRequestService {
       try {
         const savedSongRequest =
           await this.songRequestRepository.save(songRequest);
-        this.eventEmitter.emit(SongRequestAddedEvent.name, {
+        this.eventEmitter.emit(SongRequestAddedEvent.constructor.name, {
           songRequest: savedSongRequest,
         });
         resolve({ success: true });
+        return;
       } catch (error) {
         let errorType = SongRequestErrorType.SERVER_ERROR;
 
@@ -82,7 +83,7 @@ export class SongRequestService {
         } else {
           this.logger.warn('Saving song request threw error', { error: error });
         }
-        
+
         resolve({
           success: false,
           errorType: errorType,
@@ -111,7 +112,7 @@ export class SongRequestService {
       await this.songRequestRepository.save(nextRequest);
     }
 
-    this.eventEmitter.emit(SongRequestActiveEvent.name, {
+    this.eventEmitter.emit(SongRequestActiveEvent.constructor.name, {
       songRequest: nextRequest,
     });
     return nextRequest;
@@ -140,7 +141,7 @@ export class SongRequestService {
     });
     if (mostRecentRequest) {
       await this.songRequestRepository.remove(mostRecentRequest);
-      this.eventEmitter.emit(SongRequestRemovedEvent.name, {
+      this.eventEmitter.emit(SongRequestRemovedEvent.constructor.name, {
         songRequest: mostRecentRequest,
       });
       return mostRecentRequest;
@@ -151,7 +152,7 @@ export class SongRequestService {
 
   async clearAllRequests(channel: Channel) {
     await this.songRequestRepository.delete({ channel: channel });
-    this.eventEmitter.emit(SongRequestQueueClearedEvent.name);
+    this.eventEmitter.emit(SongRequestQueueClearedEvent.constructor.name);
   }
 
   // FIXME: Add a cron that clears out requests that have been played that are older than 12h

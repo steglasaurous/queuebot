@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { QueueListComponent } from '../queue-list/queue-list.component';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
-import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { SettingsService } from '../../services/settings.service';
+import { WindowWithElectron } from '../../models/window.global';
+
+declare let window: WindowWithElectron;
 
 @Component({
   selector: 'app-login',
@@ -35,5 +37,16 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/home']);
       }
     });
+  }
+
+  openLoginPage() {
+    if (window['settings']) {
+      // FIXME: Continue here - setup method on preload.ts
+      // Make sure additional ts files are being compiled as expected.
+      window['settings'].openTwitchLogin();
+    } else {
+      console.log('DEV: Open twitch auth in a new tab');
+      window.open('http://localhost:3000/auth/twitch', '_blank');
+    }
   }
 }

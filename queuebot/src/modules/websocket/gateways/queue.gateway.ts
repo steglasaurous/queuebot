@@ -147,7 +147,7 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
     };
   }
 
-  @OnEvent(SongRequestAddedEvent.name)
+  @OnEvent(SongRequestAddedEvent.constructor.name)
   handleSongRequestAdded(event: SongRequestAddedEvent) {
     // Find all clients that want to know about this.
     if (this.channelToClientMap.has(event.songRequest.channel.channelName)) {
