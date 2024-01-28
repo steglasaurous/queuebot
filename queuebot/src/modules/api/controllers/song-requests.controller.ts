@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
-import { SongRequestDto } from '../../data-store/dto/song-request.dto';
+import { SongRequestDto } from '../../../../../common';
 
 @Controller('api/channels/:channelName/song-requests')
 export class SongRequestsController {

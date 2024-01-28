@@ -4,7 +4,7 @@ import { SettingsService } from '../../services/settings.service';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { NgIf } from '@angular/common';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { ChannelDto } from '../../models/channel.dto';
+import { ChannelDto } from '../../../../../common';
 
 @Component({
   selector: 'app-home',

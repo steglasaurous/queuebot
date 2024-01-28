@@ -5,8 +5,8 @@
   "scripts": {
     "ng": "ng",
     "start": "electron-forge start",
-    "build": "tsc main-process/main.ts main-process/constants.ts main-process/preload.ts main-process/settings-store.service.ts && ng build --base-href ./",
-    "build-dev": "tsc main-process/main.ts main-process/constants.ts main-process/preload.ts main-process/settings-store.service.ts  && ng build --base-href ./ --configuration=development",
+    "build": "tsc -p main-process/tsconfig.json && ng build --base-href ./",
+    "build-dev": "tsc -p main-process/tsconfig.json && ng build --base-href ./ --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron-tsc-dev": "npm run build-dev && electron .",

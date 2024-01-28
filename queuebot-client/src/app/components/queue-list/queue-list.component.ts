@@ -2,14 +2,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { SongRequestDto } from '../../models/song-request.dto';
+import { SongRequestDto } from '../../../../../common';
 import {
   CdkDragDrop,
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { WebsocketService } from '../../services/websocket.service';
-import {MatIcon} from "@angular/material/icon";
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-queue-list',

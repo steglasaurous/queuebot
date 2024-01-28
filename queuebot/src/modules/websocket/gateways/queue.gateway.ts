@@ -13,8 +13,8 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger } from '@nestjs/common';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { QueueDto } from '../../data-store/dto/queue.dto';
-import { SongRequestDto } from '../../data-store/dto/song-request.dto';
+import { QueueDto } from '../../../../../common';
+import { SongRequestDto } from '../../../../../common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { SongRequestAddedEvent } from '../../song-request/events/song-request-added.event';
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
@@ -126,10 +126,11 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
         },
       );
 
-      const queueDto = new QueueDto();
-      queueDto.channelName = channel.channelName;
-      queueDto.gameDisplayName = channel.game.displayName;
-      queueDto.songRequests = songRequestsDtos;
+      const queueDto: QueueDto = {
+        channelName: channel.channelName,
+        gameDisplayName: channel.game.displayName,
+        songRequests: songRequestsDtos,
+      };
 
       return <WsResponse>{
         event: 'queue',

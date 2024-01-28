@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { QUEUEBOT_API_BASE_URL } from '../app.config';
-import { SongRequestDto } from '../models/song-request.dto';
-import { ChannelDto } from '../models/channel.dto';
+import { SongRequestDto } from '../../../../common';
+import { ChannelDto } from '../../../../common';
 
 @Injectable({
   providedIn: 'root',

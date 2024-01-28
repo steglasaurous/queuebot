@@ -1,5 +1,5 @@
 import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
-import { ChannelDto } from '../../data-store/dto/channel.dto';
+import { ChannelDto } from '../../../../../common';
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
