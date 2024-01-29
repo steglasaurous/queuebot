@@ -3,6 +3,10 @@ import { app, BrowserWindow, dialog, shell, ipcMain } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import { SettingsStoreService } from './settings-store.service';
+import { DownloadHandler } from './downloader/handlers/download-handler.interface';
+import { SpinRhythmDownloadHandler } from './downloader/handlers/spin-rhythm-download-handler';
+import { SongDownloader } from './downloader/song-downloader';
+import { SongDto } from '../../common';
 // import {
 //   IPC_OPEN_TWITCH_LOGIN,
 //   IPC_SETTINGS_GET_VALUE,
@@ -14,6 +18,7 @@ export const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
 export const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
 export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
+export const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
 
 let win: BrowserWindow | null;
 
@@ -54,6 +59,8 @@ function bootstrap() {
     path.join(__dirname, 'settings.json'),
   );
 
+  const songDownloader = getDownloaderService();
+
   ipcMain.handle(IPC_SETTINGS_SET_VALUE, (event, key, value) => {
     settingsService.setValue(key, value);
   });
@@ -69,7 +76,31 @@ function bootstrap() {
     });
   });
 
+  ipcMain.handle(
+    IPC_SONG_DOWNLOADER_PROCESS_SONG,
+    async (event, song: SongDto) => {
+      console.log('Processing song for auto-download');
+      await songDownloader.processSong(song);
+    },
+  );
+
   createWindow();
+}
+
+function getDownloaderService() {
+  const appData = process.env['APPDATA'];
+  if (appData) {
+    const downloadHandlers: DownloadHandler[] = [
+      new SpinRhythmDownloadHandler(
+        appData.replace('Roaming', 'LocalLow') +
+          '\\Super Spin Digital\\Spin Rhythm XD\\Custom',
+      ),
+    ];
+    return new SongDownloader(downloadHandlers);
+  }
+  throw new Error(
+    'Unable to find the APPDATA dir - cannot instantiate songDownloader',
+  );
 }
 
 function createWindow() {
@@ -94,17 +125,6 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
   });
-
-  // FIXME: Confirm - is this OK security-wise?  Assuming we don't load external pages in our app..
-  // win.webContents.setWindowOpenHandler(({ url }) => {
-  //   // config.fileProtocol is my custom file protocol
-  //   if (url.startsWith('file:')) {
-  //     return { action: 'allow' };
-  //   }
-  //   // open url in a browser and prevent default
-  //   shell.openExternal(url);
-  //   return { action: 'deny' };
-  // });
 }
 
 app.on('ready', bootstrap);
@@ -113,10 +133,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
-// Create whatever we need to do "backend stuff" here
-
-// option 1: Relay requests to API via node rather than frontend doing it (requires knowledge of the JWT)
-// option 2: Store and retrieve the JWT locally? Are we cool with that?
-// Seems like the main issues with frontend apps reading the JWT itself is concern of a rando
-// package reading it and stealing it in some fashion to impersonate the user.

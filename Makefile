@@ -17,7 +17,7 @@ queuebot-client/node_modules: queuebot-client/package.json queuebot-client/packa
 	cd queuebot-client && npm ci
 
 common/index.d.ts: common/node_modules common/index.ts
-	cd common && tsc -p ./tsconfig.json
+	cd common && npx tsc -p ./tsconfig.json
 
 common/node_modules: common/package.json common/package-lock.json
 	cd common && npm ci
@@ -29,5 +29,16 @@ queuebot/.env: .env
 	cp .env queuebot/.env
 
 clean:
-	rm -rf queuebot/node_modules queuebot-client/node_modules queuebot/dist queuebot-client/dist queuebot-client/main-process/*.js queuebot-client/out common/index.d.ts* common/index.js* common/queuebot-dto/*.js common/queuebot-dto/*.map
+	rm -rf \
+	queuebot/node_modules \
+  	queuebot-client/node_modules \
+  	queuebot/dist \
+  	queuebot-client/dist \
+  	queuebot-client/main-process/*.js \
+  	queuebot-client/out common/index.d.ts* \
+  	common/index.js* \
+  	common/queuebot-dto/*.js \
+  	common/queuebot-dto/*.map \
+  	common/node_modules \
+  	common/tsconfig.tsbuildinfo
 
