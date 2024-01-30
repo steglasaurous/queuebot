@@ -1,5 +1,5 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -11,7 +11,7 @@ export const WEBSOCKET_URL = 'websocket_url';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withHashLocation()),
     {
       provide: JWT_PUBLIC_KEY,
       useValue: environment.jwtPublicKey,

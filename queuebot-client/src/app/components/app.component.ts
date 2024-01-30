@@ -16,4 +16,8 @@ import { WebsocketService } from '../services/websocket.service';
 })
 export class AppComponent {
   title = 'queuebot-client';
+
+  constructor() {
+    console.log('starting app');
+  }
 }

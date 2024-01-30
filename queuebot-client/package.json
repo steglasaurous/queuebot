@@ -1,7 +1,7 @@
 {
   "name": "queuebot-client",
   "version": "0.0.0",
-  "main": "main-process/main.js",
+  "main": "dist/main-process/main.js",
   "scripts": {
     "ng": "ng",
     "start": "electron-forge start",

@@ -20,6 +20,7 @@ export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 // FIXME: Need to make this configurable at build time
 export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
 export const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
+export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
 
 let win: BrowserWindow | null;
 
@@ -44,9 +45,12 @@ if (!gotTheLock) {
         win.restore();
       }
       win.focus();
-    }
 
-    dialog.showErrorBox('Welcome back', `Here you go: ${commandLine.pop()}`);
+      win.webContents.send(IPC_PROTOCOL_HANDLER, commandLine.pop());
+    }
+    // Pass this up to the render so it can get its JWT cookie set.
+
+    // dialog.showErrorBox('Welcome back', `Here you go: ${commandLine.pop()}`);
   });
 }
 
@@ -113,13 +117,13 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '/../dist/main-process/preload.js'),
+      preload: path.join(__dirname, '/preload.js'),
     },
   });
 
   win.loadURL(
     url.format({
-      pathname: path.join(__dirname, '/../dist/render/browser/index.html'),
+      pathname: path.join(__dirname, '/../render/browser/index.html'),
       protocol: 'file:',
       slashes: true,
     }),

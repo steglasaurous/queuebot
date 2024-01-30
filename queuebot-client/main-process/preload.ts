@@ -11,6 +11,7 @@ const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
 const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
 const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
+export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
 
 contextBridge.exposeInMainWorld('settings', {
   setValue: (key: string, value: string) =>
@@ -22,10 +23,15 @@ contextBridge.exposeInMainWorld('settings', {
 // For some reason, this errors out with "
 contextBridge.exposeInMainWorld('login', {
   openTwitchLogin: () => ipcRenderer.invoke(IPC_OPEN_TWITCH_LOGIN),
+  onProtocolHandle: (callback: any) =>
+    ipcRenderer.on(IPC_PROTOCOL_HANDLER, (_event, url) => {
+      callback(url);
+    }),
 });
 
 contextBridge.exposeInMainWorld('songs', {
   processSong: (songDto: SongDto) =>
     ipcRenderer.invoke(IPC_SONG_DOWNLOADER_PROCESS_SONG, songDto),
 });
+
 //

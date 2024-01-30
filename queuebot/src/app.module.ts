@@ -38,10 +38,6 @@ import { MetricsModule } from './modules/metrics/metrics.module';
         { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
       ],
-      typesOutputPath: path.join(
-        __dirname,
-        '../../src/generated/i18n.generated.ts',
-      ),
     }),
     SongRequestModule,
     WebsocketModule,

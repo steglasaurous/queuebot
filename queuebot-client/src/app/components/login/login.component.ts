@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { QueueListComponent } from '../queue-list/queue-list.component';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { Router } from '@angular/router';
@@ -20,9 +20,21 @@ export class LoginComponent implements OnInit {
     private queuebotApiService: QueuebotApiService,
     private settingsService: SettingsService,
     private router: Router,
+    private zone: NgZone,
   ) {}
   ngOnInit() {
     // If we're authenticated, go right to the good stuff.
+    if (window.login) {
+      window.login.onProtocolHandle((url: string) => {
+        const parsedUrl = new URL(url);
+        const authCode = parsedUrl.searchParams.get('authCode');
+        if (authCode) {
+          this.submitAuthCode(authCode);
+        } else {
+          console.log('Unable to get auth code from URL');
+        }
+      });
+    }
   }
 
   submitAuthCode(value: string) {
@@ -34,7 +46,10 @@ export class LoginComponent implements OnInit {
         // Could consider ngrx..  otherwise our own service that stores shit?
         // Use electron-store or similar?  Or just a plain json file managed in the main process.
         // FIXME: CONTINUE HERE
-        this.router.navigate(['/home']);
+        console.log('Triggering navigate');
+        this.zone.run(() => {
+          this.router.navigate(['/home']);
+        });
       }
     });
   }

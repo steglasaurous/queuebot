@@ -8,6 +8,7 @@ import { SongImporter } from './song-importers/song-importer.interface';
 import { Cron } from '@nestjs/schedule';
 import { SONG_IMPORTERS } from '../injection-tokens';
 import { Worker, isMainThread } from 'worker_threads';
+import * as path from 'path';
 
 @Injectable()
 export class SongImporterManagerService implements OnApplicationBootstrap {
@@ -38,14 +39,17 @@ export class SongImporterManagerService implements OnApplicationBootstrap {
   // FIXME: Add handling to not trigger this all the time in dev
   //        so we're not hammering APIs for no good reason.
   onApplicationBootstrap(): any {
-    // if (isMainThread) {
-    //   this.logger.log('Bootstrap: Executing song importers');
-    //   this.startImportWorker();
-    // }
+    if (isMainThread) {
+      this.logger.log('Bootstrap: Executing song importers');
+      this.startImportWorker();
+    }
   }
 
   private startImportWorker() {
     const worker = new Worker(require.main.filename);
+    // FYI: The above doesn't work if assembled via webpack.  It seems require.main.filename doesn't populate properly.
+    // To that end, referring directly to where main.js lives will work.
+    // const worker = new Worker(path.join(__dirname, 'main.js'));
     worker.on('exit', () => {
       this.logger.log('Worker exited');
     });

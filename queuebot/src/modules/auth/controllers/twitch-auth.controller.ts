@@ -91,10 +91,13 @@ export class TwitchAuthController {
 
     // For now, we're just spitting back one of these auth codes for the electron app to use.
     // FIXME: Replace this with a proper redirect when I work that out.
-    response.send(authCode);
+
+    //response.send(authCode);
 
     // Do electron redirect here.
-    //response.redirect('requestobot://jwt=' + this.authService.getJwt(user));
+    response.redirect(`requestobot://?authCode=${authCode}`);
     // response.redirect('/launch');
   }
 }
+
+// requestobot:///?authCode=dfd8deeb2bd471c7cc177cc40b19242b
