@@ -17,7 +17,8 @@
     "importHelpers": true,
     "target": "ES2018",
     "module": "commonjs",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "outDir": "../dist/main-process",
   },
   "references": [
     {

@@ -3,7 +3,6 @@ import { DownloadHandler } from './download-handler.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
-import * as os from 'os';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import decompress from 'decompress';

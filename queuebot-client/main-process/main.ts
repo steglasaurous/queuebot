@@ -17,6 +17,7 @@ import { SongDto } from '../../common';
 export const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
 export const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
 export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
+// FIXME: Need to make this configurable at build time
 export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
 export const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
 
@@ -89,18 +90,22 @@ function bootstrap() {
 
 function getDownloaderService() {
   const appData = process.env['APPDATA'];
+  const downloadHandlers: DownloadHandler[] = [];
+
   if (appData) {
-    const downloadHandlers: DownloadHandler[] = [
+    downloadHandlers.push(
       new SpinRhythmDownloadHandler(
         appData.replace('Roaming', 'LocalLow') +
           '\\Super Spin Digital\\Spin Rhythm XD\\Custom',
       ),
-    ];
-    return new SongDownloader(downloadHandlers);
+    );
+  } else {
+    console.warn(
+      'Unable to find the APPDATA dir - song downloaders will not download.',
+    );
   }
-  throw new Error(
-    'Unable to find the APPDATA dir - cannot instantiate songDownloader',
-  );
+
+  return new SongDownloader(downloadHandlers);
 }
 
 function createWindow() {
@@ -108,13 +113,13 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '/preload.js'),
+      preload: path.join(__dirname, '/../dist/main-process/preload.js'),
     },
   });
 
   win.loadURL(
     url.format({
-      pathname: path.join(__dirname, '/../dist/browser/index.html'),
+      pathname: path.join(__dirname, '/../dist/render/browser/index.html'),
       protocol: 'file:',
       slashes: true,
     }),
