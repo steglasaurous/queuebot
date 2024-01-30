@@ -9,9 +9,10 @@ export class SongDownloader {
       if (downloadHandler.songSupported(song)) {
         if (downloadHandler.songIsLocal(song)) {
           // Song is already present, no need to download it.
+          console.log('Song is already local, moving on.');
           return;
         }
-
+        console.log('Downloading song');
         await downloadHandler.downloadSong(song);
       }
     }

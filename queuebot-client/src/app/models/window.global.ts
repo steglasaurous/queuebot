@@ -7,4 +7,7 @@ export interface WindowWithElectron extends Window {
   login?: {
     openTwitchLogin: any;
   };
+  songs?: {
+    processSong: any;
+  };
 }

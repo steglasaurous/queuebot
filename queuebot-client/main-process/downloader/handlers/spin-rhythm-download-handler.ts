@@ -6,10 +6,9 @@ import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
 import * as os from 'os';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import * as decompress from 'decompress';
+import decompress from 'decompress';
 
 export class SpinRhythmDownloadHandler implements DownloadHandler {
-  private tmpDir = os.tmpdir();
   constructor(private songsDir: string) {}
   songIsLocal(song: SongDto): boolean {
     const filepath = path.join(this.songsDir, song.fileReference + '.srtb');
@@ -32,10 +31,12 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
         .then((response: AxiosResponse<any, any>) => {
           response.data.pipe(writer);
           writer.on('finish', () => {
+            console.log('writer finished');
             // FIXME: Continue here: Extract the zip to the destination, then remove the zip.
             // NOTE: The IDE says this is an error, but the compiler does not.  Ignore the IDE in this case.
             // @ts-ignore
             decompress(zipFilename, this.songsDir).then(() => {
+              console.log('Decompressing done');
               resolve(true);
             });
           });

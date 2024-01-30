@@ -10,6 +10,9 @@ import {
 } from '@angular/cdk/drag-drop';
 import { WebsocketService } from '../../services/websocket.service';
 import { MatIcon } from '@angular/material/icon';
+import { WindowWithElectron } from '../../models/window.global';
+
+declare let window: WindowWithElectron;
 
 @Component({
   selector: 'app-queue-list',
@@ -37,6 +40,12 @@ export class QueueListComponent implements OnInit {
         .subscribe((result) => {
           console.log('Got queue', result);
           this.songRequests = result;
+          if (window.songs) {
+            for (const songRequest of this.songRequests) {
+              window.songs.processSong(songRequest.song);
+            }
+          }
+          // Process song requests for anything we need to download locally.
         });
 
       if (!this.websocketService.isConnected) {
@@ -59,6 +68,9 @@ export class QueueListComponent implements OnInit {
         if (message.event == 'songRequestAdded') {
           console.log('Adding new song');
           this.songRequests.push(message.data as SongRequestDto);
+          if (window.songs) {
+            window.songs.processSong(message.data.song);
+          }
         }
       });
     }
