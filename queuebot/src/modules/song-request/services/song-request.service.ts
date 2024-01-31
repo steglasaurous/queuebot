@@ -155,5 +155,31 @@ export class SongRequestService {
     this.eventEmitter.emit(SongRequestQueueClearedEvent.constructor.name);
   }
 
+  /**
+   * Swaps the given song request with the song request at newPosition.  Note that since
+   * the database doesn't necessarily number the requests in sequential order, it picks
+   * the result from the
+   * @param songRequest
+   * @param newPosition
+   */
+  async reorderRequests(songRequest: SongRequest, newPosition: number) {
+    // Find the songRequest that's present in the position we want to replace.
+    const songRequestToSwap = await this.songRequestRepository.findOneBy({
+      channel: songRequest.channel,
+      requestOrder: newPosition,
+    });
+    if (!songRequestToSwap) {
+      // There's nothing in that current position, which is probably an error. Fail it out.
+      return;
+    }
+
+    const oldRequestOrder = songRequest.requestOrder;
+    songRequest.requestOrder = songRequestToSwap.requestOrder;
+    songRequestToSwap.requestOrder = oldRequestOrder;
+
+    await this.songRequestRepository.save(songRequest);
+    await this.songRequestRepository.save(songRequestToSwap);
+  }
+
   // FIXME: Add a cron that clears out requests that have been played that are older than 12h
 }

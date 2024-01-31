@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { SongRequestService } from '../../song-request/services/song-request.service';
@@ -48,10 +49,10 @@ export class SongRequestsController {
     });
   }
 
-  async changeOrder(
+  @Put('/{songRequestId}/swapOrder')
+  async swapOrder(
     @Param('channelName') channelName: string,
-    previousIndex: number,
-    newIndex: number,
+    @Param('songRequestId') songRequestId: number,
   ) {
     // FIXME: Implement this
     // How to get params in a PUT?

@@ -18,6 +18,7 @@ import { SongRequestDto } from '../../../../../common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { SongRequestAddedEvent } from '../../song-request/events/song-request-added.event';
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
+import { SongRequestRemovedEvent } from '../../song-request/events/song-request-removed.event';
 
 @WebSocketGateway({})
 export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
@@ -150,18 +151,44 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
 
   @OnEvent(SongRequestAddedEvent.name)
   handleSongRequestAdded(event: SongRequestAddedEvent) {
-    // Find all clients that want to know about this.
-    if (this.channelToClientMap.has(event.songRequest.channel.channelName)) {
-      this.channelToClientMap
-        .get(event.songRequest.channel.channelName)
-        .forEach((client) => {
-          client.send(
-            JSON.stringify({
-              event: 'songRequestAdded',
-              data: this.dtoMappingService.songRequestToDto(event.songRequest),
-            }),
-          );
-        });
+    const message = {
+      event: 'songRequestAdded',
+      data: this.dtoMappingService.songRequestToDto(event.songRequest),
+    };
+
+    this.sendMessageToChannelSubscribers(
+      event.songRequest.channel.channelName,
+      message,
+    );
+  }
+
+  @OnEvent(SongRequestRemovedEvent.name)
+  handleSongRequestRemoved(event: SongRequestRemovedEvent) {
+    const message = {
+      event: 'songRequestRemoved',
+      data: this.dtoMappingService.songRequestToDto(event.songRequest),
+    };
+
+    this.sendMessageToChannelSubscribers(
+      event.songRequest.channel.channelName,
+      message,
+    );
+  }
+
+  private sendMessageToChannelSubscribers(channelName: string, message: any) {
+    this.getClientsSubscribedToChannel(channelName).forEach((client) => {
+      this.logger.debug('WS message to client', {
+        clientId: client.id,
+        message: message,
+      });
+      client.send(JSON.stringify(message));
+    });
+  }
+
+  private getClientsSubscribedToChannel(channelName: string): Set<any> {
+    if (this.channelToClientMap.has(channelName)) {
+      return this.channelToClientMap.get(channelName);
     }
+    return new Set<any>();
   }
 }
