@@ -57,7 +57,7 @@ export class SongRequestService {
       try {
         const savedSongRequest =
           await this.songRequestRepository.save(songRequest);
-        this.eventEmitter.emit(SongRequestAddedEvent.constructor.name, {
+        this.eventEmitter.emit(SongRequestAddedEvent.name, {
           songRequest: savedSongRequest,
         });
         resolve({ success: true });
@@ -112,7 +112,7 @@ export class SongRequestService {
       await this.songRequestRepository.save(nextRequest);
     }
 
-    this.eventEmitter.emit(SongRequestActiveEvent.constructor.name, {
+    this.eventEmitter.emit(SongRequestActiveEvent.name, {
       songRequest: nextRequest,
     });
     return nextRequest;
@@ -141,7 +141,7 @@ export class SongRequestService {
     });
     if (mostRecentRequest) {
       await this.songRequestRepository.remove(mostRecentRequest);
-      this.eventEmitter.emit(SongRequestRemovedEvent.constructor.name, {
+      this.eventEmitter.emit(SongRequestRemovedEvent.name, {
         songRequest: mostRecentRequest,
       });
       return mostRecentRequest;

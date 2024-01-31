@@ -24,10 +24,6 @@ module.exports = {
         mimeType: ["x-scheme-handler/requestobot"],
       },
     },
-    {
-      name: "@electron-forge/maker-rpm",
-      config: {},
-    },
   ],
   plugins: [
     {
