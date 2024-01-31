@@ -30,4 +30,20 @@ export class QueuebotApiService {
       { withCredentials: true },
     );
   }
+
+  swapOrder(
+    channel: string,
+    sourceSongRequestId: number,
+    destinationSongRequestId: number,
+  ): Observable<boolean> {
+    return this.httpClient.put<boolean>(
+      `${this.apiBaseUrl}/api/channels/${channel}/song-requests/${sourceSongRequestId}/swapOrder`,
+      {
+        songRequestId: destinationSongRequestId,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+  }
 }

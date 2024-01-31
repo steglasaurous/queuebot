@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, shell, ipcMain, session } from 'electron';
 
 import * as path from 'path';
 import * as url from 'url';
@@ -7,6 +7,7 @@ import { DownloadHandler } from './downloader/handlers/download-handler.interfac
 import { SpinRhythmDownloadHandler } from './downloader/handlers/spin-rhythm-download-handler';
 import { SongDownloader } from './downloader/song-downloader';
 import { SongDto } from '../../common';
+
 // import {
 //   IPC_OPEN_TWITCH_LOGIN,
 //   IPC_SETTINGS_GET_VALUE,
@@ -45,7 +46,8 @@ if (!gotTheLock) {
         win.restore();
       }
       win.focus();
-
+      // FIXME: Handle exchanging the authCode for a JWT here, and store the JWT locally.
+      // Inform the render process once the exchange is complete and JWT is stored.
       win.webContents.send(IPC_PROTOCOL_HANDLER, commandLine.pop());
     }
     // Pass this up to the render so it can get its JWT cookie set.
@@ -134,6 +136,41 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
   });
+
+  // According to documentation, this SHOULD work, however it appears it does not.
+  // session.defaultSession.cookies
+  //   .set({
+  //     url: 'http://localhost:3000/',
+  //     name: 'jwt',
+  //     value: 'testValue',
+  //   })
+  //   .then(
+  //     () => {
+  //       console.log('Done');
+  //     },
+  //     (error) => {
+  //       console.log('Error', error);
+  //     },
+  //   );
+
+  // This works, albeit a bit more invasive.
+  // FIXME: Work out strategy for setting JWT here - perhaps this makes the authCode exchange request
+  //        from the main process and saves the JWT to storage.
+  // This could also mean we can use local JWT tools that work in node to decode the contents of the
+  // JWT as needed, including the user's info and when the JWT expires.
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    {
+      urls: [
+        'http://localhost:3000/*',
+        'https://queuebot.steglasaurous.com/*',
+        'https://queuebot-dev.steglasaurous.com/*',
+      ],
+    },
+    (details, callback) => {
+      details.requestHeaders['Cookie'] = 'jwt=balls;';
+      callback({ requestHeaders: details.requestHeaders });
+    },
+  );
 }
 
 app.on('ready', bootstrap);

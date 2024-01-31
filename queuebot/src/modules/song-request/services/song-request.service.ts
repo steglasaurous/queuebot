@@ -156,28 +156,46 @@ export class SongRequestService {
   }
 
   /**
-   * Swaps the given song request with the song request at newPosition.  Note that since
-   * the database doesn't necessarily number the requests in sequential order, it picks
-   * the result from the
-   * @param songRequest
-   * @param newPosition
+   * Swaps the requestOrder between sourceSongRequestId and destinationSongRequestId.
+   *
+   * Note that this will fail if both requests do not belong to the same channel.
    */
-  async reorderRequests(songRequest: SongRequest, newPosition: number) {
+  async swapOrder(
+    sourceSongRequestId: number,
+    destinationSongRequestId: number,
+  ) {
+    const sourceSongRequest = await this.songRequestRepository.findOneBy({
+      id: sourceSongRequestId,
+    });
+
     // Find the songRequest that's present in the position we want to replace.
     const songRequestToSwap = await this.songRequestRepository.findOneBy({
-      channel: songRequest.channel,
-      requestOrder: newPosition,
+      id: destinationSongRequestId,
     });
     if (!songRequestToSwap) {
       // There's nothing in that current position, which is probably an error. Fail it out.
       return;
     }
 
-    const oldRequestOrder = songRequest.requestOrder;
-    songRequest.requestOrder = songRequestToSwap.requestOrder;
+    if (
+      sourceSongRequest.channel.channelName !==
+      songRequestToSwap.channel.channelName
+    ) {
+      this.logger.warn(
+        'swapOrder(): Will not swap order for 2 requests belonging to different channels',
+        {
+          sourceChannel: sourceSongRequest.channel.channelName,
+          destinationChannel: songRequestToSwap.channel.channelName,
+        },
+      );
+      return;
+    }
+
+    const oldRequestOrder = sourceSongRequest.requestOrder;
+    sourceSongRequest.requestOrder = songRequestToSwap.requestOrder;
     songRequestToSwap.requestOrder = oldRequestOrder;
 
-    await this.songRequestRepository.save(songRequest);
+    await this.songRequestRepository.save(sourceSongRequest);
     await this.songRequestRepository.save(songRequestToSwap);
   }
 

@@ -21,6 +21,7 @@ export class AuthService {
   generateAuthCode(): string {
     return crypto.randomBytes(16).toString('hex');
   }
+
   storeAuthCodeJwt(authCode: string, jwt: string) {
     this.authCodes.set(authCode, {
       authCode: authCode,
@@ -42,6 +43,7 @@ export class AuthService {
 
     return undefined;
   }
+
   getJwt(user: User) {
     const payload: UserJwt = {
       username: user.username,
@@ -49,6 +51,10 @@ export class AuthService {
       sub: user.id,
     };
     return this.jwtService.sign(payload);
+  }
+
+  verifyJwt(jwt: string): UserJwt {
+    return this.jwtService.verify<UserJwt>(jwt);
   }
 
   cleanAuthCodes() {

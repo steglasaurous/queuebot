@@ -91,5 +91,6 @@ import { AuthCodeController } from './controllers/auth-code.controller';
     TwitchAuthController,
     AuthCodeController,
   ],
+  exports: [AuthService, JWT_COOKIE_NAME],
 })
 export class AuthModule {}

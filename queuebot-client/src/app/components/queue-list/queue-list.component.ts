@@ -78,6 +78,21 @@ export class QueueListComponent implements OnInit {
 
   drop($event: CdkDragDrop<any, any>) {
     // RE-order the list we have now, and send an API update to swap shit.
+    // We got the previous and current index.  Use these to resolve them to our dataset
+    this.queuebotApiService
+      .swapOrder(
+        this.channelName,
+        this.songRequests[$event.previousIndex].id,
+        this.songRequests[$event.currentIndex].id,
+      )
+      .subscribe({
+        next: (result) => {
+          console.log('got result', { result: result });
+        },
+        error: (err) => {
+          console.log('Got error', { err: err });
+        },
+      });
     moveItemInArray(
       this.songRequests,
       $event.previousIndex,

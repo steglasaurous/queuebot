@@ -6,6 +6,7 @@ import { isMainThread } from 'worker_threads';
 import { ImportWorkerModule } from './import-worker.module';
 import { SongImporterManagerService } from './modules/song-store/services/song-importer-manager.service';
 import { Logger } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   if (isMainThread) {
@@ -16,6 +17,7 @@ async function bootstrap() {
       credentials: true,
       origin: 'http://localhost:4200',
     });
+    app.use(cookieParser());
     await app.listen(config.get('PORT') ?? 3000);
   } else {
     // This is VERY simplistic for now - if started as a worker, assume it's to
