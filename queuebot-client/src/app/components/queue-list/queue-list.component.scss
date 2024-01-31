@@ -27,6 +27,13 @@
 
 }
 
+.container {
+  display: flex;
+}
+.requestList {
+  flex-grow: 1;
+}
+
 .requestLine {
   display: flex;
   border: 1px solid black;

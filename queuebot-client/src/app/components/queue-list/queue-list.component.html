@@ -7,7 +7,7 @@
   <div class="controlsHeading"></div>
 </div>
 
-<div cdkDropList (cdkDropListDropped)="drop($event)">
+<div cdkDropList (cdkDropListDropped)="drop($event)" class="requestList">
   <div cdkDrag class="requestLine" *ngFor="let queueItem of songRequests; index as i"
        [ngClass]="{ activeRequest: queueItem.isActive }">
     <div class="requestLineDrag">_ _ _</div>
@@ -20,8 +20,17 @@
     <div class="requester">{{ queueItem.requesterName }}</div>
     <div class="localState"> --</div>
     <div class="controls">
-      <div class="markPlayed"><button><mat-icon>done</mat-icon></button></div>
-      <div class="deleteRequest"><button><mat-icon>delete</mat-icon></button></div>
+      <div class="markPlayed">
+        <button>
+          <mat-icon>done</mat-icon>
+        </button>
+      </div>
+      <div class="deleteRequest">
+        <button>
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
 </div>
+

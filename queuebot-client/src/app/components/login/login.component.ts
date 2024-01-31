@@ -35,6 +35,14 @@ export class LoginComponent implements OnInit {
         }
       });
     }
+
+    // See if we have a channel name in settings. If we do, act as though we're logged in.. (if the JWT is expired, we'll
+    // rely on the next API requests to tell us.
+    this.settingsService.getValue('username').then((username) => {
+      if (username != undefined) {
+        this.router.navigate(['/home']);
+      }
+    });
   }
 
   submitAuthCode(value: string) {

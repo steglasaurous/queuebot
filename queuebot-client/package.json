@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "electron-forge start",
     "build": "tsc -p main-process/tsconfig.json && ng build --base-href ./",
-    "build-dev": "tsc -p main-process/tsconfig.json && ng build --base-href ./ --configuration=development",
+    "build-dev": "tsc -p main-process/tsconfig.json && ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron-tsc-dev": "npm run build-dev && electron .",
