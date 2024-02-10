@@ -4,7 +4,7 @@ import { getGenericNestMock } from '../../../../test/helpers';
 
 describe('SongRequestsController', () => {
   let controller: SongRequestsController;
-  let channelRepositoryMock = {
+  const channelRepositoryMock = {
     findOneBy: jest.fn(),
   };
 
@@ -16,6 +16,8 @@ describe('SongRequestsController', () => {
         switch (token) {
           case 'ChannelRepository':
             return channelRepositoryMock;
+          case 'JWT_COOKIE_NAME':
+            return 'jwt_cookie';
           default:
             return getGenericNestMock(token);
         }
@@ -28,4 +30,6 @@ describe('SongRequestsController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  // FIXME: Write tests to cover the controller.
 });
