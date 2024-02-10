@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, shell, ipcMain, session } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, session } from 'electron';
 
 import * as path from 'path';
 import * as url from 'url';
@@ -7,6 +7,7 @@ import { DownloadHandler } from './downloader/handlers/download-handler.interfac
 import { SpinRhythmDownloadHandler } from './downloader/handlers/spin-rhythm-download-handler';
 import { SongDownloader } from './downloader/song-downloader';
 import { SongDto } from '../../common';
+import * as cookie from 'cookie';
 
 // import {
 //   IPC_OPEN_TWITCH_LOGIN,
@@ -22,6 +23,16 @@ export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
 export const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
 export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
+
+export const FILTERED_URLS = [
+  'http://localhost:3000/*',
+  'https://queuebot.steglasaurous.com/*',
+  'https://queuebot-dev.steglasaurous.com/*',
+];
+
+const settingsService = new SettingsStoreService(
+  path.join(__dirname, 'settings.json'),
+);
 
 let win: BrowserWindow | null;
 
@@ -46,26 +57,20 @@ if (!gotTheLock) {
         win.restore();
       }
       win.focus();
-      // FIXME: Handle exchanging the authCode for a JWT here, and store the JWT locally.
-      // Inform the render process once the exchange is complete and JWT is stored.
       win.webContents.send(IPC_PROTOCOL_HANDLER, commandLine.pop());
     }
-    // Pass this up to the render so it can get its JWT cookie set.
-
-    // dialog.showErrorBox('Welcome back', `Here you go: ${commandLine.pop()}`);
   });
 }
 
 // MacOS
 app.on('open-url', (event, url) => {
-  dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
+  if (win) {
+    win.focus();
+    win.webContents.send(IPC_PROTOCOL_HANDLER, url);
+  }
 });
 
 function bootstrap() {
-  const settingsService = new SettingsStoreService(
-    path.join(__dirname, 'settings.json'),
-  );
-
   const songDownloader = getDownloaderService();
 
   ipcMain.handle(IPC_SETTINGS_SET_VALUE, (event, key, value) => {
@@ -137,27 +142,8 @@ function createWindow() {
     win = null;
   });
 
-  // According to documentation, this SHOULD work, however it appears it does not.
-  // session.defaultSession.cookies
-  //   .set({
-  //     url: 'http://localhost:3000/',
-  //     name: 'jwt',
-  //     value: 'testValue',
-  //   })
-  //   .then(
-  //     () => {
-  //       console.log('Done');
-  //     },
-  //     (error) => {
-  //       console.log('Error', error);
-  //     },
-  //   );
-
-  // This works, albeit a bit more invasive.
-  // FIXME: Work out strategy for setting JWT here - perhaps this makes the authCode exchange request
-  //        from the main process and saves the JWT to storage.
-  // This could also mean we can use local JWT tools that work in node to decode the contents of the
-  // JWT as needed, including the user's info and when the JWT expires.
+  // This attaches the JWT cookie to the outgoing request if available,
+  // so authenticated endpoints work correctly.
   session.defaultSession.webRequest.onBeforeSendHeaders(
     {
       urls: [
@@ -167,8 +153,44 @@ function createWindow() {
       ],
     },
     (details, callback) => {
-      details.requestHeaders['Cookie'] = 'jwt=balls;';
+      const jwt = settingsService.getValue('jwt');
+      if (jwt) {
+        details.requestHeaders['Cookie'] = `jwt=${jwt};`;
+      }
       callback({ requestHeaders: details.requestHeaders });
+    },
+  );
+
+  // This captures the JWT cookie when /authCode is called in the app.
+  // This allows authenticated requests to work correctly, but still
+  // retain the ability for the frontend app to continue working normally
+  // in a regular browser.
+  // (In electron, the frontend is loaded as a file url, which doesn't allow cookies
+  // to be stored - cookies only work when the app is served from an http(s) url.
+  session.defaultSession.webRequest.onCompleted(
+    {
+      urls: FILTERED_URLS,
+    },
+    (details) => {
+      // We only care about the auth-code endpoint, which sets the cookie.
+      // Otherwise no work needs to be done.
+      if (!details.url.includes('auth-code')) {
+        return;
+      }
+
+      if (details.responseHeaders && details.responseHeaders['Set-Cookie']) {
+        // Note: This only works if the endpoint passes back a single cookie.  If there's multiple
+        // cookies at some future date, this needs to be updated.
+        const decodedCookie = cookie.parse(
+          details.responseHeaders['Set-Cookie'][0],
+        );
+
+        if (decodedCookie['jwt']) {
+          // Store this locally.
+          console.log('Storing jwt');
+          settingsService.setValue('jwt', decodedCookie['jwt']);
+        }
+      }
     },
   );
 }

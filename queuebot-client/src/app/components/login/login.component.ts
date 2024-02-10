@@ -46,26 +46,20 @@ export class LoginComponent implements OnInit {
   }
 
   submitAuthCode(value: string) {
-    this.queuebotApiService.getAuthCodeResult(value).subscribe((result) => {
-      if (result.status == 'OK') {
-        this.settingsService.setValue('username', result.username);
-        // Username comes back as result.username
-        // Need to grab the username and persist it to some kind of store or service.
-        // Could consider ngrx..  otherwise our own service that stores shit?
-        // Use electron-store or similar?  Or just a plain json file managed in the main process.
-        // FIXME: CONTINUE HERE
-        console.log('Triggering navigate');
-        this.zone.run(() => {
-          this.router.navigate(['/home']);
-        });
-      }
-    });
+    this.queuebotApiService
+      .getAuthCodeResult(value)
+      .subscribe(async (result) => {
+        if (result.status == 'OK') {
+          await this.settingsService.setValue('username', result.username);
+          this.zone.run(() => {
+            this.router.navigate(['/home']);
+          });
+        }
+      });
   }
 
   openLoginPage() {
     if (window['settings']) {
-      // FIXME: Continue here - setup method on preload.ts
-      // Make sure additional ts files are being compiled as expected.
       window['settings'].openTwitchLogin();
     } else {
       console.log('DEV: Open twitch auth in a new tab');
