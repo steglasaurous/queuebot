@@ -2,15 +2,50 @@
 
 1. Goto /auth/twitch, login to twitch.
 
-
 # Todo
+
+## First
+
+- [ ] Server: Implement queuing strategies - add 'fair queuing' strategy
+  - `!rbset queuestrategy oneperuser` 
+    - Sets queuing to order by one per user at a time.  Ex: if user A makes 2 requests and user B makes 1 request, the order would be: User A request 1, User B request 1, User A request 2
+  - `!rbset queuestrategy random`
+    - Injects the request in a random spot in the queue when it comes in.
+  - `!rbset queuestrategy fifo`
+    - "First In, First Out" - queuing based on first-come, first-served.  This is the default.
+  - `!rbset queuestrategy default`
+    - Sets the queue strategy to the default, which is `fifo`
+
+- [ ] Server: Implement remove song from queue
+- [ ] UI: Implement logout
+- [ ] UI: Implement current game and queue status display  
+- [ ] UI: Implement ability to open or close the queue from interface
+- [ ] UI: Implement add song to queue via search/autocomplete
+- [ ] UI: Implement next song button to advance the queue
+- [ ] Server: Add a 'deny list' - songs that cannot be queued
+
+
+## Next
+
+- [ ] Implement auto-reconnect for websocket connections
+- [ ] Remove menus from electron interface (for now)
+- [ ] UI: Implement ability to change game from interface
+- [ ] UI: Implement showing what's already been played
+- [ ] UI: Implement clearing played history
+- [ ] Server: Implement clearing played history via command
+- [ ] UI: Implement rollback/undo button to reverse the queue to its previous state
+- [ ] Server: Implement rollback/undo command to reverse the queue to its previous state
+- [ ] `!rbget` - Return a list of requestobot settings for the channel it's in.  Broadcaster and mods only.
+
+## Backlog
+
 - [x] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
 - [x] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
 - [x] Implement Twitch SSO
 - [ ] Implement broadcaster queue manager UI
-  - [ ] Queue display
-  - [ ] Implement websocket connection to queuebot for new song notifications
-  - [ ] Implement drag-and-drop queue reordering
+  - [x] Queue display
+  - [x] Implement websocket connection to queuebot for new song notifications
+  - [x] Implement drag-and-drop queue reordering
   - [ ] Next song button
   - [ ] Remove song from queue
 - [ ] !remove (song #)

@@ -46,6 +46,7 @@ export class SongRequestService {
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = new Date();
+      // FIXME: Implement song request strategies here - look at what channel's strategy is set to
       songRequest.requestOrder =
         (await this.songRequestRepository.maximum('requestOrder', {
           channel: channel,
@@ -60,6 +61,10 @@ export class SongRequestService {
         this.eventEmitter.emit(SongRequestAddedEvent.name, {
           songRequest: savedSongRequest,
         });
+
+        // Apply songRequest strategy to entity
+        // We do this after the save so the strategy has the opportunity to reorder other items in the queue if necessary.
+
         resolve({ success: true });
         return;
       } catch (error) {

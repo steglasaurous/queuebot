@@ -32,5 +32,9 @@
   "QueueAlreadyOpen": "Queue is already open.",
   "QueueOpen": "Queue is now open.",
   "SorryQueueIsClosed": "Sorry, the request queue is closed.",
-  "SearchErrorTryAgain": "Sorry, a search error occurred.  Please try your request again."
+  "SearchErrorTryAgain": "Sorry, a search error occurred.  Please try your request again.",
+  "SettingSetToValue": "{settingName} set to {value}.",
+  "InvalidSettingValue": "Invalid value. Valid values are {values}.",
+  "InvalidSetting": "Invalid setting name.",
+  "RbsetUsage": "How to use rbset: !rbset settingname newvalue"
 }

@@ -28,6 +28,7 @@ import {
   makeGaugeProvider,
 } from '@willsoto/nestjs-prometheus';
 import { Metrics } from './models/metrics.enum';
+import { RbsetBotCommand } from './commands/rbset.bot-command';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { Metrics } from './models/metrics.enum';
     ClearBotCommand,
     OpenBotCommand,
     CloseBotCommand,
+    RbsetBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -74,6 +76,7 @@ import { Metrics } from './models/metrics.enum';
         ClearBotCommand,
         OpenBotCommand,
         CloseBotCommand,
+        RbsetBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -88,6 +91,7 @@ import { Metrics } from './models/metrics.enum';
         clearBotCommand: ClearBotCommand,
         openBotCommand: OpenBotCommand,
         closeBotCommand: CloseBotCommand,
+        rbSetCommand: RbsetBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -102,6 +106,7 @@ import { Metrics } from './models/metrics.enum';
           clearBotCommand,
           openBotCommand,
           closeBotCommand,
+          rbSetCommand,
         ];
       },
     },
