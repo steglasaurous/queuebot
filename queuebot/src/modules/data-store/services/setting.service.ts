@@ -38,4 +38,23 @@ export class SettingService {
     settingValue.value = value;
     await this.settingRepository.save(settingValue);
   }
+
+  async getValue(
+    channel: Channel,
+    settingName: string,
+  ): Promise<string | undefined> {
+    const settingDefinition = await this.getSettingDefinition(settingName);
+    if (!settingDefinition) {
+      return undefined;
+    }
+    const settingValue = await this.settingRepository.findOneBy({
+      channel: channel,
+      settingName: settingDefinition,
+    });
+    if (!settingValue) {
+      return settingDefinition.defaultValue;
+    }
+
+    return settingValue.value;
+  }
 }

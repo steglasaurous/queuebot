@@ -12,6 +12,9 @@ import { SongRequestAddedEvent } from '../events/song-request-added.event';
 import { SongRequestRemovedEvent } from '../events/song-request-removed.event';
 import { SongRequestQueueClearedEvent } from '../events/song-request-queue-cleared.event';
 import { SongRequestActiveEvent } from '../events/song-request-active.event';
+import { QueueStrategyService } from './queue-strategies/queue-strategy.service';
+import { SettingService } from '../../data-store/services/setting.service';
+import { SettingName } from '../../data-store/models/setting-name.enum';
 
 @Injectable()
 export class SongRequestService {
@@ -21,6 +24,8 @@ export class SongRequestService {
     private songRequestRepository: Repository<SongRequest>,
     private songService: SongService,
     private eventEmitter: EventEmitter2,
+    private queueStrategyService: QueueStrategyService,
+    private settingService: SettingService,
   ) {}
 
   async addRequest(
@@ -46,11 +51,16 @@ export class SongRequestService {
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = new Date();
-      // FIXME: Implement song request strategies here - look at what channel's strategy is set to
-      songRequest.requestOrder =
-        (await this.songRequestRepository.maximum('requestOrder', {
-          channel: channel,
-        })) + 1; // Not sure what the performance implications are on this.  Will have to keep an eye on it for now.
+
+      const queueStrategyName = await this.settingService.getValue(
+        channel,
+        SettingName.QueueStrategy,
+      );
+      songRequest.requestOrder = await this.queueStrategyService.getNextOrder(
+        channel,
+        songRequest,
+        queueStrategyName,
+      );
       songRequest.channel = channel;
       songRequest.isActive = false;
       songRequest.isDone = false;
