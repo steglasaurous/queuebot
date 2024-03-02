@@ -26,8 +26,17 @@ export class SongRequest {
   @Column({ type: 'timestamptz' })
   requestTimestamp: Date;
 
+  // This maintains specific ordering of requests, regardless of priority.
+  // Useful when the user has one-per-user ordering enabled and wants to manually change the order
+  // of certain requests.  This will retain manual ordering while still allowing
+  // the one-per-user queue strategy to work normally.
   @Column()
   requestOrder: number;
+
+  // This is used mainly for one-per-user ordering - to determine what group to get
+  // the max requestOrder from so it can maintain the request order appropriately.
+  @Column()
+  requestPriority: number;
 
   @Column({ default: false })
   isActive: boolean;
