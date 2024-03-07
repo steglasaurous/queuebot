@@ -5,6 +5,7 @@ import { SongStoreModule } from '../song-store/song-store.module';
 import { QueueStrategyService } from './services/queue-strategies/queue-strategy.service';
 import { FifoQueueStrategy } from './services/queue-strategies/fifo.queue-strategy';
 import { QUEUE_STRATEGIES } from './utils/di-tokens';
+import { OnePerUserQueueStrategy } from './services/queue-strategies/one-per-user.queue-strategy';
 
 @Module({
   imports: [DataStoreModule, SongStoreModule],
@@ -12,11 +13,15 @@ import { QUEUE_STRATEGIES } from './utils/di-tokens';
     SongRequestService,
     QueueStrategyService,
     FifoQueueStrategy,
+    OnePerUserQueueStrategy,
     {
       provide: QUEUE_STRATEGIES,
-      inject: [FifoQueueStrategy],
-      useFactory: (fifo: FifoQueueStrategy) => {
-        return [fifo];
+      inject: [FifoQueueStrategy, OnePerUserQueueStrategy],
+      useFactory: (
+        fifo: FifoQueueStrategy,
+        onePerUser: OnePerUserQueueStrategy,
+      ) => {
+        return [fifo, onePerUser];
       },
     },
   ],

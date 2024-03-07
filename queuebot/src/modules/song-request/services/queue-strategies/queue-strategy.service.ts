@@ -15,7 +15,7 @@ export class QueueStrategyService {
     channel: Channel,
     songRequest: SongRequest,
     queueStrategyName: string,
-  ): Promise<number> {
+  ): Promise<SongRequest> {
     let queueStrategy: QueueStrategy =
       this.getQueueStrategyForName(queueStrategyName);
 
@@ -25,7 +25,7 @@ export class QueueStrategyService {
       );
     }
 
-    return await queueStrategy.getNextOrder(channel, songRequest);
+    return await queueStrategy.setNextOrder(channel, songRequest);
   }
 
   private getQueueStrategyForName(

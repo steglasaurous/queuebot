@@ -11,15 +11,16 @@ export class FifoQueueStrategy implements QueueStrategy {
     @InjectRepository(SongRequest)
     private songRequestRepository: Repository<SongRequest>,
   ) {}
-  async getNextOrder(
+  async setNextOrder(
     channel: Channel,
     songRequest: SongRequest,
-  ): Promise<number> {
-    return (
+  ): Promise<SongRequest> {
+    songRequest.requestOrder =
       (await this.songRequestRepository.maximum('requestOrder', {
         channel: channel,
-      })) + 1
-    );
+      })) + 1;
+    songRequest.requestPriority = 0;
+    return songRequest;
   }
 
   getStrategyName(): string {

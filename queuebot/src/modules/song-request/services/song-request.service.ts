@@ -47,7 +47,7 @@ export class SongRequestService {
       // If it's present as a pending request, return the 'already in queue' error.
       // If it's present as a recently played request, return the 'was already played' error.
       // FUTURE: Make this configurable that if the streamer wants to allow repeats after playing a song, they can do so
-      const songRequest = new SongRequest();
+      let songRequest = new SongRequest();
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = new Date();
@@ -56,14 +56,16 @@ export class SongRequestService {
         channel,
         SettingName.QueueStrategy,
       );
-      songRequest.requestOrder = await this.queueStrategyService.getNextOrder(
+      songRequest.channel = channel;
+      songRequest.isActive = false;
+      songRequest.isDone = false;
+
+      // This sets the requestOrder and requestPriority fields.
+      songRequest = await this.queueStrategyService.getNextOrder(
         channel,
         songRequest,
         queueStrategyName,
       );
-      songRequest.channel = channel;
-      songRequest.isActive = false;
-      songRequest.isDone = false;
 
       try {
         const savedSongRequest =

@@ -48,6 +48,14 @@ describe('SongRequestService', () => {
     );
     mockEventEmitter = module.get<EventEmitter2>(EventEmitter2);
     mockSongService = module.get<SongService>(SongService);
+
+    mockQueueStrategyService.getNextOrder.mockImplementation(
+      (channel, songRequest) => {
+        songRequest.requestOrder = 1;
+        songRequest.requestPriority = 0;
+        return songRequest;
+      },
+    );
   });
 
   const expectSuccessfulSongRequest = (expectedSongRequestObject: any) => {
@@ -113,7 +121,6 @@ describe('SongRequestService', () => {
     const channel = getMockChannel();
     const requesterName = 'steg';
     mockSettingService.getValue.mockReturnValue('fifo');
-    mockQueueStrategyService.getNextOrder.mockReturnValue(1);
 
     const expectedSongRequestObject = new SongRequest();
     expectedSongRequestObject.song = song;
@@ -142,11 +149,11 @@ describe('SongRequestService', () => {
 
     mockSongService.saveSong.mockImplementation((song) => {
       song.id = 1;
-      return song;
+      return Promise.resolve(song);
     });
 
     mockSettingService.getValue.mockReturnValue(Promise.resolve('fifo'));
-    mockQueueStrategyService.getNextOrder.mockReturnValue(1);
+
     const expectedSongRequestObject = {
       song: song,
       requesterName: 'steg',
@@ -171,7 +178,7 @@ describe('SongRequestService', () => {
     const channel = getMockChannel();
     const requesterName = 'steg';
     mockSettingService.getValue.mockReturnValue('fifo');
-    mockQueueStrategyService.getNextOrder.mockReturnValue(1);
+
     const existingSongRequestObject = {
       id: 1,
       song: song,
@@ -183,7 +190,7 @@ describe('SongRequestService', () => {
       isDone: false,
     };
 
-    mockSongRequestRepository.save.mockImplementation((songRequest) => {
+    mockSongRequestRepository.save.mockImplementation(() => {
       return Promise.reject({ code: 23505 });
     });
 
@@ -202,7 +209,6 @@ describe('SongRequestService', () => {
     const channel = getMockChannel();
     const requesterName = 'steg';
     mockSettingService.getValue.mockReturnValue('fifo');
-    mockQueueStrategyService.getNextOrder.mockReturnValue(1);
     const existingSongRequestObject = {
       id: 1,
       song: song,
@@ -214,7 +220,7 @@ describe('SongRequestService', () => {
       isDone: true,
     };
 
-    mockSongRequestRepository.save.mockImplementation((songRequest) => {
+    mockSongRequestRepository.save.mockImplementation(() => {
       return Promise.reject({ code: 23505 });
     });
 
@@ -234,9 +240,8 @@ describe('SongRequestService', () => {
     const requesterName = 'steg';
 
     mockSettingService.getValue.mockReturnValue(Promise.resolve('fifo'));
-    mockQueueStrategyService.getNextOrder.mockReturnValue(1);
 
-    mockSongRequestRepository.save.mockImplementation((songRequest) => {
+    mockSongRequestRepository.save.mockImplementation(() => {
       return Promise.reject({ code: 99999 });
     });
 

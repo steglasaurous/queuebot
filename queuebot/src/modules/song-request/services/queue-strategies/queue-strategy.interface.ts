@@ -8,7 +8,10 @@ export interface QueueStrategy {
    * @param channel
    * @param songRequest
    */
-  getNextOrder(channel: Channel, songRequest: SongRequest): Promise<number>;
+  setNextOrder(
+    channel: Channel,
+    songRequest: SongRequest,
+  ): Promise<SongRequest>;
 
   /**
    * Gets the strategy name that matches what would be stored in the database (e.g. 'fifo')
