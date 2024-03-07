@@ -22,6 +22,10 @@ export class OnePerUserQueueStrategy implements QueueStrategy {
       isDone: false,
     });
 
+    if (songRequest.requestPriority == undefined) {
+      songRequest.requestPriority = 0;
+    }
+
     // Now find how many songs are in this priority so we know what order to assign.
     const lastOrder = await this.songRequestRepository.maximum('requestOrder', {
       channel: channel,

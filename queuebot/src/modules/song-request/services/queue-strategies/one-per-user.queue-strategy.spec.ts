@@ -7,9 +7,11 @@ import {
 import { OnePerUserQueueStrategy } from './one-per-user.queue-strategy';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { SongRequest } from '../../../data-store/entities/song-request.entity';
+import { Repository } from 'typeorm';
 
 describe('One-Per-User QueueStrategy', () => {
   let service: OnePerUserQueueStrategy;
+  let mockSongRequestRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,6 +32,9 @@ describe('One-Per-User QueueStrategy', () => {
       .compile();
 
     service = module.get<OnePerUserQueueStrategy>(OnePerUserQueueStrategy);
+    mockSongRequestRepository = module.get<Repository<SongRequest>>(
+      getRepositoryToken(SongRequest),
+    );
   });
 
   it('should be defined', () => {
@@ -40,12 +45,54 @@ describe('One-Per-User QueueStrategy', () => {
     const channel = getMockChannel();
     const songRequest = getSampleSongRequests(1)[0];
 
-    // FIXME: Continue here: Implement these tests, make sure the
+    const resultingSongRequest = await service.setNextOrder(
+      channel,
+      songRequest,
+    );
+    expect(resultingSongRequest.requestOrder).toEqual(1);
+    expect(resultingSongRequest.requestPriority).toEqual(0);
   });
 
-  it('should add the user to the end of the queue if they already have a request', async () => {});
+  it('should add the user to the end of the queue if they already have a request', async () => {
+    // Mocking the dataset like:
+    // User A | requestOrder 1 | requestPriority 0
+    // User B | requestOrder 2 | requestPriority 0
 
-  it('should add the request to the end of the next priority group if they already have a song in the queue', async () => {});
+    const channel = getMockChannel();
+    const songRequest = getSampleSongRequests(1)[0];
 
-  it('should add the request to the end of the next priority group when there are multiple groups already present', async () => {});
+    mockSongRequestRepository.countBy.mockReturnValue(1);
+    mockSongRequestRepository.maximum.mockReturnValueOnce(2);
+
+    const resultingSongRequest = await service.setNextOrder(
+      channel,
+      songRequest,
+    );
+
+    expect(resultingSongRequest.requestPriority).toEqual(1);
+    expect(resultingSongRequest.requestOrder).toEqual(3);
+  });
+
+  it('should add the request to the end of the next priority group if they already have a song in the queue', async () => {
+    // Mocking the dataset like:
+    // User A | requestOrder 1 | requestPriority 0
+    // User B | requestOrder 2 | requestPriority 0
+    // User B | requestOrder 3 | requestPriority 1
+    // User B | requestOrder 4 | requestPriority 2
+
+    // Adding another User A request.
+    const channel = getMockChannel();
+    const songRequest = getSampleSongRequests(1)[0];
+
+    mockSongRequestRepository.countBy.mockReturnValue(1);
+    mockSongRequestRepository.maximum.mockReturnValueOnce(2);
+
+    const resultingSongRequest = await service.setNextOrder(
+      channel,
+      songRequest,
+    );
+
+    expect(resultingSongRequest.requestPriority).toEqual(1);
+    expect(resultingSongRequest.requestOrder).toEqual(3);
+  });
 });
