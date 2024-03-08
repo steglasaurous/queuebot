@@ -6,7 +6,7 @@
 
 ## First
 
-- [ ] Server: Implement queuing strategies - add 'fair queuing' strategy
+- [x] Server: Implement queuing strategies - add 'fair queuing' strategy
   - `!rbset queuestrategy oneperuser` 
     - Sets queuing to order by one per user at a time.  Ex: if user A makes 2 requests and user B makes 1 request, the order would be: User A request 1, User B request 1, User A request 2
   - `!rbset queuestrategy random`
@@ -15,7 +15,8 @@
     - "First In, First Out" - queuing based on first-come, first-served.  This is the default.
   - `!rbset queuestrategy default`
     - Sets the queue strategy to the default, which is `fifo`
-
+- [ ] Server: Send queue update websocket messages whenever the queue changes
+- [ ] UI: Update queue state on all update events
 - [ ] Server: Implement remove song from queue
 - [ ] UI: Implement logout
 - [ ] UI: Implement current game and queue status display  

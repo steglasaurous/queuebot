@@ -21,6 +21,9 @@ import { SettingDefinition } from './modules/data-store/entities/setting-definit
 import { Migration1707708934544 } from '../migrations/1707708934544-migration';
 import { Migration1709249266296 } from '../migrations/1709249266296-migration';
 import { Migration1709249266297 } from '../migrations/1709249266297-migration';
+import { Migration1709865668612 } from '../migrations/1709865668612-migration';
+import { Migration1709872065282 } from '../migrations/1709872065282-migration';
+import { Migration1709872297346 } from '../migrations/1709872297346-migration';
 
 export const typeORMAppConfig: DataSourceOptions = {
   type: 'postgres',
@@ -49,5 +52,8 @@ export const typeORMAppConfig: DataSourceOptions = {
     Migration1707708934544,
     Migration1709249266296,
     Migration1709249266297,
+    Migration1709865668612,
+    Migration1709872065282,
+    Migration1709872297346,
   ],
 };

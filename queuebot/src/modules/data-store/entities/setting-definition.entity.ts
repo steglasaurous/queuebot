@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Setting } from './setting.entity';
 
 @Entity()
 /**
@@ -14,4 +15,7 @@ export class SettingDefinition {
   // If this setting only has specific values it can be set to, this should set it.
   @Column({ type: 'simple-array', nullable: true })
   choices: string[];
+
+  @OneToMany(() => Setting, (setting) => setting.settingName)
+  settings: Setting[];
 }

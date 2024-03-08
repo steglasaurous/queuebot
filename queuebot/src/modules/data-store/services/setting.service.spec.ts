@@ -21,6 +21,7 @@ describe('SettingService', () => {
           case getRepositoryToken(SettingDefinition):
             return {
               findOneBy: jest.fn(),
+              findOne: jest.fn(),
               save: jest.fn(),
             };
           default:
@@ -61,14 +62,18 @@ describe('SettingService', () => {
     const channel = getMockChannel();
     const value = 'testvalue';
 
-    mockSettingRepo.findOneBy.mockReturnValue(Promise.resolve());
+    mockSettingRepo.findOne.mockReturnValue(Promise.resolve());
     mockSettingRepo.save.mockReturnValue(Promise.resolve());
 
     await service.setValue(channel, settingDefinition, value);
 
-    expect(mockSettingRepo.findOneBy).toHaveBeenCalledWith({
-      channel: channel,
-      settingName: settingDefinition,
+    expect(mockSettingRepo.findOne).toHaveBeenCalledWith({
+      where: {
+        channel: channel,
+        settingName: {
+          name: 'testdefinition',
+        },
+      },
     });
 
     expect(mockSettingRepo.save).toHaveBeenCalledWith({
@@ -90,14 +95,18 @@ describe('SettingService', () => {
     settingValue.id = 1;
     settingValue.value = 'oldvalue';
 
-    mockSettingRepo.findOneBy.mockReturnValue(Promise.resolve(settingValue));
+    mockSettingRepo.findOne.mockReturnValue(Promise.resolve(settingValue));
     mockSettingRepo.save.mockReturnValue(Promise.resolve());
 
     await service.setValue(channel, settingDefinition, value);
 
-    expect(mockSettingRepo.findOneBy).toHaveBeenCalledWith({
-      channel: channel,
-      settingName: settingDefinition,
+    expect(mockSettingRepo.findOne).toHaveBeenCalledWith({
+      where: {
+        channel: channel,
+        settingName: {
+          name: settingDefinition.name,
+        },
+      },
     });
 
     expect(mockSettingRepo.save).toHaveBeenCalledWith({

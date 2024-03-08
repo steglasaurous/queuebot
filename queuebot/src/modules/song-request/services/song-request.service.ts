@@ -41,7 +41,6 @@ export class SongRequestService {
       } else {
         savedSong = song;
       }
-      this.logger.log('savedSong', JSON.stringify(savedSong));
 
       // Search for an existing song request in the queue.
       // If it's present as a pending request, return the 'already in queue' error.
@@ -51,14 +50,15 @@ export class SongRequestService {
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = new Date();
+      songRequest.channel = channel;
+      songRequest.isActive = false;
+      songRequest.isDone = false;
 
       const queueStrategyName = await this.settingService.getValue(
         channel,
         SettingName.QueueStrategy,
       );
-      songRequest.channel = channel;
-      songRequest.isActive = false;
-      songRequest.isDone = false;
+      this.logger.debug('QueueStrategyName', queueStrategyName);
 
       // This sets the requestOrder and requestPriority fields.
       songRequest = await this.queueStrategyService.getNextOrder(

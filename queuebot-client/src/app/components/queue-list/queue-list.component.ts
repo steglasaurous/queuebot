@@ -38,7 +38,6 @@ export class QueueListComponent implements OnInit {
       this.queuebotApiService
         .getSongRequestQueue(this.channelName)
         .subscribe((result) => {
-          console.log('Got queue', result);
           this.songRequests = result;
           if (window.songs) {
             for (const songRequest of this.songRequests) {

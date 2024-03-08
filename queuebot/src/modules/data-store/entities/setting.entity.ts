@@ -16,7 +16,11 @@ export class Setting {
   })
   channel: Channel;
 
-  @ManyToOne(() => SettingDefinition, { eager: true, nullable: false })
+  @ManyToOne(
+    () => SettingDefinition,
+    (settingDefinition) => settingDefinition.settings,
+    { eager: true, nullable: false },
+  )
   settingName: SettingDefinition;
 
   @Column()

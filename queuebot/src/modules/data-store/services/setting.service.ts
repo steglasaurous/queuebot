@@ -25,10 +25,15 @@ export class SettingService {
     settingDefinition: SettingDefinition,
     value: string,
   ): Promise<void> {
-    let settingValue = await this.settingRepository.findOneBy({
-      channel: channel,
-      settingName: settingDefinition,
+    let settingValue = await this.settingRepository.findOne({
+      where: {
+        channel: channel,
+        settingName: {
+          name: settingDefinition.name,
+        },
+      },
     });
+
     if (!settingValue) {
       settingValue = new Setting();
       settingValue.settingName = settingDefinition;
@@ -47,9 +52,13 @@ export class SettingService {
     if (!settingDefinition) {
       return undefined;
     }
-    const settingValue = await this.settingRepository.findOneBy({
-      channel: channel,
-      settingName: settingDefinition,
+    const settingValue = await this.settingRepository.findOne({
+      where: {
+        channel: channel,
+        settingName: {
+          name: settingDefinition.name,
+        },
+      },
     });
     if (!settingValue) {
       return settingDefinition.defaultValue;
