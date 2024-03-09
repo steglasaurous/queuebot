@@ -92,7 +92,6 @@ export class SongRequestsController {
     @Body() swapOrderDto: SwapOrderDto,
     @Req() request: Request,
   ) {
-    console.log('Reached swapOrder');
     if (!request['user']) {
       throw new UnauthorizedException('Login required.');
     }
