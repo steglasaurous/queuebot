@@ -91,8 +91,7 @@ function bootstrap() {
   ipcMain.handle(
     IPC_SONG_DOWNLOADER_PROCESS_SONG,
     async (event, song: SongDto) => {
-      console.log('Processing song for auto-download');
-      await songDownloader.processSong(song);
+      return await songDownloader.processSong(song);
     },
   );
 

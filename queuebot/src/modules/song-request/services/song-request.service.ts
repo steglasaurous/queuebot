@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SongRequest } from '../../data-store/entities/song-request.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, LessThanOrEqual, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Song } from '../../data-store/entities/song.entity';
 import { Channel } from '../../data-store/entities/channel.entity';
@@ -8,13 +8,11 @@ import { SongRequestResponse } from '../models/song-request-response.interface';
 import { SongRequestErrorType } from '../models/song-request-error-type.enum';
 import { SongService } from '../../song-store/services/song.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SongRequestAddedEvent } from '../events/song-request-added.event';
-import { SongRequestRemovedEvent } from '../events/song-request-removed.event';
-import { SongRequestQueueClearedEvent } from '../events/song-request-queue-cleared.event';
-import { SongRequestActiveEvent } from '../events/song-request-active.event';
 import { QueueStrategyService } from './queue-strategies/queue-strategy.service';
 import { SettingService } from '../../data-store/services/setting.service';
 import { SettingName } from '../../data-store/models/setting-name.enum';
+import { SongRequestQueueChangedEvent } from '../events/song-request-queue-changed.event';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class SongRequestService {
@@ -58,7 +56,6 @@ export class SongRequestService {
         channel,
         SettingName.QueueStrategy,
       );
-      this.logger.debug('QueueStrategyName', queueStrategyName);
 
       // This sets the requestOrder and requestPriority fields.
       songRequest = await this.queueStrategyService.getNextOrder(
@@ -68,10 +65,10 @@ export class SongRequestService {
       );
 
       try {
-        const savedSongRequest =
-          await this.songRequestRepository.save(songRequest);
-        this.eventEmitter.emit(SongRequestAddedEvent.name, {
-          songRequest: savedSongRequest,
+        await this.songRequestRepository.save(songRequest);
+        this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+          channel: channel,
+          songRequests: await this.getAllRequests(channel),
         });
 
         // Apply songRequest strategy to entity
@@ -129,9 +126,11 @@ export class SongRequestService {
       await this.songRequestRepository.save(nextRequest);
     }
 
-    this.eventEmitter.emit(SongRequestActiveEvent.name, {
-      songRequest: nextRequest,
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: channel,
+      songRequests: await this.getAllRequests(channel),
     });
+
     return nextRequest;
   }
 
@@ -158,8 +157,9 @@ export class SongRequestService {
     });
     if (mostRecentRequest) {
       await this.songRequestRepository.remove(mostRecentRequest);
-      this.eventEmitter.emit(SongRequestRemovedEvent.name, {
-        songRequest: mostRecentRequest,
+      this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+        channel: channel,
+        songRequests: await this.getAllRequests(channel),
       });
       return mostRecentRequest;
     }
@@ -169,7 +169,10 @@ export class SongRequestService {
 
   async clearAllRequests(channel: Channel) {
     await this.songRequestRepository.delete({ channel: channel });
-    this.eventEmitter.emit(SongRequestQueueClearedEvent.constructor.name);
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: channel,
+      songRequests: await this.getAllRequests(channel),
+    });
   }
 
   /**
@@ -214,7 +217,26 @@ export class SongRequestService {
 
     await this.songRequestRepository.save(sourceSongRequest);
     await this.songRequestRepository.save(songRequestToSwap);
-  }
 
-  // FIXME: Add a cron that clears out requests that have been played that are older than 12h
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: sourceSongRequest.channel,
+      songRequests: await this.getAllRequests(sourceSongRequest.channel),
+    });
+  }
+  // FIXME: Test this cron, make sure it does what it's supposed to.
+  @Cron('* 0 * * * *')
+  async clearOldDoneRequests() {
+    const maxDoneAge = 12 * 60 * 60 * 1000; // 12 hours
+
+    const oldestTimestamp = new Date(Date.now() - maxDoneAge);
+
+    const result = await this.songRequestRepository.delete({
+      isDone: true,
+      requestTimestamp: LessThanOrEqual(oldestTimestamp),
+    } as FindOptionsWhere<SongRequest>);
+
+    this.logger.log('clearOldRequests completed', {
+      requestsRemoved: result.affected,
+    });
+  }
 }

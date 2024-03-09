@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, retry, timer } from 'rxjs';
 import { QUEUEBOT_API_BASE_URL } from '../app.config';
 import { SongRequestDto } from '../../../../common';
 import { ChannelDto } from '../../../../common';
@@ -25,10 +25,18 @@ export class QueuebotApiService {
   }
 
   getChannel(channel: string): Observable<ChannelDto> {
-    return this.httpClient.get<ChannelDto>(
-      `${this.apiBaseUrl}/api/channels/${channel}`,
-      { withCredentials: true },
-    );
+    return this.httpClient
+      .get<ChannelDto>(`${this.apiBaseUrl}/api/channels/${channel}`, {
+        withCredentials: true,
+      })
+      .pipe(
+        retry({
+          delay: () => {
+            console.log('API request failed, retrying...');
+            return timer(5000);
+          },
+        }),
+      );
   }
 
   swapOrder(

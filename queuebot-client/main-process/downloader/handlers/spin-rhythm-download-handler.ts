@@ -15,10 +15,19 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
   }
   async downloadSong(song: SongDto): Promise<boolean> {
     return new Promise((resolve, reject) => {
+      if (!song.downloadUrl) {
+        console.log('Song does not have a downloadUrl', {
+          songId: song.id,
+          title: song.title,
+        });
+        // Nothing to download.
+        return;
+      }
+
       const workDir = fs.mkdtempSync(join(tmpdir(), 'queuebot-'));
       const zipFilename = path.join(workDir, 'download.zip');
       const writer = fs.createWriteStream(zipFilename);
-
+      console.log('Downloading song', { songId: song.id, title: song.title });
       axios({
         method: 'get',
         url: song.downloadUrl,
@@ -30,8 +39,6 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
         .then((response: AxiosResponse<any, any>) => {
           response.data.pipe(writer);
           writer.on('finish', () => {
-            console.log('writer finished');
-            // FIXME: Continue here: Extract the zip to the destination, then remove the zip.
             // NOTE: The IDE says this is an error, but the compiler does not.  Ignore the IDE in this case.
             // @ts-ignore
             decompress(zipFilename, this.songsDir).then(() => {
@@ -41,7 +48,11 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
           });
         })
         .catch((e) => {
-          console.log(`Failed to download ${song.downloadUrl}`, e);
+          console.log(`Failed to download ${song.downloadUrl}`, {
+            error: e,
+            songId: song.id,
+            title: song.title,
+          });
           reject(e);
         });
     });

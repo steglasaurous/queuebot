@@ -16,9 +16,8 @@ import { SongRequestService } from '../../song-request/services/song-request.ser
 import { QueueDto } from '../../../../../common';
 import { SongRequestDto } from '../../../../../common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { SongRequestAddedEvent } from '../../song-request/events/song-request-added.event';
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
-import { SongRequestRemovedEvent } from '../../song-request/events/song-request-removed.event';
+import { SongRequestQueueChangedEvent } from '../../song-request/events/song-request-queue-changed.event';
 
 @WebSocketGateway({})
 export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
@@ -53,7 +52,6 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
         clientId: client.id,
       });
 
-      // Should emit an error or something
       return {
         event: 'subscribe',
         data: {
@@ -149,30 +147,16 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
     };
   }
 
-  @OnEvent(SongRequestAddedEvent.name)
-  handleSongRequestAdded(event: SongRequestAddedEvent) {
-    const message = {
-      event: 'songRequestAdded',
-      data: this.dtoMappingService.songRequestToDto(event.songRequest),
-    };
-
-    this.sendMessageToChannelSubscribers(
-      event.songRequest.channel.channelName,
-      message,
-    );
-  }
-
-  @OnEvent(SongRequestRemovedEvent.name)
-  handleSongRequestRemoved(event: SongRequestRemovedEvent) {
-    const message = {
-      event: 'songRequestRemoved',
-      data: this.dtoMappingService.songRequestToDto(event.songRequest),
-    };
-
-    this.sendMessageToChannelSubscribers(
-      event.songRequest.channel.channelName,
-      message,
-    );
+  @OnEvent(SongRequestQueueChangedEvent.name)
+  handleQueueChange(event: SongRequestQueueChangedEvent) {
+    const output = [];
+    for (const songRequest of event.songRequests) {
+      output.push(this.dtoMappingService.songRequestToDto(songRequest));
+    }
+    this.sendMessageToChannelSubscribers(event.channel.channelName, {
+      event: 'songRequestQueueChanged',
+      data: output,
+    });
   }
 
   private sendMessageToChannelSubscribers(channelName: string, message: any) {

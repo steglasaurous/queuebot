@@ -9,10 +9,10 @@ export class SongDownloader {
       if (downloadHandler.songSupported(song)) {
         if (downloadHandler.songIsLocal(song)) {
           // Song is already present, no need to download it.
-          console.log('Song is already local, moving on.');
+          console.log('Song present', { songId: song.id, title: song.title });
           return;
         }
-        console.log('Downloading song');
+        console.log('Downloading song', { songId: song.id, title: song.title });
         await downloadHandler.downloadSong(song);
       }
     }

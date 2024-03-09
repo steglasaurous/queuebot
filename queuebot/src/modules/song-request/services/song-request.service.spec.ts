@@ -11,9 +11,10 @@ import { SettingService } from '../../data-store/services/setting.service';
 import { QueueStrategyService } from './queue-strategies/queue-strategy.service';
 import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SongRequestAddedEvent } from '../events/song-request-added.event';
 import { SongService } from '../../song-store/services/song.service';
 import { SongRequestErrorType } from '../models/song-request-error-type.enum';
+import { Song } from '../../data-store/entities/song.entity';
+import { SongRequestQueueChangedEvent } from '../events/song-request-queue-changed.event';
 
 describe('SongRequestService', () => {
   let service: SongRequestService;
@@ -32,6 +33,7 @@ describe('SongRequestService', () => {
           case getRepositoryToken(SongRequest):
             return {
               findOneBy: jest.fn(),
+              find: jest.fn(),
               save: jest.fn(),
             };
         }
@@ -84,32 +86,32 @@ describe('SongRequestService', () => {
     );
 
     expect(mockEventEmitter.emit.mock.calls[0][0]).toEqual(
-      SongRequestAddedEvent.name,
+      SongRequestQueueChangedEvent.name,
     );
-    expect(mockEventEmitter.emit.mock.calls[0][1].songRequest.song).toEqual(
+    expect(mockEventEmitter.emit.mock.calls[0][1].songRequests[0].song).toEqual(
       expectedSongRequestObject.song,
     );
     expect(
-      mockEventEmitter.emit.mock.calls[0][1].songRequest.requesterName,
+      mockEventEmitter.emit.mock.calls[0][1].songRequests[0].requesterName,
     ).toEqual(expectedSongRequestObject.requesterName);
     expect(
-      mockEventEmitter.emit.mock.calls[0][1].songRequest.requestTimestamp.valueOf(),
+      mockEventEmitter.emit.mock.calls[0][1].songRequests[0].requestTimestamp.valueOf(),
     ).toBeGreaterThanOrEqual(
       expectedSongRequestObject.requestTimestamp.valueOf(),
     );
 
     expect(
-      mockEventEmitter.emit.mock.calls[0][1].songRequest.requestOrder,
+      mockEventEmitter.emit.mock.calls[0][1].songRequests[0].requestOrder,
     ).toEqual(expectedSongRequestObject.requestOrder);
-    expect(mockEventEmitter.emit.mock.calls[0][1].songRequest.channel).toEqual(
-      expectedSongRequestObject.channel,
-    );
-    expect(mockEventEmitter.emit.mock.calls[0][1].songRequest.isActive).toEqual(
-      expectedSongRequestObject.isActive,
-    );
-    expect(mockEventEmitter.emit.mock.calls[0][1].songRequest.isDone).toEqual(
-      expectedSongRequestObject.isDone,
-    );
+    expect(
+      mockEventEmitter.emit.mock.calls[0][1].songRequests[0].channel,
+    ).toEqual(expectedSongRequestObject.channel);
+    expect(
+      mockEventEmitter.emit.mock.calls[0][1].songRequests[0].isActive,
+    ).toEqual(expectedSongRequestObject.isActive);
+    expect(
+      mockEventEmitter.emit.mock.calls[0][1].songRequests[0].isDone,
+    ).toEqual(expectedSongRequestObject.isDone);
   };
 
   it('should be defined', () => {
@@ -131,9 +133,14 @@ describe('SongRequestService', () => {
     expectedSongRequestObject.isActive = false;
     expectedSongRequestObject.isDone = false;
 
-    mockSongRequestRepository.save.mockImplementation((songRequest) => {
-      return songRequest;
-    });
+    mockSongRequestRepository.save.mockImplementation(
+      (songRequest: SongRequest) => {
+        return songRequest;
+      },
+    );
+    mockSongRequestRepository.find.mockReturnValue(
+      Promise.resolve([expectedSongRequestObject]),
+    );
 
     const result = await service.addRequest(song, channel, requesterName);
     expect(result.success).toBeTruthy();
@@ -147,7 +154,7 @@ describe('SongRequestService', () => {
 
     song.id = undefined;
 
-    mockSongService.saveSong.mockImplementation((song) => {
+    mockSongService.saveSong.mockImplementation((song: Song) => {
       song.id = 1;
       return Promise.resolve(song);
     });
@@ -167,7 +174,9 @@ describe('SongRequestService', () => {
     mockSongRequestRepository.save.mockImplementation((songRequest) => {
       return songRequest;
     });
-
+    mockSongRequestRepository.find.mockReturnValue(
+      Promise.resolve([expectedSongRequestObject]),
+    );
     const result = await service.addRequest(song, channel, requesterName);
     expect(result.success).toBeTruthy();
     expectSuccessfulSongRequest(expectedSongRequestObject);

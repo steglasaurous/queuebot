@@ -64,11 +64,18 @@ export class QueueListComponent implements OnInit {
 
       this.websocketService.messages$.subscribe((message) => {
         console.log(message);
-        if (message.event == 'songRequestAdded') {
-          console.log('Adding new song');
-          this.songRequests.push(message.data as SongRequestDto);
+
+        if (message.event == 'songRequestQueueChanged') {
+          this.songRequests = message.data as SongRequestDto[];
+
           if (window.songs) {
-            window.songs.processSong(message.data.song);
+            for (const songRequest of this.songRequests) {
+              window.songs.processSong(songRequest);
+            }
+          } else {
+            console.log(
+              'Window.songs does not exist, not calling processSong()',
+            );
           }
         }
       });

@@ -1,13 +1,4 @@
-import {
-  mergeMap,
-  Observable,
-  Observer,
-  of,
-  retry,
-  Subject,
-  throwError,
-  timer,
-} from 'rxjs';
+import { Observer, of, retry, Subject, throwError, timer } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { Inject, Injectable } from '@angular/core';
@@ -61,22 +52,6 @@ export class WebsocketService {
   }
 
   private doConnect() {
-    const genericRetryStrategy =
-      ({ retryTime = 30000 }: { retryTime?: number } = {}) =>
-      (attempts: Observable<any>) => {
-        return attempts.pipe(
-          mergeMap((error, i) => {
-            if (this.isRetryEnabled) {
-              //console.log('Failed to connect. Retrying...');
-              this.connected = false;
-              return timer(retryTime);
-            }
-            // If disabled, stop retrying.
-            return throwError(error);
-          }),
-        );
-      };
-
     if (this.socket$ && !this.socket$.closed) {
       // Force the socket to close
       this.socket$.unsubscribe();
@@ -87,7 +62,16 @@ export class WebsocketService {
 
       this.socket$
         .pipe(
-          retry({ delay: genericRetryStrategy() }),
+          retry({
+            delay: (error) => {
+              if (this.isRetryEnabled) {
+                this.connected = false;
+                console.log('Retrying connection...');
+                return timer(5000);
+              }
+              return throwError(() => new Error(error));
+            },
+          }),
           catchError((error) => of(error)),
         )
         .subscribe({
