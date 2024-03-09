@@ -1,18 +1,17 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
 import { Game } from '../../data-store/entities/game.entity';
-import { MessageFormatterService } from '../services/message-formatter.service';
 import { I18nService } from 'nestjs-i18n';
 import { BaseBotCommand } from './base.bot-command';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class SetGameBotCommand extends BaseBotCommand {
   constructor(
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(Game) private gameRepository: Repository<Game>,
-    private messageFormatter: MessageFormatterService,
     private i18n: I18nService,
   ) {
     super();
@@ -32,23 +31,24 @@ export class SetGameBotCommand extends BaseBotCommand {
       .replace('!setgame', '')
       .trim();
     if (!inputGameName) {
-      return this.i18n.t('chat.NoGameSpecified');
+      return this.i18n.t('chat.CurrentGame', {
+        lang: channel.lang,
+        args: { gameName: channel.game.displayName },
+      });
     }
 
-    const gameSearchResults = await this.gameRepository.findBy({
+    const game = await this.gameRepository.findOneBy({
       setGameName: inputGameName,
     });
-    if (gameSearchResults.length > 1) {
-      return this.i18n.t('chat.MatchedTooManyGames');
-    }
 
-    if (gameSearchResults.length < 1) {
+    if (!game) {
       return this.i18n.t('chat.UnsupportedGame');
     }
 
-    channel.game = gameSearchResults[0];
+    channel.game = game;
     await this.channelRepository.save(channel);
     return this.i18n.t('chat.GameChanged', {
+      lang: channel.lang,
       args: { gameName: channel.game.displayName },
     });
   }

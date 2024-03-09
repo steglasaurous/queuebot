@@ -9,6 +9,9 @@ import { DtoMappingService } from './services/dto-mapping.service';
 import { UserService } from './services/user.service';
 import { User } from './entities/user.entity';
 import { UserAuthSource } from './entities/user-auth-source.entity';
+import { SettingService } from './services/setting.service';
+import { SettingDefinition } from './entities/setting-definition.entity';
+import { Setting } from './entities/setting.entity';
 
 @Module({
   imports: [
@@ -20,9 +23,11 @@ import { UserAuthSource } from './entities/user-auth-source.entity';
       UserBotState,
       User,
       UserAuthSource,
+      Setting,
+      SettingDefinition,
     ]),
   ],
-  exports: [TypeOrmModule, DtoMappingService, UserService],
-  providers: [DtoMappingService, UserService],
+  exports: [TypeOrmModule, DtoMappingService, UserService, SettingService],
+  providers: [DtoMappingService, UserService, SettingService],
 })
 export class DataStoreModule {}

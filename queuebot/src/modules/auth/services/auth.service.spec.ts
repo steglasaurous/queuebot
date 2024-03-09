@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { getGenericNestMock } from '../../../test/test-helper';
-import { User } from '../../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '../../data-store/entities/user.entity';
+import { getGenericNestMock } from '../../../../test/helpers';
 
 describe('AuthService', () => {
   let service: AuthService;

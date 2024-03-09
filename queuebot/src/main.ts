@@ -6,12 +6,30 @@ import { isMainThread } from 'worker_threads';
 import { ImportWorkerModule } from './import-worker.module';
 import { SongImporterManagerService } from './modules/song-store/services/song-importer-manager.service';
 import { Logger } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiModule } from './modules/api/api.module';
 
 async function bootstrap() {
   if (isMainThread) {
     const app = await NestFactory.create(AppModule);
     app.useWebSocketAdapter(new WsAdapter(app));
     const config = await app.get(ConfigService);
+    app.enableCors({
+      credentials: true,
+      origin: '*',
+    });
+    app.use(cookieParser());
+
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Requestobot API')
+      .setDescription('The Requestobot API')
+      .setVersion('1.4.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig, {
+      include: [ApiModule],
+    });
+    SwaggerModule.setup('api', app, document);
 
     await app.listen(config.get('PORT') ?? 3000);
   } else {

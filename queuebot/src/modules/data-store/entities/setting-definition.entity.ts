@@ -1,17 +1,21 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { SettingDataType } from '../models/setting-data-type.enum';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Setting } from './setting.entity';
 
 @Entity()
+/**
+ * A generic setting mechanism - this defines the possible settings available for a channel
+ */
 export class SettingDefinition {
   @PrimaryColumn()
   name: string;
 
-  @Column()
-  dataType: SettingDataType;
-
-  @Column({ nullable: true })
-  choices?: string[];
-
   @Column({ nullable: true })
   defaultValue?: string;
+
+  // If this setting only has specific values it can be set to, this should set it.
+  @Column({ type: 'simple-array', nullable: true })
+  choices: string[];
+
+  @OneToMany(() => Setting, (setting) => setting.settingName)
+  settings: Setting[];
 }

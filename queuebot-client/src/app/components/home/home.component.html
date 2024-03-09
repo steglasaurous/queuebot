@@ -1,0 +1,14 @@
+<div class="logged-in-state">
+  {{ channelName }} <button>Logout</button>
+</div>
+<div class="queue-settings">
+  <div class="game-switch">
+    {{ channel.game.displayName }} <button>Change Game...</button>
+  </div>
+  <div class="open-queue-switch">
+    <mat-slide-toggle [checked]="channel.queueOpen">Open Queue</mat-slide-toggle>
+  </div>
+</div>
+<div>
+  <app-queue-list *ngIf="channelName != ''" [channelName]="channelName"></app-queue-list>
+</div>

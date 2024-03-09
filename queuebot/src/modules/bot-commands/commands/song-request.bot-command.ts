@@ -38,7 +38,9 @@ export class SongRequestBotCommand extends BaseBotCommand {
     if (chatMessage.message.indexOf(' ') == -1) {
       // No search term.  Display help.
       if (channel.game) {
-        return this.i18n.t(this.getHelpMessageTranslationKey(channel.game));
+        return this.i18n.t(this.getHelpMessageTranslationKey(channel.game), {
+          lang: 'en',
+        });
       }
     }
 
@@ -116,6 +118,7 @@ export class SongRequestBotCommand extends BaseBotCommand {
       }
       if (searchResults.length > songLimit) {
         outputMessage += this.i18n.t('chat.AndMore', {
+          lang: channel.lang,
           args: { songsRemaining: searchResults.length - songLimit },
         });
       }
@@ -140,19 +143,16 @@ export class SongRequestBotCommand extends BaseBotCommand {
       if (requestResult.errorType == SongRequestErrorType.ALREADY_IN_QUEUE) {
         return this.i18n.t('chat.SongAlreadyInQueue', {
           lang: channel.lang,
-          defaultValue: 'Song is already in queue.',
         });
       } else if (
         requestResult.errorType == SongRequestErrorType.ALREADY_PLAYED
       ) {
         return this.i18n.t('chat.SongAlreadyPlayed', {
           lang: channel.lang,
-          defaultValue: 'Song has already been played.',
         });
       } else {
         return this.i18n.t('chat.SongRequestFailed', {
           lang: channel.lang,
-          defaultValue: 'Queuebot error while attempting to add song to queue.',
         });
       }
     }

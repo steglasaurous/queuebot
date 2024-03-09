@@ -1,21 +1,16 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { Channel } from '../../data-store/entities/channel.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { MessageFormatterService } from '../services/message-formatter.service';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { BaseBotCommand } from './base.bot-command';
 
+@Injectable()
 export class QueueBotCommand extends BaseBotCommand {
   private logger: Logger = new Logger(this.constructor.name);
   constructor(
     private songRequestService: SongRequestService,
-    @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private i18n: I18nService,
-    private messageFormatterService: MessageFormatterService,
   ) {
     super();
     this.triggers = ['!queue'];

@@ -44,6 +44,23 @@ export class BotCommandListener {
             // This is in the bot's own channel, which won't have an entry in the channels database (nor should it, since it's special).
             // We provide a fake channel instance so it can run with events.
             channel = this.botChannel;
+          } else {
+            this.logger.warn(
+              'Got a message from a channel not found in the database',
+              {
+                originalMessageId: chatEvent.chatMessage.id,
+                botCommand: botCommand.constructor.name,
+                username: chatEvent.chatMessage.username,
+                chatMessage: chatEvent.chatMessage.message,
+                channel: channel.channelName,
+                userIsBroadcaster: chatEvent.chatMessage.userIsBroadcaster,
+                userIsMod: chatEvent.chatMessage.userIsMod,
+                userIsSubscriber: chatEvent.chatMessage.userIsSubscriber,
+                userIsVip: chatEvent.chatMessage.userIsVip,
+              },
+            );
+
+            return;
           }
         }
         if (channel.enabled != true && !botCommand.shouldAlwaysTrigger()) {

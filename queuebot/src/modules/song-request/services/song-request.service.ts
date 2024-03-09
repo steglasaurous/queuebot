@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SongRequest } from '../../data-store/entities/song-request.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, LessThanOrEqual, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Song } from '../../data-store/entities/song.entity';
 import { Channel } from '../../data-store/entities/channel.entity';
@@ -8,10 +8,11 @@ import { SongRequestResponse } from '../models/song-request-response.interface';
 import { SongRequestErrorType } from '../models/song-request-error-type.enum';
 import { SongService } from '../../song-store/services/song.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SongRequestAddedEvent } from '../events/song-request-added.event';
-import { SongRequestRemovedEvent } from '../events/song-request-removed.event';
-import { SongRequestQueueClearedEvent } from '../events/song-request-queue-cleared.event';
-import { SongRequestActiveEvent } from '../events/song-request-active.event';
+import { QueueStrategyService } from './queue-strategies/queue-strategy.service';
+import { SettingService } from '../../data-store/services/setting.service';
+import { SettingName } from '../../data-store/models/setting-name.enum';
+import { SongRequestQueueChangedEvent } from '../events/song-request-queue-changed.event';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class SongRequestService {
@@ -21,6 +22,8 @@ export class SongRequestService {
     private songRequestRepository: Repository<SongRequest>,
     private songService: SongService,
     private eventEmitter: EventEmitter2,
+    private queueStrategyService: QueueStrategyService,
+    private settingService: SettingService,
   ) {}
 
   async addRequest(
@@ -36,31 +39,43 @@ export class SongRequestService {
       } else {
         savedSong = song;
       }
-      this.logger.log('savedSong', JSON.stringify(savedSong));
 
       // Search for an existing song request in the queue.
       // If it's present as a pending request, return the 'already in queue' error.
       // If it's present as a recently played request, return the 'was already played' error.
       // FUTURE: Make this configurable that if the streamer wants to allow repeats after playing a song, they can do so
-      const songRequest = new SongRequest();
+      let songRequest = new SongRequest();
       songRequest.song = savedSong;
       songRequest.requesterName = requesterName;
       songRequest.requestTimestamp = new Date();
-      songRequest.requestOrder =
-        (await this.songRequestRepository.maximum('requestOrder', {
-          channel: channel,
-        })) + 1; // Not sure what the performance implications are on this.  Will have to keep an eye on it for now.
       songRequest.channel = channel;
       songRequest.isActive = false;
       songRequest.isDone = false;
 
+      const queueStrategyName = await this.settingService.getValue(
+        channel,
+        SettingName.QueueStrategy,
+      );
+
+      // This sets the requestOrder and requestPriority fields.
+      songRequest = await this.queueStrategyService.getNextOrder(
+        channel,
+        songRequest,
+        queueStrategyName,
+      );
+
       try {
-        const savedSongRequest =
-          await this.songRequestRepository.save(songRequest);
-        this.eventEmitter.emit(SongRequestAddedEvent.name, {
-          songRequest: savedSongRequest,
+        await this.songRequestRepository.save(songRequest);
+        this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+          channel: channel,
+          songRequests: await this.getAllRequests(channel),
         });
+
+        // Apply songRequest strategy to entity
+        // We do this after the save so the strategy has the opportunity to reorder other items in the queue if necessary.
+
         resolve({ success: true });
+        return;
       } catch (error) {
         let errorType = SongRequestErrorType.SERVER_ERROR;
 
@@ -82,7 +97,7 @@ export class SongRequestService {
         } else {
           this.logger.warn('Saving song request threw error', { error: error });
         }
-        
+
         resolve({
           success: false,
           errorType: errorType,
@@ -111,9 +126,11 @@ export class SongRequestService {
       await this.songRequestRepository.save(nextRequest);
     }
 
-    this.eventEmitter.emit(SongRequestActiveEvent.name, {
-      songRequest: nextRequest,
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: channel,
+      songRequests: await this.getAllRequests(channel),
     });
+
     return nextRequest;
   }
 
@@ -140,8 +157,9 @@ export class SongRequestService {
     });
     if (mostRecentRequest) {
       await this.songRequestRepository.remove(mostRecentRequest);
-      this.eventEmitter.emit(SongRequestRemovedEvent.name, {
-        songRequest: mostRecentRequest,
+      this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+        channel: channel,
+        songRequests: await this.getAllRequests(channel),
       });
       return mostRecentRequest;
     }
@@ -151,8 +169,74 @@ export class SongRequestService {
 
   async clearAllRequests(channel: Channel) {
     await this.songRequestRepository.delete({ channel: channel });
-    this.eventEmitter.emit(SongRequestQueueClearedEvent.name);
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: channel,
+      songRequests: await this.getAllRequests(channel),
+    });
   }
 
-  // FIXME: Add a cron that clears out requests that have been played that are older than 12h
+  /**
+   * Swaps the requestOrder between sourceSongRequestId and destinationSongRequestId.
+   *
+   * Note that this will fail if both requests do not belong to the same channel.
+   */
+  async swapOrder(
+    sourceSongRequestId: number,
+    destinationSongRequestId: number,
+  ) {
+    const sourceSongRequest = await this.songRequestRepository.findOneBy({
+      id: sourceSongRequestId,
+    });
+
+    // Find the songRequest that's present in the position we want to replace.
+    const songRequestToSwap = await this.songRequestRepository.findOneBy({
+      id: destinationSongRequestId,
+    });
+    if (!songRequestToSwap) {
+      // There's nothing in that current position, which is probably an error. Fail it out.
+      return;
+    }
+
+    if (
+      sourceSongRequest.channel.channelName !==
+      songRequestToSwap.channel.channelName
+    ) {
+      this.logger.warn(
+        'swapOrder(): Will not swap order for 2 requests belonging to different channels',
+        {
+          sourceChannel: sourceSongRequest.channel.channelName,
+          destinationChannel: songRequestToSwap.channel.channelName,
+        },
+      );
+      return;
+    }
+
+    const oldRequestOrder = sourceSongRequest.requestOrder;
+    sourceSongRequest.requestOrder = songRequestToSwap.requestOrder;
+    songRequestToSwap.requestOrder = oldRequestOrder;
+
+    await this.songRequestRepository.save(sourceSongRequest);
+    await this.songRequestRepository.save(songRequestToSwap);
+
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: sourceSongRequest.channel,
+      songRequests: await this.getAllRequests(sourceSongRequest.channel),
+    });
+  }
+
+  @Cron('0 * * * *')
+  async clearOldDoneRequests() {
+    const maxDoneAge = 12 * 60 * 60 * 1000; // 12 hours
+
+    const oldestTimestamp = new Date(Date.now() - maxDoneAge);
+
+    const result = await this.songRequestRepository.delete({
+      isDone: true,
+      requestTimestamp: LessThanOrEqual(oldestTimestamp),
+    } as FindOptionsWhere<SongRequest>);
+
+    this.logger.log('clearOldRequests completed', {
+      requestsRemoved: result.affected,
+    });
+  }
 }

@@ -46,6 +46,9 @@ export class SongImporterManagerService implements OnApplicationBootstrap {
 
   private startImportWorker() {
     const worker = new Worker(require.main.filename);
+    // FYI: The above doesn't work if assembled via webpack.  It seems require.main.filename doesn't populate properly.
+    // To that end, referring directly to where main.js lives will work.
+    // const worker = new Worker(path.join(__dirname, 'main.js'));
     worker.on('exit', () => {
       this.logger.log('Worker exited');
     });

@@ -1,12 +1,55 @@
+# Authentication
+
+1. Goto /auth/twitch, login to twitch.
+
 # Todo
+
+## First
+
+- [x] Server: Implement queuing strategies - add 'fair queuing' strategy
+  - `!rbset queuestrategy oneperuser` 
+    - Sets queuing to order by one per user at a time.  Ex: if user A makes 2 requests and user B makes 1 request, the order would be: User A request 1, User B request 1, User A request 2
+  - `!rbset queuestrategy random`
+    - Injects the request in a random spot in the queue when it comes in.
+  - `!rbset queuestrategy fifo`
+    - "First In, First Out" - queuing based on first-come, first-served.  This is the default.
+  - `!rbset queuestrategy default`
+    - Sets the queue strategy to the default, which is `fifo`
+- [x] Server: Send queue update websocket messages whenever the queue changes
+- [x] UI: Update queue state on all update events
+- [ ] Server: Implement remove song from queue command
+- [ ] Server: Implement remove song from queue API
+- [ ] UI: Implement remove song
+- [ ] UI: Implement logout
+- [ ] UI: Implement current game and queue status display  
+- [ ] UI: Implement ability to open or close the queue from interface
+- [ ] UI: Implement add song to queue via search/autocomplete
+- [ ] UI: Implement next song button to advance the queue
+- [ ] Server: Add a 'deny list' - songs that cannot be queued
+- [x] Implement auto-reconnect for websocket connections
+
+## Next
+
+- [ ] Remove menus from electron interface (for now)
+- [ ] UI: Implement ability to change game from interface
+- [ ] UI: Implement showing what's already been played
+- [ ] UI: Implement clearing played history
+- [ ] Server: Implement clearing played history via command
+- [ ] UI: Implement rollback/undo button to reverse the queue to its previous state
+- [ ] Server: Implement rollback/undo command to reverse the queue to its previous state
+- [ ] `!rbget` - Return a list of requestobot settings for the channel it's in.  Broadcaster and mods only.
+
+## Backlog
+
 - [x] Instead of removing songs from the queue database, mark them as played.  Add cron to remove played songs after 12 hours or so.
 - [x] Add concept of "current song" to keep track of what the current song in the queue is.  !nextsong should mark the song as current song. Another !nextsong should remove the current song and put the next song as the 'current song', etc.
-- [ ] Implement Twitch SSO
+- [x] Implement Twitch SSO
 - [ ] Implement broadcaster queue manager UI
-  - [ ] Queue display
+  - [x] Queue display
+  - [x] Implement websocket connection to queuebot for new song notifications
+  - [x] Implement drag-and-drop queue reordering
   - [ ] Next song button
   - [ ] Remove song from queue
-
 - [ ] !remove (song #)
 - [ ] Clear out queue when switching games.
 - [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
@@ -18,25 +61,14 @@
 - [ ] Allow adding songs via client?
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc.
 
-- [x] For multiple search results, include artist and mapper
-- [x] Add !clear to clean out the queue
-- [x] Add !open to open queue, !close to close queue, display appropriate message for requesters when queue is closed.
-- [x] Create docker container config
-- [x] Implement !getout to kick the bot out (or similar command)
-- [x] !oops - Remove last song requested by user
-- [x] !nextsong - Pop the newest song off the queue
-- [x] Implement proper ordering of the queue
-- [x] !queue - List songs in queue
-- [x] Create a dedicated queuebot twitch account
-- [x] Load up entries for Audio Trip OSTs
-- [x] Look into why database wasn't persisted between rebuilds (docker volume)
-- [x] Add exclamation in front of all messages so TTS doesn't read them by default.
+- [ ] Importers: Only report new songs imported, vs total songs
+- [ ] Spin rhythm importer: Implement song downloader to read duration and BPM data (or use API?)
+
+- [ ] Idea: Allow adding search filters by difficulty, so streamer can limit difficulty level being requested.
 
 Websocket gateway to expose queue state and changes for clients and 3rd party apps
 
-
 Connect:
-Option 1: Build it into a namespace
 `wss://requestobot.steglasaurous.com/queue/{channelName}`
 
 On connect: Emit entire contents of queue, including download links of each song

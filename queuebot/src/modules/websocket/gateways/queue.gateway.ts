@@ -13,11 +13,11 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger } from '@nestjs/common';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { QueueDto } from '../../data-store/dto/queue.dto';
-import { SongRequestDto } from '../../data-store/dto/song-request.dto';
+import { QueueDto } from '../../../../../common';
+import { SongRequestDto } from '../../../../../common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { SongRequestAddedEvent } from '../../song-request/events/song-request-added.event';
 import { DtoMappingService } from '../../data-store/services/dto-mapping.service';
+import { SongRequestQueueChangedEvent } from '../../song-request/events/song-request-queue-changed.event';
 
 @WebSocketGateway({})
 export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
@@ -52,7 +52,6 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
         clientId: client.id,
       });
 
-      // Should emit an error or something
       return {
         event: 'subscribe',
         data: {
@@ -126,10 +125,11 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
         },
       );
 
-      const queueDto = new QueueDto();
-      queueDto.channelName = channel.channelName;
-      queueDto.gameDisplayName = channel.game.displayName;
-      queueDto.songRequests = songRequestsDtos;
+      const queueDto: QueueDto = {
+        channelName: channel.channelName,
+        gameDisplayName: channel.game.displayName,
+        songRequests: songRequestsDtos,
+      };
 
       return <WsResponse>{
         event: 'queue',
@@ -147,20 +147,32 @@ export class QueueGateway implements OnGatewayDisconnect, OnGatewayConnection {
     };
   }
 
-  @OnEvent(SongRequestAddedEvent.name)
-  handleSongRequestAdded(event: SongRequestAddedEvent) {
-    // Find all clients that want to know about this.
-    if (this.channelToClientMap.has(event.songRequest.channel.channelName)) {
-      this.channelToClientMap
-        .get(event.songRequest.channel.channelName)
-        .forEach((client) => {
-          client.send(
-            JSON.stringify({
-              event: 'songRequestAdded',
-              data: this.dtoMappingService.songRequestToDto(event.songRequest),
-            }),
-          );
-        });
+  @OnEvent(SongRequestQueueChangedEvent.name)
+  handleQueueChange(event: SongRequestQueueChangedEvent) {
+    const output = [];
+    for (const songRequest of event.songRequests) {
+      output.push(this.dtoMappingService.songRequestToDto(songRequest));
     }
+    this.sendMessageToChannelSubscribers(event.channel.channelName, {
+      event: 'songRequestQueueChanged',
+      data: output,
+    });
+  }
+
+  private sendMessageToChannelSubscribers(channelName: string, message: any) {
+    this.getClientsSubscribedToChannel(channelName).forEach((client) => {
+      this.logger.debug('WS message to client', {
+        clientId: client.id,
+        message: message,
+      });
+      client.send(JSON.stringify(message));
+    });
+  }
+
+  private getClientsSubscribedToChannel(channelName: string): Set<any> {
+    if (this.channelToClientMap.has(channelName)) {
+      return this.channelToClientMap.get(channelName);
+    }
+    return new Set<any>();
   }
 }

@@ -2,69 +2,32 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SongRequestBotCommand } from './song-request.bot-command';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
-import { getGenericNestMock } from '../../../../test/helpers';
+import {
+  getGenericNestMock,
+  getMockChannel,
+  getMockChatMessage,
+  getSampleSong,
+} from '../../../../test/helpers';
 import { BotStateService } from '../services/bot-state.service';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
-import { MessageFormatterService } from '../services/message-formatter.service';
-import { AbstractChatClient } from '../../chat/services/clients/abstract-chat.client';
-import { Game } from '../../data-store/entities/game.entity';
-import { ChatMessage } from '../../chat/services/chat-message';
 import { SongService } from '../../song-store/services/song.service';
+import { UserBotState } from '../../data-store/entities/user-bot-state.entity';
+import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 
 describe('SongRequestBotCommand', () => {
-  let botCommand: SongRequestBotCommand;
+  let service: SongRequestBotCommand;
   let botStateService;
   let i18n;
   let songRequestService;
-  let messageFormatterService;
-  let channelRepository;
   let songService;
-
-  const getChatMessageObject = (): ChatMessage => {
-    return {
-      channelName: 'testchannel',
-      client: {
-        sendMessage: jest.fn(),
-      } as unknown as AbstractChatClient,
-      message: '',
-      id: '1',
-      date: new Date(),
-      color: '',
-      emotes: new Map<string, string[]>(),
-      userIsBroadcaster: false,
-      userIsMod: false,
-      userIsSubscriber: false,
-      userIsVip: false,
-      username: 'testuser',
-    } as ChatMessage;
-  };
-
-  const getChannelObject = (): Channel => {
-    const game = new Game();
-    game.id = 1;
-    game.name = 'spin';
-
-    const channel = new Channel();
-    channel.enabled = true;
-    channel.queueOpen = true;
-    channel.channelName = 'testchannel';
-    channel.game = game;
-    channel.lang = 'en';
-
-    return channel;
-  };
+  let channel;
+  let chatMessage;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SongRequestBotCommand,
-        {
-          provide: BotStateService,
-          useValue: {
-            getState: jest.fn(),
-          },
-        },
         {
           provide: getRepositoryToken(Channel),
           useValue: {
@@ -78,110 +41,222 @@ describe('SongRequestBotCommand', () => {
       })
       .compile();
 
-    botCommand = module.get<SongRequestBotCommand>(SongRequestBotCommand);
+    service = module.get<SongRequestBotCommand>(SongRequestBotCommand);
     botStateService = module.get<BotStateService>(BotStateService);
     i18n = module.get(I18nService);
+    i18n.t.mockImplementation((key: string) => {
+      return key;
+    });
+
     songRequestService = module.get(SongRequestService);
-    messageFormatterService = module.get(MessageFormatterService);
-    channelRepository = module.get(getRepositoryToken(Channel));
     songService = module.get(SongService);
+
+    channel = getMockChannel();
+    chatMessage = getMockChatMessage();
   });
 
   it('should be defined', () => {
-    expect(botCommand).toBeDefined();
+    expect(service).toBeDefined();
   });
 
-  // FIXME: RIght now using the built-in nest logger, we can't spy on it or mock it because it's private.
-  //        I'm thinking replace with winston so we can spy on it AND log to other things like syslog.
-  xit('should not do anything if the channelName cannot be found in the database', async () => {
-    channelRepository.findOneBy.mockImplementation(() => {
-      return undefined;
-    });
-
-    // await botCommand.execute(getChatMessageObject());
+  it('should return a description', () => {
+    expect(service.getDescription()).toBeDefined();
   });
-
-  xit('should not respond if the bot is disabled in the channel', async () => {});
 
   it('should display a help message relevant to the current game if no search terms are present', async () => {
-    const channel = getChannelObject();
-
-    channelRepository.findOneBy.mockImplementation(() => {
-      return channel;
-    });
-
-    const chatMessage = getChatMessageObject();
     chatMessage.message = '!req';
 
-    i18n.t.mockImplementation(() => {
-      return 'SPIN HELP';
+    const response = await service.execute(channel, chatMessage);
+
+    expect(response).toEqual('chat.RequestHelp_spin');
+    expect(i18n.t).toHaveBeenCalledWith('chat.RequestHelp_spin', {
+      lang: 'en',
     });
-
-    const response = await botCommand.execute(channel, chatMessage);
-
-    expect(i18n.t).toHaveBeenCalledWith('chat.RequestHelp_spin');
-    expect(response).toEqual('SPIN HELP');
 
     return Promise.resolve();
   });
 
   it('should return a message if the queue is closed', async () => {
-    const channel = getChannelObject();
     channel.queueOpen = false;
-
-    channelRepository.findOneBy.mockImplementation(() => {
-      return channel;
-    });
-
-    const chatMessage = getChatMessageObject();
     chatMessage.message = '!req test';
 
-    i18n.t.mockImplementation(() => {
-      return 'Queue Closed';
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SorryQueueIsClosed');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SorryQueueIsClosed', {
+      lang: 'en',
     });
-
-    const response = await botCommand.execute(channel, chatMessage);
-
-    expect(i18n.t).toHaveBeenCalledWith('chat.SorryQueueIsClosed');
-
-    expect(response).toEqual('Queue Closed');
 
     return Promise.resolve();
   });
 
   it('should send an error message when search throws an error', async () => {
-    const channel = getChannelObject();
-
-    channelRepository.findOneBy.mockImplementation(() => {
-      return channel;
-    });
-
-    const chatMessage = getChatMessageObject();
     chatMessage.message = '!req test';
-
-    i18n.t.mockImplementation(() => {
-      return 'Search Error';
-    });
-
     songService.searchSongs.mockImplementation(() => {
       throw new Error('search failed');
     });
 
-    const response = await botCommand.execute(channel, chatMessage);
-
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SearchErrorTryAgain');
     expect(i18n.t).toHaveBeenCalledWith('chat.SearchErrorTryAgain', {
       lang: 'en',
     });
 
-    expect(response).toEqual('Search Error');
-
     return Promise.resolve();
   });
 
-  xit('should add song to the queue if only one result is found', async () => {});
-  xit('should send a message with multiple results, storing the results for later selection', async () => {});
-  xit('should show x more songs if there are more than 5 songs in the results', async () => {});
-  xit('should add a song from a previous search by # to the request queue', async () => {});
-  xit('should match multiple triggers', () => {});
-  xit('should send a message that the song is already in the queue', async () => {});
+  it('should return no songs found if search returned with no results', async () => {
+    songService.searchSongs.mockReturnValue([]);
+    const response = await service.execute(channel, chatMessage);
+
+    expect(response).toEqual('chat.NoSongsFound');
+    expect(i18n.t).toHaveBeenCalledWith('chat.NoSongsFound', { lang: 'en' });
+  });
+
+  it('should add song to the queue if only one result is found', async () => {
+    const sampleSong = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([sampleSong]);
+    songRequestService.addRequest.mockReturnValue({
+      success: true,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAddedToQueue');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAddedToQueue', {
+      lang: 'en',
+      args: {
+        title: sampleSong.title,
+        artist: sampleSong.artist,
+        mapper: sampleSong.mapper,
+      },
+    });
+  });
+  it('should send a message with multiple results, storing the results for later selection', async () => {
+    const songResults = [getSampleSong(1), getSampleSong(2)];
+    songService.searchSongs.mockReturnValue(songResults);
+
+    const expectedOutput =
+      'chat.SelectSong#1 title_1 - artist_1 (mapper_1) #2 title_2 - artist_2 (mapper_2) ';
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual(expectedOutput);
+    expect(i18n.t).toHaveBeenCalledWith('chat.SelectSong', { lang: 'en' });
+  });
+  it('should show x more songs if there are more than 5 songs in the results', async () => {
+    const songResults = [];
+    let expectedResponse = 'chat.SelectSong';
+
+    for (let i = 1; i <= 6; i++) {
+      songResults.push(getSampleSong(i));
+      if (i < 6) {
+        expectedResponse += `#${i} title_${i} - artist_${i} (mapper_${i}) `;
+      }
+    }
+    expectedResponse += 'chat.AndMore';
+
+    songService.searchSongs.mockReturnValue(songResults);
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual(expectedResponse);
+    expect(i18n.t).toHaveBeenCalledWith('chat.SelectSong', { lang: 'en' });
+    expect(i18n.t).toHaveBeenCalledWith('chat.AndMore', {
+      lang: 'en',
+      args: { songsRemaining: 1 },
+    });
+  });
+
+  it('should add a song from a previous search by # to the request queue', async () => {
+    const songResults = [getSampleSong(1), getSampleSong(2)];
+    const botState: UserBotState = {
+      id: 1,
+      requesterName: 'someuser',
+      channel: channel,
+      state: { lastQueryResults: songResults },
+      timestamp: new Date(),
+    };
+
+    botStateService.getState.mockReturnValue(botState);
+    songRequestService.addRequest.mockReturnValue({
+      success: true,
+    });
+
+    chatMessage.message = '!req #1';
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAddedToQueue');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAddedToQueue', {
+      lang: 'en',
+      args: {
+        title: songResults[0].title,
+        artist: songResults[0].artist,
+        mapper: songResults[0].mapper,
+      },
+    });
+  });
+
+  it('should return no songs found if an incorrect # is requested from a previous search', async () => {
+    const songResults = [getSampleSong(1), getSampleSong(2)];
+    const botState: UserBotState = {
+      id: 1,
+      requesterName: 'someuser',
+      channel: channel,
+      state: { lastQueryResults: songResults },
+      timestamp: new Date(),
+    };
+
+    botStateService.getState.mockReturnValue(botState);
+    songRequestService.addRequest.mockReturnValue({
+      success: true,
+    });
+
+    chatMessage.message = '!req #8';
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.NoSongsFound');
+    expect(i18n.t).toHaveBeenCalledWith('chat.NoSongsFound', {
+      lang: 'en',
+    });
+  });
+
+  it('should send a message that the song is already in the queue', async () => {
+    const song = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([song]);
+    songRequestService.addRequest.mockReturnValue({
+      success: false,
+      errorType: SongRequestErrorType.ALREADY_IN_QUEUE,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAlreadyInQueue');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAlreadyInQueue', {
+      lang: 'en',
+    });
+  });
+
+  it('should respond that the song has already been played', async () => {
+    const song = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([song]);
+    songRequestService.addRequest.mockReturnValue({
+      success: false,
+      errorType: SongRequestErrorType.ALREADY_PLAYED,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongAlreadyPlayed');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongAlreadyPlayed', {
+      lang: 'en',
+    });
+  });
+
+  it('should report an error if adding a song request failed for an uncaught reason', async () => {
+    const song = getSampleSong(1);
+    songService.searchSongs.mockReturnValue([song]);
+    songRequestService.addRequest.mockReturnValue({
+      success: false,
+      errorType: SongRequestErrorType.SERVER_ERROR,
+    });
+
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SongRequestFailed');
+    expect(i18n.t).toHaveBeenCalledWith('chat.SongRequestFailed', {
+      lang: 'en',
+    });
+  });
 });

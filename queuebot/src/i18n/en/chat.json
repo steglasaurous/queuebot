@@ -14,7 +14,7 @@
   "RequestRemoved": "{title} removed from the queue.",
   "ImOut": "I'm out!  Cya!",
   "AlreadyJoined": "I've already joined your channel.  Try using commands in your own channel to interact with the bot.",
-  "NoGameSpecified": "You must specify a game when using !setgame.",
+  "CurrentGame": "Current game is {gameName}.",
   "MatchedTooManyGames": "Matched too many games, please narrow down your game name.",
   "UnsupportedGame": "Game is unsupported.",
   "GameChanged": "Game changed to {gameName}.",
@@ -32,5 +32,9 @@
   "QueueAlreadyOpen": "Queue is already open.",
   "QueueOpen": "Queue is now open.",
   "SorryQueueIsClosed": "Sorry, the request queue is closed.",
-  "SearchErrorTryAgain": "Sorry, a search error occurred.  Please try your request again."
+  "SearchErrorTryAgain": "Sorry, a search error occurred.  Please try your request again.",
+  "SettingSetToValue": "{settingName} set to {value}.",
+  "InvalidSettingValue": "Invalid value. Valid values are {values}.",
+  "InvalidSetting": "Invalid setting name.",
+  "RbsetUsage": "How to use rbset: !rbset settingname newvalue"
 }

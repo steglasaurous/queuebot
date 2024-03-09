@@ -18,7 +18,7 @@ export type I18nTranslations = {
         "RequestRemoved": string;
         "ImOut": string;
         "AlreadyJoined": string;
-        "NoGameSpecified": string;
+        "CurrentGame": string;
         "MatchedTooManyGames": string;
         "UnsupportedGame": string;
         "GameChanged": string;
@@ -29,6 +29,7 @@ export type I18nTranslations = {
         "RequestHelp_audio_trip": string;
         "RequestHelp_spin_rhythm": string;
         "RequestHelp_pistol_whip": string;
+        "RequestHelp_dance_dash": string;
         "QueueCleared": string;
         "QueueAlreadyClosed": string;
         "QueueClosed": string;

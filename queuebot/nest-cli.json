@@ -2,12 +2,15 @@
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
+  "entryFile": "queuebot/src/main",
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
-      { "include": "i18n/**/*",
-        "outDir": "dist/src",
-        "watchAssets": true }
+      {
+        "include": "i18n/**/*",
+        "outDir": "dist/queuebot/src",
+        "watchAssets": true
+      }
     ]
   }
 }

@@ -34,7 +34,6 @@ export abstract class BaseBotCommand implements BotCommandInterface {
     });
 
     return result;
-    return chatMessage.message.toLowerCase().startsWith(this.triggers[0]);
   }
 
   shouldAlwaysTrigger(): boolean {

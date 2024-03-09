@@ -1,12 +1,9 @@
-import { BotCommandInterface } from './bot-command.interface';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { I18nService } from 'nestjs-i18n';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
-import { MessageFormatterService } from '../services/message-formatter.service';
-import { SongRequestService } from '../../song-request/services/song-request.service';
 import { BaseBotCommand } from './base.bot-command';
 
 @Injectable()
