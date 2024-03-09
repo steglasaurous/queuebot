@@ -18,6 +18,15 @@ import { DtoMappingService } from '../../data-store/services/dto-mapping.service
 import { SongRequestDto } from '../../../../../common';
 import { SwapOrderDto } from '../dto/swap-order.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import {
+  ApiBody,
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
+import { SongRequestDto as SongRequestDtoClass } from '../dto/song-request.dto';
 
 @Controller('api/channels/:channelName/song-requests')
 export class SongRequestsController {
@@ -27,6 +36,21 @@ export class SongRequestsController {
     private dtoMappingService: DtoMappingService,
   ) {}
 
+  @ApiOperation({
+    description:
+      'Retrieves the request queue for the given channel, optionally moving the queue forward if nextsong is defined',
+    tags: ['Request Queue'],
+  })
+  @ApiParam({
+    name: 'channelName',
+    description: 'The twitch channel name (i.e. twitch username)',
+  })
+  @ApiQuery({
+    name: 'nextsong',
+    description:
+      'If set to true, advances the song queue ahead as if !nextsong was used',
+  })
+  @ApiOkResponse({ type: [SongRequestDtoClass] })
   @Get()
   async getSongRequestQueue(
     @Param('channelName') channelName: string,
@@ -52,6 +76,14 @@ export class SongRequestsController {
     });
   }
 
+  @ApiCookieAuth('jwt')
+  @ApiBody({ type: SwapOrderDto })
+  @ApiOperation({
+    description:
+      'Swap requestOrder between the songRequestId in the URL with the songRequestId in the body',
+    tags: ['Request Queue'],
+  })
+  @ApiOkResponse({ type: 'boolean' })
   @UseGuards(JwtAuthGuard)
   @Put('/:songRequestId/swapOrder')
   async swapOrder(

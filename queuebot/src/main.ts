@@ -7,6 +7,8 @@ import { ImportWorkerModule } from './import-worker.module';
 import { SongImporterManagerService } from './modules/song-store/services/song-importer-manager.service';
 import { Logger } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiModule } from './modules/api/api.module';
 
 async function bootstrap() {
   if (isMainThread) {
@@ -18,6 +20,17 @@ async function bootstrap() {
       origin: 'http://localhost:4200',
     });
     app.use(cookieParser());
+
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Requestobot API')
+      .setDescription('The Requestobot API')
+      .setVersion('1.4.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig, {
+      include: [ApiModule],
+    });
+    SwaggerModule.setup('api', app, document);
+
     await app.listen(config.get('PORT') ?? 3000);
   } else {
     // This is VERY simplistic for now - if started as a worker, assume it's to

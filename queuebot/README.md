@@ -15,20 +15,21 @@
     - "First In, First Out" - queuing based on first-come, first-served.  This is the default.
   - `!rbset queuestrategy default`
     - Sets the queue strategy to the default, which is `fifo`
-- [ ] Server: Send queue update websocket messages whenever the queue changes
-- [ ] UI: Update queue state on all update events
-- [ ] Server: Implement remove song from queue
+- [x] Server: Send queue update websocket messages whenever the queue changes
+- [x] UI: Update queue state on all update events
+- [ ] Server: Implement remove song from queue command
+- [ ] Server: Implement remove song from queue API
+- [ ] UI: Implement remove song
 - [ ] UI: Implement logout
 - [ ] UI: Implement current game and queue status display  
 - [ ] UI: Implement ability to open or close the queue from interface
 - [ ] UI: Implement add song to queue via search/autocomplete
 - [ ] UI: Implement next song button to advance the queue
 - [ ] Server: Add a 'deny list' - songs that cannot be queued
-
+- [x] Implement auto-reconnect for websocket connections
 
 ## Next
 
-- [ ] Implement auto-reconnect for websocket connections
 - [ ] Remove menus from electron interface (for now)
 - [ ] UI: Implement ability to change game from interface
 - [ ] UI: Implement showing what's already been played

@@ -223,8 +223,8 @@ export class SongRequestService {
       songRequests: await this.getAllRequests(sourceSongRequest.channel),
     });
   }
-  // FIXME: Test this cron, make sure it does what it's supposed to.
-  @Cron('* 0 * * * *')
+
+  @Cron('0 * * * *')
   async clearOldDoneRequests() {
     const maxDoneAge = 12 * 60 * 60 * 1000; // 12 hours
 
