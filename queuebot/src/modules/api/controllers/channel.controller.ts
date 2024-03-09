@@ -4,6 +4,8 @@ import { DtoMappingService } from '../../data-store/services/dto-mapping.service
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Repository } from 'typeorm';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ChannelDto as ChannelDtoClass } from '../dto/channel.dto';
 
 @Controller('api/channels/:channelName')
 export class ChannelController {
@@ -12,8 +14,13 @@ export class ChannelController {
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
   ) {}
 
-  // FIXME: Decision: Just make this public for anyone?  Or limit it to authorized users?
-  // So far nothing here is really private or otherwise unknown information.
+  @ApiOperation({
+    description: 'Get general details about the given channel',
+    tags: ['Channel'],
+  })
+  @ApiOkResponse({
+    type: ChannelDtoClass,
+  })
   @Get()
   async getChannelDetails(
     @Param('channelName') channelName: string,
