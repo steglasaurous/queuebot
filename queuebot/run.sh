@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-envsubst < /server/.env.dist > /server/.env
-cd /server && npm run typeorm:run-migrations && npm run start
+envsubst < /opt/queuebot/queuebot/.env.dist > /opt/queuebot/queuebot/.env
+cd /opt/queuebot/queuebot && npm run typeorm:run-migrations && npm run start
