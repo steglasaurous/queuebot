@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Put,
@@ -21,6 +22,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import {
   ApiBody,
   ApiCookieAuth,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -105,5 +107,40 @@ export class SongRequestsController {
     );
 
     return true;
+  }
+
+  @ApiCookieAuth('jwt')
+  @ApiOperation({
+    description:
+      'Remove a song request.  Must either be a broadcaster or mod of the channel it belongs to, or be the original requester of this request.',
+  })
+  @ApiNoContentResponse()
+  @UseGuards(JwtAuthGuard)
+  @Delete(`/:songRequestId`)
+  async deleteSongRequest(
+    @Param('channelName') channelName: string,
+    @Param('songRequestId') songRequestId: number,
+    @Req() request: Request,
+  ) {
+    if (!request['user']) {
+      throw new UnauthorizedException('Login required.');
+    }
+    const songRequest =
+      await this.songRequestService.getRequestById(songRequestId);
+    if (!songRequest) {
+      throw new BadRequestException('Song request does not exist');
+    }
+
+    if (
+      request['user'].username != songRequest.channel.channelName &&
+      request['user'].username != songRequest.requesterName
+    ) {
+      throw new UnauthorizedException(
+        'User is not the broadcaster nor the original requester of this request.',
+      );
+    }
+
+    // IF we made it here, we're good to go.
+    await this.songRequestService.removeRequest(songRequest);
   }
 }
