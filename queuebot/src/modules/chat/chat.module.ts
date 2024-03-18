@@ -3,6 +3,7 @@ import { ChatManagerService } from './services/chat-manager.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TwitchChatClient } from './services/clients/twitch-chat.client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TestChatClient } from './services/clients/test-chat.client';
 
 @Module({
   imports: [ConfigModule],
@@ -26,6 +27,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
       },
     },
     ChatManagerService,
+    TestChatClient,
   ],
   exports: [ChatManagerService],
 })
