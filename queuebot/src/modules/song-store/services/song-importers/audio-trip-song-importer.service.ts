@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SongImporter } from './song-importer.interface';
 import { HttpService } from '@nestjs/axios';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +13,8 @@ export class AudioTripSongImporterService implements SongImporter {
 
   gameName = 'audio_trip';
 
+  private logger: Logger = new Logger(this.constructor.name);
+
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(Game) private gameRepository: Repository<Game>,
@@ -26,7 +28,7 @@ export class AudioTripSongImporterService implements SongImporter {
         .subscribe(async (response) => {
           const neatCsv = await import('neat-csv');
           const parsedSheet = await neatCsv.default(response.data, {
-            skipLines: 1,
+            skipLines: 3,
           });
 
           let lineSkipped = false;
@@ -34,18 +36,25 @@ export class AudioTripSongImporterService implements SongImporter {
             if (!lineSkipped) {
               lineSkipped = true;
             } else {
-              await this.songService.saveSong(
-                this.songService.createSongEntity(
-                  game,
-                  row.Title,
-                  row.Artists,
-                  row.Mapper,
-                  undefined,
-                  row['GET ALL'],
-                  parseInt(row.BPM) > 0 ? parseInt(row.BPM) : undefined,
-                  undefined, // FIXME: Need to convert this from time format to seconds.
-                ),
-              );
+              try {
+                await this.songService.saveSong(
+                  this.songService.createSongEntity(
+                    game,
+                    row.Title,
+                    row.Artists,
+                    row.Mapper,
+                    undefined,
+                    row['GET ALL'],
+                    parseInt(row.BPM) > 0 ? parseInt(row.BPM) : undefined,
+                    undefined, // FIXME: Need to convert this from time format to seconds.
+                  ),
+                );
+              } catch (err) {
+                this.logger.warn('Import of audio trip song failed', {
+                  err: err,
+                  row: row,
+                });
+              }
             }
           }
           resolve(parsedSheet.length);
