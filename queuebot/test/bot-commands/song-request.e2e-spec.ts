@@ -222,5 +222,59 @@ describe('AppController (e2e)', () => {
     expect(queueResponse3.message).toEqual(
       '! #1 Anemone - Naden (OST) #2 Bangarang - Skrillex (OST) #3 Hit the Beat - IamDayLight (OST) #4 Drift - Rafael Frost (OST) #5 Gangnam Style - PSY (OST) and 1 more.',
     );
+
+    const nextSongResponse3 =
+      await chatClient.emitReceivedMessageAndAwaitResponse({
+        ...getMockChatMessage(),
+        message: '!nextsong',
+        username: 'channelactive',
+        channelName: 'channelactive',
+        userIsBroadcaster: true,
+        client: chatClient,
+      });
+    const nextSongResponse4 =
+      await chatClient.emitReceivedMessageAndAwaitResponse({
+        ...getMockChatMessage(),
+        message: '!nextsong',
+        username: 'channelactive',
+        channelName: 'channelactive',
+        userIsBroadcaster: true,
+        client: chatClient,
+      });
+    const nextSongResponse5 =
+      await chatClient.emitReceivedMessageAndAwaitResponse({
+        ...getMockChatMessage(),
+        message: '!nextsong',
+        username: 'channelactive',
+        channelName: 'channelactive',
+        userIsBroadcaster: true,
+        client: chatClient,
+      });
+
+    // Brand new user makes a request.
+    const user5Request1Response =
+      await chatClient.emitReceivedMessageAndAwaitResponse({
+        ...getMockChatMessage(),
+        message: '!req Golden Pineapple',
+        username: 'user5',
+        channelName: 'channelactive',
+        client: chatClient,
+      });
+
+    expect(user5Request1Response.message).toEqual(
+      '! Golden Pineapple - Tolan (OST) added to the queue.',
+    );
+
+    const nextSongResponse6 =
+      await chatClient.emitReceivedMessageAndAwaitResponse({
+        ...getMockChatMessage(),
+        message: '!nextsong',
+        username: 'channelactive',
+        channelName: 'channelactive',
+        userIsBroadcaster: true,
+        client: chatClient,
+      });
+
+    // FIXME: Finish by checking the queue order.
   }, 30000);
 });
