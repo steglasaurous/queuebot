@@ -13,7 +13,7 @@ export class QueueBotCommand extends BaseBotCommand {
     private i18n: I18nService,
   ) {
     super();
-    this.triggers = ['!queue'];
+    this.triggers = ['!queue', '!q'];
   }
   async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
     const songRequests = await this.songRequestService.getAllRequests(channel);

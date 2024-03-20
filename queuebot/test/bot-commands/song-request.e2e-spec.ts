@@ -275,6 +275,17 @@ describe('AppController (e2e)', () => {
         client: chatClient,
       });
 
-    // FIXME: Finish by checking the queue order.
+    const queueResponse4 = await chatClient.emitReceivedMessageAndAwaitResponse(
+      {
+        ...getMockChatMessage(),
+        message: '!queue',
+        username: 'user1',
+        channelName: 'channelactive',
+        client: chatClient,
+      },
+    );
+    expect(queueResponse4.message).toEqual(
+      '! #1 Golden Pineapple - Tolan (OST) #2 Gangnam Style - PSY (OST) #3 Freedom - The Originals (OST) ',
+    );
   }, 30000);
 });
