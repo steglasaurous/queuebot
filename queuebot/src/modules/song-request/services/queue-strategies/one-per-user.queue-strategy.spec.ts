@@ -80,19 +80,67 @@ describe('One-Per-User QueueStrategy', () => {
     // User B | requestOrder 3 | requestPriority 1
     // User B | requestOrder 4 | requestPriority 2
 
+    // Result should look like:
+
+    // User A | requestOrder 1 | requestPriority 0
+    // User B | requestOrder 2 | requestPriority 0
+    // User B | requestOrder 3 | requestPriority 1
+    // User A | requestOrder 3.5 | requestPriority 1
+    // User B | requestOrder 4 | requestPriority 2
+
     // Adding another User A request.
     const channel = getMockChannel();
     const songRequest = getSampleSongRequests(1)[0];
 
     mockSongRequestRepository.countBy.mockReturnValue(1);
-    mockSongRequestRepository.maximum.mockReturnValueOnce(2);
+    mockSongRequestRepository.maximum.mockReturnValueOnce(3);
 
+    const nextOrderSongRequest = getSampleSongRequests(1)[0];
+    nextOrderSongRequest.requestPriority = 2;
+    nextOrderSongRequest.requestOrder = 4;
+
+    mockSongRequestRepository.findOne.mockReturnValue(nextOrderSongRequest);
     const resultingSongRequest = await service.setNextOrder(
       channel,
       songRequest,
     );
 
     expect(resultingSongRequest.requestPriority).toEqual(1);
-    expect(resultingSongRequest.requestOrder).toEqual(3);
+    expect(resultingSongRequest.requestOrder).toEqual(3.5);
+  });
+
+  it('should add the request to the end of the next priority group if they already have a song in the queue 2', async () => {
+    // Mocking the dataset like:
+    // User A | requestOrder 1 | requestPriority 0
+    // User B | requestOrder 2 | requestPriority 0
+    // User B | requestOrder 3 | requestPriority 1
+    // User A | requestOrder 3.5 | requestPriority 1
+    // User B | requestOrder 4 | requestPriority 2
+
+    // REsult should look like:
+
+    // User A | requestOrder 1 | requestPriority 0
+    // User B | requestOrder 2 | requestPriority 0
+    // User B | requestOrder 3 | requestPriority 1
+    // User A | requestOrder 3.5 | requestPriority 1
+    // User B | requestOrder 4 | requestPriority 2
+    // User A | requestOrder 5 | requestPriority 2
+
+    // Adding another User A request.
+    const channel = getMockChannel();
+    const songRequest = getSampleSongRequests(1)[0];
+
+    mockSongRequestRepository.countBy.mockReturnValue(2);
+    mockSongRequestRepository.maximum.mockReturnValueOnce(4);
+
+    mockSongRequestRepository.findOne.mockReturnValue(undefined);
+
+    const resultingSongRequest = await service.setNextOrder(
+      channel,
+      songRequest,
+    );
+
+    expect(resultingSongRequest.requestPriority).toEqual(2);
+    expect(resultingSongRequest.requestOrder).toEqual(5);
   });
 });

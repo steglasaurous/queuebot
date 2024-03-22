@@ -22,7 +22,8 @@
     "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./src/typeorm-cli.config.ts",
     "typeorm:generate-migration": "npm run typeorm -- -d ./src/typeorm-cli.config.ts migration:generate ./migrations/migration",
     "typeorm:create-migration": "npm run typeorm -- migration:create ./migrations/",
-    "typeorm:revert-migration": "npm run typeorm -- -d ./src/typeorm-cli.config.ts migration:revert"
+    "typeorm:revert-migration": "npm run typeorm -- -d ./src/typeorm-cli.config.ts migration:revert",
+    "fixtures": "fixtures-ts-node-commonjs"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
@@ -42,6 +43,7 @@
     "@twurple/chat": "^7.0.2",
     "@willsoto/nestjs-prometheus": "^6.0.0",
     "axios": "^1.5.0",
+    "child-process-promise": "^2.2.1",
     "cookie-parser": "^1.4.6",
     "hbs": "^4.2.0",
     "memory-streams": "^0.1.3",
@@ -83,6 +85,7 @@
     "ts-loader": "^9.4.4",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "4.2.0",
+    "typeorm-fixtures-cli": "^4.0.0",
     "typescript": "^5.2.2"
   },
   "jest": {

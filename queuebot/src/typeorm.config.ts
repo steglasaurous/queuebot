@@ -56,4 +56,5 @@ export const typeORMAppConfig: DataSourceOptions = {
     Migration1709872065282,
     Migration1709872297346,
   ],
+  migrationsRun: true,
 };

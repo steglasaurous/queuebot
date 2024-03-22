@@ -50,14 +50,17 @@ export class OnePerUserQueueStrategy implements QueueStrategy {
     }
 
     if (!nextOrder && !lastOrder) {
-      nextOrder = await this.songRequestRepository.maximum('requestOrder', {
-        channel: channel,
-        isDone: false,
-      });
-      if (!nextOrder) {
+      const nextOrderMax = await this.songRequestRepository.maximum(
+        'requestOrder',
+        {
+          channel: channel,
+          isDone: false,
+        },
+      );
+      if (!nextOrderMax) {
         songRequest.requestOrder = 1;
       } else {
-        songRequest.requestOrder = nextOrder + 1;
+        songRequest.requestOrder = nextOrderMax + 1;
       }
     } else if (!nextOrder) {
       songRequest.requestOrder = lastOrder + 1;
