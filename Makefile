@@ -1,9 +1,9 @@
-build: queuebot/dist queuebot-client/dist
+build: queuebot/dist queuebot-client/dist queuebot/.env
 
 package-client: queuebot-client/dist
 	cd queuebot-client && npm run make
 
-queuebot/dist: common/index.d.ts queuebot/node_modules
+queuebot/dist: common/index.d.ts queuebot/node_modules queuebot-client/src/environments/environment.ts
 	cd queuebot && npm run build
 
 queuebot/node_modules: queuebot/package.json queuebot/package-lock.json
@@ -25,8 +25,14 @@ common/node_modules: common/package.json common/package-lock.json
 start-server: queuebot/dist queuebot/.env
 	cd queuebot && npm run typeorm:run-migrations && npm run start
 
-queuebot/.env: .env
-	cp .env queuebot/.env
+queuebot/.env: .env queuebot/.env.dist
+	export $$(cat .env | xargs) && envsubst < queuebot/.env.dist > queuebot/.env
+
+queuebot-client/src/environments/environment.ts: .env queuebot-client/src/environments/environment.ts.dist
+	export $$(cat .env | xargs) && envsubst < queuebot-client/src/environments/environment.ts.dist > queuebot-client/src/environments/environment.ts
+
+queuebot-client/main-process/environment.ts: queuebot-client/src/environments/environment.ts
+	cp queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts
 
 clean:
 	rm -rf \
@@ -40,5 +46,7 @@ clean:
   	common/queuebot-dto/*.js \
   	common/queuebot-dto/*.map \
   	common/node_modules \
-  	common/tsconfig.tsbuildinfo
-
+  	common/tsconfig.tsbuildinfo \
+  	queuebot/.env \
+  	queuebot-client/src/environments/environment.ts \
+  	queuebot-client/main-process/environment.ts

@@ -8,6 +8,7 @@ import { SpinRhythmDownloadHandler } from './downloader/handlers/spin-rhythm-dow
 import { SongDownloader } from './downloader/song-downloader';
 import { SongDto } from '../../common';
 import * as cookie from 'cookie';
+import { environment } from './environment';
 
 // import {
 //   IPC_OPEN_TWITCH_LOGIN,
@@ -20,15 +21,11 @@ export const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
 export const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
 export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 // FIXME: Need to make this configurable at build time
-export const LOGIN_URL = 'http://localhost:3000/auth/twitch';
+export const LOGIN_URL = `${environment.queuebotApiBaseUrl}/auth/twitch`;
 export const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
 export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
 
-export const FILTERED_URLS = [
-  'http://localhost:3000/*',
-  'https://queuebot.steglasaurous.com/*',
-  'https://queuebot-dev.steglasaurous.com/*',
-];
+export const FILTERED_URLS = [`${environment.queuebotApiBaseUrl}/*`];
 
 const settingsService = new SettingsStoreService(
   path.join(__dirname, 'settings.json'),
@@ -145,11 +142,7 @@ function createWindow() {
   // so authenticated endpoints work correctly.
   session.defaultSession.webRequest.onBeforeSendHeaders(
     {
-      urls: [
-        'http://localhost:3000/*',
-        'https://queuebot.steglasaurous.com/*',
-        'https://queuebot-dev.steglasaurous.com/*',
-      ],
+      urls: [`${environment.queuebotApiBaseUrl}/*`],
     },
     (details, callback) => {
       const jwt = settingsService.getValue('jwt');
