@@ -22,9 +22,6 @@ common/index.d.ts: common/node_modules common/index.ts
 common/node_modules: common/package.json common/package-lock.json
 	cd common && npm ci
 
-start-server: queuebot/dist queuebot/.env
-	cd queuebot && npm run typeorm:run-migrations && npm run start
-
 queuebot/.env: .env queuebot/.env.dist
 	export $$(cat .env | xargs) && envsubst < queuebot/.env.dist > queuebot/.env
 
@@ -33,6 +30,13 @@ queuebot-client/src/environments/environment.ts: .env queuebot-client/src/enviro
 
 queuebot-client/main-process/environment.ts: queuebot-client/src/environments/environment.ts
 	cp queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts
+
+start-server: queuebot/.env queuebot/node_modules
+	cd queuebot && npm run start:dev
+
+start-client: queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts queuebot-client/node_modules
+	cd queuebot-client && npm run electron-tsc-dev
+
 
 clean:
 	rm -rf \
