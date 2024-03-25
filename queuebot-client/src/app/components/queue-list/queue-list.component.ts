@@ -20,7 +20,7 @@ declare let window: WindowWithElectron;
   imports: [HttpClientModule, CommonModule, DragDropModule, MatIcon],
   providers: [],
   templateUrl: './queue-list.component.html',
-  styleUrl: './queue-list.component.scss',
+  styleUrl: './queue-list.component.css',
 })
 export class QueueListComponent implements OnInit {
   @Input()

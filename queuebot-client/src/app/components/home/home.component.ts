@@ -12,7 +12,7 @@ import { ChannelDto } from '../../../../../common';
   imports: [QueueListComponent, NgIf, MatSlideToggle],
   providers: [],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
+  styleUrl: './home.component.css',
 })
 export class HomeComponent {
   channelName: string = '';

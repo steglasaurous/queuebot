@@ -1,9 +1,10 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, Inject, NgZone, OnInit } from '@angular/core';
 import { QueueListComponent } from '../queue-list/queue-list.component';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { Router } from '@angular/router';
 import { SettingsService } from '../../services/settings.service';
 import { WindowWithElectron } from '../../models/window.global';
+import { QUEUEBOT_API_BASE_URL } from '../../app.config';
 
 declare let window: WindowWithElectron;
 
@@ -13,7 +14,7 @@ declare let window: WindowWithElectron;
   imports: [QueueListComponent],
   providers: [],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
   constructor(
@@ -21,6 +22,7 @@ export class LoginComponent implements OnInit {
     private settingsService: SettingsService,
     private router: Router,
     private zone: NgZone,
+    @Inject(QUEUEBOT_API_BASE_URL) private apiBaseUrl: string,
   ) {}
   ngOnInit() {
     // If we're authenticated, go right to the good stuff.
@@ -63,7 +65,7 @@ export class LoginComponent implements OnInit {
       window['settings'].openTwitchLogin();
     } else {
       console.log('DEV: Open twitch auth in a new tab');
-      window.open('http://localhost:3000/auth/twitch', '_blank');
+      window.open(`${this.apiBaseUrl}/auth/twitch`, '_blank');
     }
   }
 }

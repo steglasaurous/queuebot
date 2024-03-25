@@ -60,6 +60,7 @@
     "@types/decompress": "^4.2.7",
     "@types/jasmine": "~5.1.0",
     "@types/jsonwebtoken": "^9.0.5",
+    "autoprefixer": "^10.4.19",
     "electron": "^28.1.4",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
@@ -67,7 +68,9 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.4.38",
     "prettier": "^3.2.4",
+    "tailwindcss": "^3.4.1",
     "typescript": "~5.2.2"
   },
   "browser": {

@@ -1,16 +1,20 @@
 build: queuebot/dist queuebot-client/dist queuebot/.env
 
+rebuild: queuebot/node_modules queuebot-client/node_modules
+	rm -rf queuebot/dist queuebot-client/dist queuebot/.env queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts
+	$(MAKE) build
+
 package-client: queuebot-client/dist
 	cd queuebot-client && npm run make
 
-queuebot/dist: common/index.d.ts queuebot/node_modules queuebot-client/src/environments/environment.ts
+queuebot/dist: common/index.d.ts queuebot/node_modules
 	cd queuebot && npm run build
 
 queuebot/node_modules: queuebot/package.json queuebot/package-lock.json
 	cd queuebot && npm ci
 
 # For dev, probably don't need to build until we run the app itself.
-queuebot-client/dist: common/index.d.ts queuebot-client/node_modules
+queuebot-client/dist: common/index.d.ts queuebot-client/node_modules queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts
 	cd queuebot-client && npm run build
 
 queuebot-client/node_modules: queuebot-client/package.json queuebot-client/package-lock.json
