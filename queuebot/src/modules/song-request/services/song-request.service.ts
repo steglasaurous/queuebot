@@ -245,6 +245,11 @@ export class SongRequestService {
   }
 
   async removeRequest(songRequest: SongRequest) {
-    return await this.songRequestRepository.remove(songRequest);
+    await this.songRequestRepository.remove(songRequest);
+
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: songRequest.channel,
+      songRequests: await this.getAllRequests(songRequest.channel),
+    });
   }
 }

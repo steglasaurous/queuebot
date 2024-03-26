@@ -54,4 +54,16 @@ export class QueuebotApiService {
       },
     );
   }
+
+  deleteSongRequest(
+    channel: string,
+    songRequestId: number,
+  ): Observable<boolean> {
+    return this.httpClient.delete<boolean>(
+      `${this.apiBaseUrl}/api/channels/${channel}/song-requests/${songRequestId}`,
+      {
+        withCredentials: true,
+      },
+    );
+  }
 }

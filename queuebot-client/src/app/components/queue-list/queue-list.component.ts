@@ -107,4 +107,17 @@ export class QueueListComponent implements OnInit {
 
     console.log($event);
   }
+
+  deleteSongRequest(songRequestId: number) {
+    this.queuebotApiService
+      .deleteSongRequest(this.channelName, songRequestId)
+      .subscribe({
+        next: (result) => {
+          console.log('got result', { result: result });
+        },
+        error: (err) => {
+          console.log('Got error', { err: err });
+        },
+      });
+  }
 }

@@ -3,12 +3,12 @@
 ## First
 
 - [ ] Implement CSS using tailwind
-- [ ] Server: Implement remove song from queue command !remove
-- [ ] Server: Implement remove song from queue API
+- [x] Server: Implement remove song from queue command !remove
+- [x] Server: Implement remove song from queue API
 - [ ] Server: Implement change channel settings API
 - [ ] Server: Implement clearing played history via command
 - [ ] Server: Implement rollback/undo command to reverse the queue to its previous state
-- [ ] UI: Implement remove song
+- [x] UI: Implement remove song
 - [ ] UI: Implement logout
 - [ ] UI: Implement current game and queue status display  
 - [ ] UI: Implement ability to open or close the queue from interface
