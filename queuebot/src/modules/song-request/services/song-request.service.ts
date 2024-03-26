@@ -245,6 +245,7 @@ export class SongRequestService {
   }
 
   async removeRequest(songRequest: SongRequest) {
+    // FIXME: Add handling for if/when this throws an error.
     await this.songRequestRepository.remove(songRequest);
 
     this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {

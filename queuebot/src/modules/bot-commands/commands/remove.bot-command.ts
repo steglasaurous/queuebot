@@ -25,47 +25,50 @@ export class RemoveBotCommand extends BaseBotCommand {
     const searchSongNumberResult = searchTerms.match(
       /^#(?<songRequestNumber>[0-9]?)/,
     );
-
-    if (searchSongNumberResult) {
-      const songRequestNumber: number = parseInt(
-        searchSongNumberResult.groups.songRequestNumber.replace('#', ''),
-      );
-      if (songRequestNumber < 1) {
-        return this.i18n.t('chat.InvalidSongRequestNumber', {
-          lang: channel.lang,
-        });
-      }
-
-      const songRequests =
-        await this.songRequestService.getAllRequests(channel);
-
-      if (songRequests.length < songRequestNumber) {
-        return this.i18n.t('chat.InvalidSongRequestNumber', {
-          lang: channel.lang,
-        });
-      }
-      const songRequestToRemove = songRequests[songRequestNumber - 1];
-
-      if (!chatMessage.userIsMod && !chatMessage.userIsBroadcaster) {
-        if (chatMessage.username != songRequestToRemove.requesterName) {
-          return this.i18n.t('chat.OnlyRemoveOwnSongs', {
-            lang: channel.lang,
-          });
-        }
-      }
-
-      await this.songRequestService.removeRequest(songRequestToRemove);
-
-      return this.i18n.t('chat.SongRequestRemoved', {
+    if (!searchSongNumberResult) {
+      return this.i18n.t('chat.InvalidSongRequestNumber', {
         lang: channel.lang,
-        args: {
-          title: songRequestToRemove.song.title,
-          artist: songRequestToRemove.song.artist,
-          mapper: songRequestToRemove.song.mapper,
-          requesterName: songRequestToRemove.requesterName,
-        },
       });
     }
+
+    const songRequestNumber: number = parseInt(
+      searchSongNumberResult.groups.songRequestNumber.replace('#', ''),
+    );
+
+    if (songRequestNumber < 1 || isNaN(songRequestNumber)) {
+      return this.i18n.t('chat.InvalidSongRequestNumber', {
+        lang: channel.lang,
+      });
+    }
+
+    const songRequests = await this.songRequestService.getAllRequests(channel);
+
+    if (songRequests.length < songRequestNumber) {
+      return this.i18n.t('chat.InvalidSongRequestNumber', {
+        lang: channel.lang,
+      });
+    }
+    const songRequestToRemove = songRequests[songRequestNumber - 1];
+
+    if (!chatMessage.userIsMod && !chatMessage.userIsBroadcaster) {
+      if (chatMessage.username != songRequestToRemove.requesterName) {
+        return this.i18n.t('chat.OnlyRemoveOwnSongs', {
+          lang: channel.lang,
+        });
+      }
+    }
+
+    await this.songRequestService.removeRequest(songRequestToRemove);
+
+    return this.i18n.t('chat.SongRequestRemoved', {
+      lang: channel.lang,
+      args: {
+        title: songRequestToRemove.song.title,
+        artist: songRequestToRemove.song.artist,
+        mapper: songRequestToRemove.song.mapper,
+        requesterName: songRequestToRemove.requesterName,
+      },
+    });
   }
 
   getDescription(): string {
