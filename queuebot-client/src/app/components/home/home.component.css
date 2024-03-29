@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: row-reverse;
   text-align: right;
-  .open-queue-switch {
-    padding-right: 15px;
-  }
+}
+.open-queue-switch {
+  padding-right: 15px;
 }

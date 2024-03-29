@@ -239,4 +239,18 @@ export class SongRequestService {
       requestsRemoved: result.affected,
     });
   }
+
+  async getRequestById(songRequestId: number): Promise<SongRequest> {
+    return await this.songRequestRepository.findOneBy({ id: songRequestId });
+  }
+
+  async removeRequest(songRequest: SongRequest) {
+    // FIXME: Add handling for if/when this throws an error.
+    await this.songRequestRepository.remove(songRequest);
+
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: songRequest.channel,
+      songRequests: await this.getAllRequests(songRequest.channel),
+    });
+  }
 }

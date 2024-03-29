@@ -12,7 +12,7 @@ import { WebsocketService } from '../services/websocket.service';
   imports: [CommonModule, RouterOutlet, HttpClientModule],
   providers: [SettingsService, QueuebotApiService, WebsocketService],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   title = 'queuebot-client';

@@ -9,6 +9,12 @@ import { AbstractChatClient } from '../src/modules/chat/services/clients/abstrac
 import { ChatMessage } from '../src/modules/chat/services/chat-message';
 import { Song } from '../src/modules/data-store/entities/song.entity';
 import { SongRequest } from '../src/modules/data-store/entities/song-request.entity';
+import { exec } from 'child-process-promise';
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppModule } from '../src/app.module';
+import { WsAdapter } from '@nestjs/platform-ws';
+import { TestChatClient } from '../src/modules/chat/services/clients/test-chat.client';
+import cookieParser from 'cookie-parser';
 
 export const getGenericNestMock = (token) => {
   if (token == I18nService) {
@@ -111,4 +117,41 @@ export const getSampleSongRequests = (count: number): SongRequest[] => {
   }
 
   return output;
+};
+
+export const setupDatabaseFixtures = async () => {
+  // Reset the database
+  await exec(
+    'npx ts-node ./node_modules/typeorm/cli schema:drop -d ./src/typeorm-cli.config.ts',
+  );
+  await exec(
+    'npx ts-node ./node_modules/typeorm/cli migration:run -d ./src/typeorm-cli.config.ts',
+  );
+
+  // Load fixtures
+  await exec(
+    'npx fixtures-ts-node-commonjs load -d src/typeorm-cli.config.ts fixtures',
+  );
+};
+
+export const createNestApp = async () => {
+  const chatClient = new TestChatClient();
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  })
+    .overrideProvider('ChatClients')
+    .useValue([chatClient])
+    .compile();
+
+  const app = moduleFixture.createNestApplication();
+  app.useWebSocketAdapter(new WsAdapter(app));
+  app.enableCors({
+    credentials: true,
+    // origin: '*',
+    origin: 'http://localhost:4200',
+  });
+  // FIXME:  Seems this throws a TypeError, preventing cookies from being properly parsed.
+  // even though this works fine in main.ts.  Not sure what the deal is yet.
+  app.use(cookieParser());
+  return app;
 };

@@ -14,7 +14,7 @@ async function bootstrap() {
   if (isMainThread) {
     const app = await NestFactory.create(AppModule);
     app.useWebSocketAdapter(new WsAdapter(app));
-    const config = await app.get(ConfigService);
+    const config = app.get(ConfigService);
     app.enableCors({
       credentials: true,
       origin: '*',

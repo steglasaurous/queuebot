@@ -20,7 +20,7 @@ declare let window: WindowWithElectron;
   imports: [HttpClientModule, CommonModule, DragDropModule, MatIcon],
   providers: [],
   templateUrl: './queue-list.component.html',
-  styleUrl: './queue-list.component.scss',
+  styleUrl: './queue-list.component.css',
 })
 export class QueueListComponent implements OnInit {
   @Input()
@@ -106,5 +106,18 @@ export class QueueListComponent implements OnInit {
     );
 
     console.log($event);
+  }
+
+  deleteSongRequest(songRequestId: number) {
+    this.queuebotApiService
+      .deleteSongRequest(this.channelName, songRequestId)
+      .subscribe({
+        next: (result) => {
+          console.log('got result', { result: result });
+        },
+        error: (err) => {
+          console.log('Got error', { err: err });
+        },
+      });
   }
 }

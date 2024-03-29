@@ -29,6 +29,7 @@ import {
 } from '@willsoto/nestjs-prometheus';
 import { Metrics } from './models/metrics.enum';
 import { RbsetBotCommand } from './commands/rbset.bot-command';
+import { RemoveBotCommand } from './commands/remove.bot-command';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { RbsetBotCommand } from './commands/rbset.bot-command';
     OpenBotCommand,
     CloseBotCommand,
     RbsetBotCommand,
+    RemoveBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -77,6 +79,7 @@ import { RbsetBotCommand } from './commands/rbset.bot-command';
         OpenBotCommand,
         CloseBotCommand,
         RbsetBotCommand,
+        RemoveBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -92,6 +95,7 @@ import { RbsetBotCommand } from './commands/rbset.bot-command';
         openBotCommand: OpenBotCommand,
         closeBotCommand: CloseBotCommand,
         rbSetCommand: RbsetBotCommand,
+        removeBotCommand: RemoveBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -107,6 +111,7 @@ import { RbsetBotCommand } from './commands/rbset.bot-command';
           openBotCommand,
           closeBotCommand,
           rbSetCommand,
+          removeBotCommand,
         ];
       },
     },

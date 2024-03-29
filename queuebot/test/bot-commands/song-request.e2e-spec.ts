@@ -1,41 +1,23 @@
 import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
 import { TestChatClient } from '../../src/modules/chat/services/clients/test-chat.client';
-import { exec } from 'child-process-promise';
-import { WsAdapter } from '@nestjs/platform-ws';
-import { getMockChatMessage } from '../helpers';
+import {
+  createNestApp,
+  getMockChatMessage,
+  setupDatabaseFixtures,
+} from '../helpers';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  const chatClient = new TestChatClient();
+  let chatClient: TestChatClient;
 
   beforeAll(async () => {
-    // Reset the database
-    await exec(
-      'npx ts-node ./node_modules/typeorm/cli schema:drop -d ./src/typeorm-cli.config.ts',
-    );
-    await exec(
-      'npx ts-node ./node_modules/typeorm/cli migration:run -d ./src/typeorm-cli.config.ts',
-    );
-
-    // Load fixtures
-    await exec(
-      'npx fixtures-ts-node-commonjs load -d src/typeorm-cli.config.ts fixtures',
-    );
+    await setupDatabaseFixtures();
   }, 30000);
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider('ChatClients')
-      .useValue([chatClient])
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useWebSocketAdapter(new WsAdapter(app));
+    app = await createNestApp();
     await app.init();
+    chatClient = app.get('ChatClients')[0];
   });
 
   afterEach(async () => {
