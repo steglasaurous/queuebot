@@ -1,4 +1,6 @@
-build: queuebot/dist queuebot-client/dist queuebot/.env
+build-dev: queuebot/dist queuebot-client/dist queuebot/.env
+
+build: queuebot/dist queuebot-client/dist
 
 rebuild: queuebot/node_modules queuebot-client/node_modules
 	rm -rf queuebot/dist queuebot-client/dist queuebot/.env queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts

@@ -11,9 +11,9 @@ RUN mkdir -p /opt/queuebot && mkdir -p /opt/queuebot/database
 #COPY ./queuebot/nest-cli.json ./queuebot/package.json ./queuebot/package-lock.json ./queuebot/tsconfig.json ./queuebot/tsconfig.build.json ./queuebot/.env.dist /server/
 COPY ./common /opt/queuebot/common
 COPY ./queuebot /opt/queuebot/queuebot
-COPY ./queuebot-client /opt/queuebot/queuebot-client
+# COPY ./queuebot-client /opt/queuebot/queuebot-client
 COPY ./Makefile /opt/queuebot/Makefile
-RUN cd /opt/queuebot && make build
+RUN cd /opt/queuebot && make queuebot/dist
 COPY ./queuebot/run.sh /run.sh
 EXPOSE 3000
 CMD ["/bin/bash", "/run.sh"]
