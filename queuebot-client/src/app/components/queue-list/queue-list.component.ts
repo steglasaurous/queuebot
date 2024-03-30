@@ -11,13 +11,40 @@ import {
 import { WebsocketService } from '../../services/websocket.service';
 import { MatIcon } from '@angular/material/icon';
 import { WindowWithElectron } from '../../models/window.global';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
 
 declare let window: WindowWithElectron;
 
 @Component({
   selector: 'app-queue-list',
   standalone: true,
-  imports: [HttpClientModule, CommonModule, DragDropModule, MatIcon],
+  imports: [
+    HttpClientModule,
+    CommonModule,
+    DragDropModule,
+    MatIcon,
+    MatTable,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatHeaderCell,
+    MatCell,
+    MatHeaderRow,
+    MatRow,
+    MatHeaderRowDef,
+    MatRowDef,
+    MatColumnDef,
+  ],
   providers: [],
   templateUrl: './queue-list.component.html',
   styleUrl: './queue-list.component.css',
@@ -27,6 +54,8 @@ export class QueueListComponent implements OnInit {
   channelName: string = '';
 
   songRequests: SongRequestDto[] = [];
+
+  columnsToDisplay = ['song', 'songLength', 'requester', 'ops'];
   constructor(
     private queuebotApiService: QueuebotApiService,
     private websocketService: WebsocketService,

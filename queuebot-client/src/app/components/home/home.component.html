@@ -1,5 +1,5 @@
 <div class="text-right">
-  {{ channelName }} <button>Logout</button>
+  {{ channelName }} <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400 ">Logout</button>
 </div>
 <div class="flex flex-row-reverse text-right">
   <div>
@@ -8,6 +8,9 @@
   <div class="pr-5">
     <mat-slide-toggle [checked]="channel.queueOpen">Open Queue</mat-slide-toggle>
   </div>
+</div>
+<div>
+  <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400 text-2xl">Next Song</button>
 </div>
 <div>
   <app-queue-list *ngIf="channelName != ''" [channelName]="channelName"></app-queue-list>
