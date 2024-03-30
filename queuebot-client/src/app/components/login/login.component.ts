@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
       window['settings'].openTwitchLogin();
     } else {
       console.log('DEV: Open twitch auth in a new tab');
-      window.open(`${this.apiBaseUrl}/auth/twitch`, '_blank');
+      window.open(`${this.apiBaseUrl}/auth/twitch?mode=authcode`, '_blank');
     }
   }
 }

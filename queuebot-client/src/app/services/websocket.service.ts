@@ -66,6 +66,7 @@ export class WebsocketService {
             delay: (error) => {
               if (this.isRetryEnabled) {
                 this.connected = false;
+                console.log(error);
                 console.log('Retrying connection...');
                 return timer(5000);
               }
