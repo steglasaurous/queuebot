@@ -1,7 +1,7 @@
 # Todo
 
 ## First
-- [ ] Server: Get e2e tests working for API endpoints (cookieParser() not working in test)
+- [x] Server: Get e2e tests working for API endpoints (cookieParser() not working in test)
 - [ ] UI: Implement selecting active song
 - [ ] Implement CSS using tailwind
 - [x] Server: Implement remove song from queue command !remove

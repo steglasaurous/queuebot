@@ -154,7 +154,7 @@ export const createNestApp = async () => {
     // origin: '*',
     origin: 'http://localhost:4200',
   });
-  // @ts-expect-error Even though the IDE complains about this, it actually compiles without issue.  See note on import cookie-parser above.
+  // NOTE: Even though the IDE complains about this, it actually compiles without issue.  See note on import cookie-parser above.
   app.use(cookieParser());
   return app;
 };
