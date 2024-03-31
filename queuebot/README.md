@@ -1,7 +1,8 @@
 # Todo
 
 ## First
-
+- 
+- [ ] UI: Implement selecting active song
 - [ ] Implement CSS using tailwind
 - [x] Server: Implement remove song from queue command !remove
 - [x] Server: Implement remove song from queue API

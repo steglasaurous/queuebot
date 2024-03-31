@@ -29,6 +29,8 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { SongRequestDto as SongRequestDtoClass } from '../dto/song-request.dto';
+import { ChatManagerService } from '../../chat/services/chat-manager.service';
+import { I18nService } from 'nestjs-i18n';
 
 @Controller('api/channels/:channelName/song-requests')
 export class SongRequestsController {
@@ -36,6 +38,8 @@ export class SongRequestsController {
     private songRequestService: SongRequestService,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     private dtoMappingService: DtoMappingService,
+    private chatManager: ChatManagerService,
+    private i18n: I18nService,
   ) {}
 
   @ApiOperation({
@@ -112,7 +116,52 @@ export class SongRequestsController {
   @ApiCookieAuth('jwt')
   @ApiOperation({
     description:
+      'Advances the queue by setting the currently active song to done (if available) and marking the next song as active',
+    tags: ['Request Queue'],
+  })
+  @ApiOkResponse({ type: 'boolean' })
+  @UseGuards(JwtAuthGuard)
+  @Put('next-song')
+  async nextSong(
+    @Param('channelName') channelName: string,
+    @Req() request: Request,
+  ) {
+    if (!request['user']) {
+      throw new UnauthorizedException('Login required.');
+    }
+
+    if (request['user'].username != channelName) {
+      throw new UnauthorizedException('You are not the owner of this channel.');
+    }
+    const channel = await this.channelRepository.findOneBy({
+      channelName: channelName,
+    });
+    const nextRequest = await this.songRequestService.getNextRequest(channel);
+    if (nextRequest) {
+      await this.chatManager.sendMessage(
+        channelName,
+        this.i18n.t('chat.NextRequest', {
+          lang: channel.lang,
+          args: {
+            title: nextRequest.song.title,
+            artist: nextRequest.song.artist,
+            mapper: nextRequest.song.mapper,
+            requesterName: nextRequest.requesterName,
+          },
+        }),
+      );
+
+      return this.dtoMappingService.songRequestToDto(nextRequest);
+    }
+
+    return;
+  }
+
+  @ApiCookieAuth('jwt')
+  @ApiOperation({
+    description:
       'Remove a song request.  Must either be a broadcaster or mod of the channel it belongs to, or be the original requester of this request.',
+    tags: ['Request Queue'],
   })
   @ApiNoContentResponse()
   @UseGuards(JwtAuthGuard)

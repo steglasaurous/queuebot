@@ -5,6 +5,7 @@ import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { NgIf } from '@angular/common';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { ChannelDto } from '../../../../../common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -32,6 +33,7 @@ export class HomeComponent {
   constructor(
     private settingsService: SettingsService,
     private queuebotApiService: QueuebotApiService,
+    private router: Router,
   ) {
     this.settingsService.getValue('username').then((value) => {
       console.log('Setting channel name', { channelName: value });
@@ -45,5 +47,16 @@ export class HomeComponent {
           this.channel = channel;
         });
     });
+  }
+
+  nextSong() {
+    // TODO: Disable the next song button while the request is in progress, then re-enable when the request completes (or fails)
+    this.queuebotApiService.nextSong(this.channelName).subscribe();
+  }
+
+  async logout() {
+    await this.settingsService.deleteValue('username');
+    await this.settingsService.deleteValue('jwt');
+    await this.router.navigate(['']);
   }
 }

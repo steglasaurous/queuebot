@@ -66,4 +66,14 @@ export class QueuebotApiService {
       },
     );
   }
+
+  nextSong(channel: string): Observable<SongRequestDto | undefined> {
+    return this.httpClient.put<SongRequestDto>(
+      `${this.apiBaseUrl}/api/channels/${channel}/song-requests/next-song`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+  }
 }

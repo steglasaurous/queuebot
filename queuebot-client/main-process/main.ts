@@ -20,7 +20,7 @@ import { environment } from './environment';
 export const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
 export const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
 export const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
-// FIXME: Need to make this configurable at build time
+export const IPC_SETTINGS_DELETE_VALUE = 'settings.deleteValue';
 export const LOGIN_URL = `${environment.queuebotApiBaseUrl}/auth/twitch`;
 export const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
 export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
@@ -76,6 +76,10 @@ function bootstrap() {
 
   ipcMain.handle(IPC_SETTINGS_GET_VALUE, (event, key) => {
     return settingsService.getValue(key);
+  });
+
+  ipcMain.handle(IPC_SETTINGS_DELETE_VALUE, (event, key) => {
+    return settingsService.deleteValue(key);
   });
 
   ipcMain.handle(IPC_OPEN_TWITCH_LOGIN, (event, args) => {

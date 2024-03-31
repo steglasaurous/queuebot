@@ -33,4 +33,13 @@ export class SettingsService {
       return Promise.resolve();
     }
   }
+
+  async deleteValue(key: string): Promise<void> {
+    if (window['settings']) {
+      return await window['settings'].deleteValue(key);
+    } else {
+      console.log('Deleting setting in memory', { key: key });
+      window.localStorage.removeItem(`setting:${key}`);
+    }
+  }
 }
