@@ -14,7 +14,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { WsAdapter } from '@nestjs/platform-ws';
 import { TestChatClient } from '../src/modules/chat/services/clients/test-chat.client';
-import cookieParser from 'cookie-parser';
+
+// NOTE: Importing this with '*' here INSTEAD of how it's done in main.ts as import cookieParser from 'cookie-parser'
+// Otherwise, the app complains it's not a function.
+// Details: https://stackoverflow.com/questions/51616419/nestjs-cookie-parser-is-not-a-function-error-during-e2e-test
+import * as cookieParser from 'cookie-parser';
 
 export const getGenericNestMock = (token) => {
   if (token == I18nService) {
@@ -150,8 +154,7 @@ export const createNestApp = async () => {
     // origin: '*',
     origin: 'http://localhost:4200',
   });
-  // FIXME:  Seems this throws a TypeError, preventing cookies from being properly parsed.
-  // even though this works fine in main.ts.  Not sure what the deal is yet.
+  // @ts-expect-error Even though the IDE complains about this, it actually compiles without issue.  See note on import cookie-parser above.
   app.use(cookieParser());
   return app;
 };
