@@ -76,4 +76,20 @@ export class QueuebotApiService {
       },
     );
   }
+
+  setSongRequestActive(
+    channel: string,
+    songRequestId: number,
+  ): Observable<SongRequestDto> {
+    return this.httpClient.put<SongRequestDto>(
+      `${this.apiBaseUrl}/api/channels/${channel}/song-requests/${songRequestId}`,
+      {
+        songRequestId: songRequestId,
+        isActive: true,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+  }
 }

@@ -24,6 +24,36 @@ describe('SongRequests controller (e2e)', () => {
     await app.close();
   });
 
+  it('should set a song request as active', async () => {
+    const channelName = 'channelwithrequests';
+    const jwt = authService.getJwt({
+      username: 'channelwithrequests',
+      displayName: 'channelwithrequests',
+      id: 999,
+      userAuthSources: [],
+    });
+
+    // NOTE: My IDE complains that request() is not callable, however IT WORKS :)
+    const response = await request
+      .agent(app.getHttpServer())
+      .put(`/api/channels/${channelName}/song-requests/1`)
+      .set('Cookie', [`jwt=${jwt}`])
+      .send({ songRequestId: 1, isActive: true });
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.id).toEqual(1);
+    expect(response.body.isActive).toBeTruthy();
+
+    const requestListResponse = await request
+      .agent(app.getHttpServer())
+      .get(`/api/channels/${channelName}/song-requests`)
+      .send();
+
+    expect(requestListResponse.body.length).toEqual(2);
+    expect(requestListResponse.body[0].isActive).toBeTruthy();
+    expect(requestListResponse.body[1].isActive).toBeFalsy();
+  });
+
   it('should delete a song request for a broadcaster', async () => {
     const channelName = 'channelwithrequests';
     const jwt = authService.getJwt({

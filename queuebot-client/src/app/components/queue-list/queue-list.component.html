@@ -69,6 +69,11 @@
     <div class="requester">{{ queueItem.requesterName }}</div>
     <div class="localState"> --</div>
     <div class="controls">
+      <div>
+        <button (click)="setSongRequestActive(queueItem.id)">
+          <mat-icon>play_circle</mat-icon>
+        </button>
+      </div>
       <div class="markPlayed">
         <button>
           <mat-icon>done</mat-icon>

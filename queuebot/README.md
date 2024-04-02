@@ -6,9 +6,9 @@
 
 ## First
 
-- [ ] UI: Implement next song button to advance the queue
-- [ ] Server: Implement song-request PUT to modify a request (setting song as active)
-- [ ] UI: Implement selecting active song
+- [x] UI: Implement next song button to advance the queue
+- [x] Server: Implement song-request PUT to modify a request (setting song as active)
+- [x] UI: Implement selecting active song
 - [ ] Server: Implement change channel settings API
 - [ ] UI: Implement ability to open or close the queue from interface
 - [ ] UI: Implement ability to change game from interface

@@ -149,4 +149,10 @@ export class QueueListComponent implements OnInit {
         },
       });
   }
+
+  setSongRequestActive(songRequestId: number) {
+    this.queuebotApiService
+      .setSongRequestActive(this.channelName, songRequestId)
+      .subscribe();
+  }
 }
