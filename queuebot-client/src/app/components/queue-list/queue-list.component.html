@@ -70,17 +70,17 @@
     <div class="localState"> --</div>
     <div class="controls">
       <div>
-        <button (click)="setSongRequestActive(queueItem.id)">
+        <button (click)="setSongRequestActive(queueItem.id)" title="Set as active song">
           <mat-icon>play_circle</mat-icon>
         </button>
       </div>
-      <div class="markPlayed">
+      <div class="markPlayed" title="Set song played and remove from queue">
         <button>
           <mat-icon>done</mat-icon>
         </button>
       </div>
       <div class="deleteRequest">
-        <button (click)="deleteSongRequest(queueItem.id)">
+        <button (click)="deleteSongRequest(queueItem.id)" title="Delete song from queue">
           <mat-icon>delete</mat-icon>
         </button>
       </div>

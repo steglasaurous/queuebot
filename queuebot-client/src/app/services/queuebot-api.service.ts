@@ -92,4 +92,28 @@ export class QueuebotApiService {
       },
     );
   }
+
+  closeQueue(channel: string): Observable<ChannelDto> {
+    return this.httpClient.put<ChannelDto>(
+      `${this.apiBaseUrl}/api/channels/${channel}`,
+      {
+        queueOpen: false,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  openQueue(channel: string): Observable<ChannelDto> {
+    return this.httpClient.put<ChannelDto>(
+      `${this.apiBaseUrl}/api/channels/${channel}`,
+      {
+        queueOpen: true,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+  }
 }

@@ -68,4 +68,20 @@ export class HomeComponent {
     await this.settingsService.deleteValue('jwt');
     await this.router.navigate(['']);
   }
+
+  toggleQueueOpen() {
+    if (this.channel.queueOpen) {
+      this.queuebotApiService
+        .closeQueue(this.channelName)
+        .subscribe((channelDto) => {
+          this.channel = channelDto;
+        });
+    } else {
+      this.queuebotApiService
+        .openQueue(this.channelName)
+        .subscribe((channelDto) => {
+          this.channel = channelDto;
+        });
+    }
+  }
 }
