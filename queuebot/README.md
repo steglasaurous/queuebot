@@ -1,47 +1,56 @@
 # Todo
 
+# Goal
+
+1. Get working prototype of electron app, send to internal testers
+
 ## First
-- [x] Server: Get e2e tests working for API endpoints (cookieParser() not working in test)
-- [ ] UI: Implement selecting active song
-- [ ] Implement CSS using tailwind
-- [x] Server: Implement remove song from queue command !remove
-- [x] Server: Implement remove song from queue API
-- [ ] Server: Implement change channel settings API
-- [ ] Server: Implement clearing played history via command
-- [ ] Server: Implement rollback/undo command to reverse the queue to its previous state
-- [x] UI: Implement remove song
-- [ ] UI: Implement logout
-- [ ] UI: Implement current game and queue status display  
-- [ ] UI: Implement ability to open or close the queue from interface
-- [ ] UI: Implement add song to queue via search/autocomplete
+
 - [ ] UI: Implement next song button to advance the queue
-- [ ] Server: Add a 'deny list' - songs that cannot be queued
-- [ ] Remove menus from electron interface (for now)
+- [ ] Server: Implement song-request PUT to modify a request (setting song as active)
+- [ ] UI: Implement selecting active song
+- [ ] Server: Implement change channel settings API
+- [ ] UI: Implement ability to open or close the queue from interface
 - [ ] UI: Implement ability to change game from interface
-- [ ] UI: Implement showing what's already been played
-- [ ] UI: Implement clearing played history
-- [ ] UI: Implement rollback/undo button to reverse the queue to its previous state
-- [ ] `!rbget` - Return a list of requestobot settings for the channel it's in.  Broadcaster and mods only.
-
-
+- [ ] Server: Implement song-requests POST to create new song request via API
+- [ ] Server: Implement songs GET to search for songs
+- [ ] UI: Implement add song to queue via search/autocomplete
+- [ ] Remove menus from electron interface (for now)
+- [ ] UI: Implement showing downloaded status of each song (not downloaded, download progress, present locally)
 
 ## Next
 
+- [ ] Implement unit tests for client components
+- [ ] Server: Clear out queue when switching games.
+- [ ] UI: Sketch out how I might clean up the UI / make it look slick
+- [ ] Server: Implement clearing played history via command
+- [ ] UI: Implement showing what's already been played
+- [ ] UI: Implement clearing played history (vs clearing queue completely)
+- [ ] UI: Implement rollback/undo button to reverse the queue to its previous state
+- [ ] `!rbget` - Return a list of requestobot settings for the channel it's in.  Broadcaster and mods only.
+- [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
+- [ ] Server: Add a 'deny list' - songs that cannot be queued
+- [ ] UI: Figure out how windows package signing works, see if I can do it cheaply
 
 ## Backlog
 
-- [ ] Clear out queue when switching games.
-- [ ] Implement a web client that shows the current queue (usable as an OBS overlay)
+- [ ] Server: Implement rollback/undo command to reverse the queue to its previous state
 - [ ] !top - Move song to the top of the queue - use title? song position? Or move last added song?
 - [ ] !rollback - put the last song that was popped off the queue back on top
-- [ ] Allow adding songs via client?
 - [ ] Add ability to set limits on how many requests can be queued per user, per role, etc.
 - [ ] Importers: Only report new songs imported, vs total songs
 - [ ] Spin rhythm importer: Implement song downloader to read duration and BPM data (or use API?)
 - [ ] Idea: Allow adding search filters by difficulty, so streamer can limit difficulty level being requested.
 
-
 ## Done
+
+- [x] UI: Implement logout
+- [x] UI: Implement current game and queue status display
+- [x] Implement CSS using tailwind
+- [x] Server: Implement remove song from queue command !remove
+- [x] Server: Implement remove song from queue API
+- [x] Server: Get e2e tests working for API endpoints (cookieParser() not working in test)
+- [x] UI: Implement remove song
 - [x] Implement auto-reconnect for websocket connections
 - [x] Server: Implement queuing strategies - add 'fair queuing' strategy
   - `!rbset queuestrategy oneperuser`
