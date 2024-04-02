@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, retry, timer } from 'rxjs';
 import { QUEUEBOT_API_BASE_URL } from '../app.config';
-import { SongRequestDto } from '../../../../common';
+import { GameDto, SongRequestDto } from '../../../../common';
 import { ChannelDto } from '../../../../common';
 
 @Injectable({
@@ -110,6 +110,22 @@ export class QueuebotApiService {
       `${this.apiBaseUrl}/api/channels/${channel}`,
       {
         queueOpen: true,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  getGames(): Observable<GameDto[]> {
+    return this.httpClient.get<GameDto[]>(`${this.apiBaseUrl}/api/games`);
+  }
+
+  setGame(channel: string, gameId: number) {
+    return this.httpClient.put<ChannelDto>(
+      `${this.apiBaseUrl}/api/channels/${channel}`,
+      {
+        game: { id: gameId },
       },
       {
         withCredentials: true,

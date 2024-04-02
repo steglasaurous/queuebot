@@ -9,17 +9,20 @@
 - [x] UI: Implement next song button to advance the queue
 - [x] Server: Implement song-request PUT to modify a request (setting song as active)
 - [x] UI: Implement selecting active song
-- [ ] Server: Implement change channel settings API
-- [ ] UI: Implement ability to open or close the queue from interface
-- [ ] UI: Implement ability to change game from interface
+- [x] Server: Implement change channel settings API
+- [x] UI: Implement ability to open or close the queue from interface
+- [x] UI: Implement ability to change game from interface
+- [ ] UI: Implement showing downloaded status of each song (not downloaded, download progress, present locally)
+- [ ] UI: Create an installable package, test on a new machine
+- [ ] Deploy server changes to production
+
+## Next
+
+- [ ] Implement missing unit and e2e tests
 - [ ] Server: Implement song-requests POST to create new song request via API
 - [ ] Server: Implement songs GET to search for songs
 - [ ] UI: Implement add song to queue via search/autocomplete
 - [ ] Remove menus from electron interface (for now)
-- [ ] UI: Implement showing downloaded status of each song (not downloaded, download progress, present locally)
-
-## Next
-
 - [ ] Implement unit tests for client components
 - [ ] Server: Clear out queue when switching games.
 - [ ] UI: Sketch out how I might clean up the UI / make it look slick

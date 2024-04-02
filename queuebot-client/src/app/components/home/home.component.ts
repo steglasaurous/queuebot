@@ -6,6 +6,8 @@ import { NgIf } from '@angular/common';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { ChannelDto } from '../../../../../common';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ChangeGameComponent } from '../change-game/change-game.component';
 
 @Component({
   selector: 'app-home',
@@ -35,6 +37,7 @@ export class HomeComponent {
     private settingsService: SettingsService,
     private queuebotApiService: QueuebotApiService,
     private router: Router,
+    public dialog: MatDialog,
   ) {
     this.settingsService.getValue('username').then((value) => {
       console.log('Setting channel name', { channelName: value });
@@ -83,5 +86,19 @@ export class HomeComponent {
           this.channel = channelDto;
         });
     }
+  }
+
+  showChangeGameModal() {
+    const dialogRef = this.dialog.open(ChangeGameComponent, {
+      data: { gameId: 0 },
+    });
+
+    dialogRef.afterClosed().subscribe((gameId) => {
+      this.queuebotApiService
+        .setGame(this.channelName, gameId)
+        .subscribe((channelDto) => {
+          this.channel = channelDto;
+        });
+    });
   }
 }
