@@ -1,6 +1,6 @@
 <div class="flex flex-row">
   <div>
-    <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400 text-2xl" (click)="nextSong()">Next Song</button>
+    <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400 text-2xl" (click)="nextSong()" [disabled]="nextSongDisabled">Next Song</button>
   </div>
   <div>
     <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400">{{ channel.game.displayName }}</button>

@@ -30,6 +30,7 @@ export class HomeComponent {
       name: '',
     },
   };
+  nextSongDisabled: boolean = false;
   constructor(
     private settingsService: SettingsService,
     private queuebotApiService: QueuebotApiService,
@@ -51,7 +52,15 @@ export class HomeComponent {
 
   nextSong() {
     // TODO: Disable the next song button while the request is in progress, then re-enable when the request completes (or fails)
-    this.queuebotApiService.nextSong(this.channelName).subscribe();
+    this.nextSongDisabled = true;
+    this.queuebotApiService.nextSong(this.channelName).subscribe({
+      next: () => {
+        this.nextSongDisabled = false;
+      },
+      error: () => {
+        this.nextSongDisabled = false;
+      },
+    });
   }
 
   async logout() {
