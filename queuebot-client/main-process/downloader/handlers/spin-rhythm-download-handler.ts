@@ -6,6 +6,7 @@ import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import decompress from 'decompress';
+import { DownloadState, LocalSongState } from '../../local-song-state';
 
 export class SpinRhythmDownloadHandler implements DownloadHandler {
   constructor(private songsDir: string) {}
@@ -13,14 +14,22 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
     const filepath = path.join(this.songsDir, song.fileReference + '.srtb');
     return fs.existsSync(filepath);
   }
-  async downloadSong(song: SongDto): Promise<boolean> {
+  async downloadSong(song: SongDto, songStateCallback: any): Promise<void> {
     return new Promise((resolve, reject) => {
+      const songState: LocalSongState = {
+        songId: song.id,
+        downloadState: DownloadState.Waiting,
+        downloadProgress: 0,
+      };
       if (!song.downloadUrl) {
         console.log('Song does not have a downloadUrl', {
           songId: song.id,
           title: song.title,
         });
         // Nothing to download.
+        songState.downloadState = DownloadState.Complete;
+        songStateCallback(songState);
+        resolve();
         return;
       }
 
@@ -33,7 +42,9 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
         url: song.downloadUrl,
         responseType: 'stream',
         onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
-          console.log(progressEvent);
+          songState.downloadState = DownloadState.InProgress;
+          songState.downloadProgress = progressEvent.progress;
+          songStateCallback(songState);
         },
       })
         .then((response: AxiosResponse<any, any>) => {
@@ -43,7 +54,9 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
             // @ts-ignore
             decompress(zipFilename, this.songsDir).then(() => {
               console.log('Decompressing done');
-              resolve(true);
+              songState.downloadState = DownloadState.Complete;
+              songStateCallback(songState);
+              resolve();
             });
           });
         })
@@ -53,6 +66,8 @@ export class SpinRhythmDownloadHandler implements DownloadHandler {
             songId: song.id,
             title: song.title,
           });
+          songState.downloadState = DownloadState.Failed;
+          songStateCallback(songState);
           reject(e);
         });
     });

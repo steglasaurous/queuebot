@@ -2,7 +2,6 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { AbstractChatClient } from './clients/abstract-chat.client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatMessageReceiveEvent } from '../events/chat-message-receive.event';
-import { ChatClientConnectedEvent } from '../events/chat-client-connected.event';
 
 @Injectable()
 export class ChatManagerService {
@@ -23,20 +22,23 @@ export class ChatManagerService {
     this.connectAll();
   }
 
-  public addChatClient(chatClient: AbstractChatClient) {
-    chatClient.messages$.subscribe((chatMessage) => {
-      this.eventEmitter.emit(ChatMessageReceiveEvent.name, {
-        chatMessage: chatMessage,
-      } as ChatMessageReceiveEvent);
-    });
-
-    this.chatClients.push(chatClient);
-  }
-
   public async connectAll() {
     for (const chatClient of this.chatClients) {
       await chatClient.connect();
       this.logger.log('Connected');
+    }
+  }
+
+  /**
+   * Sends a message to a channel.  Note this works by calling on ALL clients to send the message.  It's up
+   * to each client to decide whether it should send the message or not.
+   *
+   * @param channelName
+   * @param message
+   */
+  public async sendMessage(channelName: string, message: string) {
+    for (const chatClient of this.chatClients) {
+      await chatClient.sendMessage(channelName, message);
     }
   }
 }

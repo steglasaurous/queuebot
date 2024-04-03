@@ -18,13 +18,14 @@ async function bootstrap() {
     app.enableCors({
       credentials: true,
       origin: '*',
+      // origin: 'http://localhost:4200',
     });
     app.use(cookieParser());
 
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Requestobot API')
       .setDescription('The Requestobot API')
-      .setVersion('1.4.0')
+      .setVersion('1.4.2')
       .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig, {
       include: [ApiModule],

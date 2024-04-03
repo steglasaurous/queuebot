@@ -253,4 +253,23 @@ export class SongRequestService {
       songRequests: await this.getAllRequests(songRequest.channel),
     });
   }
+
+  async setRequestActive(songRequest: SongRequest): Promise<void> {
+    // Make sure any existing active song requests are marked inactive, and set this one to active.
+    // const qb = this.songRequestRepository.queryRunner.
+    // qb.update().set({ isActive: false }).where({ isActive: true });
+    // await qb.execute();
+
+    await this.songRequestRepository.query(
+      `UPDATE song_request SET "isActive" = false where "channelChannelName" = '${songRequest.channel.channelName}' AND "isActive" = true`,
+    );
+
+    songRequest.isActive = true;
+    await this.songRequestRepository.save(songRequest);
+
+    this.eventEmitter.emit(SongRequestQueueChangedEvent.name, {
+      channel: songRequest.channel,
+      songRequests: await this.getAllRequests(songRequest.channel),
+    });
+  }
 }

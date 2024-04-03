@@ -7,6 +7,7 @@ import {
   ChannelDto,
   GameDto,
 } from '../../../../../common';
+import { Game } from '../entities/game.entity';
 
 @Injectable()
 export class DtoMappingService {
@@ -36,13 +37,7 @@ export class DtoMappingService {
   }
 
   public channelToDto(channel: Channel): ChannelDto {
-    const gameDto: GameDto = {
-      id: channel.game.id,
-      name: channel.game.name,
-      displayName: channel.game.displayName,
-      setGameName: channel.game.setGameName,
-      twitchCategoryId: channel.game.twitchCategoryId,
-    };
+    const gameDto: GameDto = this.gameToDto(channel.game);
 
     return {
       game: gameDto,
@@ -51,5 +46,15 @@ export class DtoMappingService {
       enabled: channel.enabled,
       queueOpen: channel.queueOpen,
     } as ChannelDto;
+  }
+
+  public gameToDto(game: Game): GameDto {
+    return {
+      id: game.id,
+      name: game.name,
+      displayName: game.displayName,
+      setGameName: game.setGameName,
+      twitchCategoryId: game.twitchCategoryId,
+    };
   }
 }

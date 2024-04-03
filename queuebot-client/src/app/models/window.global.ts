@@ -2,6 +2,7 @@ export interface WindowWithElectron extends Window {
   settings?: {
     setValue: any;
     getValue: any;
+    deleteValue: any;
     openTwitchLogin: any;
   };
   login?: {
@@ -10,5 +11,6 @@ export interface WindowWithElectron extends Window {
   };
   songs?: {
     processSong: any;
+    onProcessSongProgress: any;
   };
 }
