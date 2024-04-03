@@ -11,5 +11,6 @@ export interface WindowWithElectron extends Window {
   };
   songs?: {
     processSong: any;
+    onProcessSongProgress: any;
   };
 }

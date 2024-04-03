@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -23,6 +23,8 @@ import {
   MatRowDef,
   MatTable,
 } from '@angular/material/table';
+import { LocalSongStatusComponent } from '../local-song-status/local-song-status.component';
+import { LocalSongState } from '../../models/local-song-state';
 
 declare let window: WindowWithElectron;
 
@@ -44,6 +46,7 @@ declare let window: WindowWithElectron;
     MatHeaderRowDef,
     MatRowDef,
     MatColumnDef,
+    LocalSongStatusComponent,
   ],
   providers: [],
   templateUrl: './queue-list.component.html',
@@ -55,10 +58,16 @@ export class QueueListComponent implements OnInit {
 
   songRequests: SongRequestDto[] = [];
 
+  downloadedSongStatus: Map<number, LocalSongState> = new Map<
+    number,
+    LocalSongState
+  >();
+
   columnsToDisplay = ['song', 'songLength', 'requester', 'ops'];
   constructor(
     private queuebotApiService: QueuebotApiService,
     private websocketService: WebsocketService,
+    private ref: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -91,7 +100,7 @@ export class QueueListComponent implements OnInit {
         });
       }
 
-      this.websocketService.messages$.subscribe((message) => {
+      this.websocketService.messages$.subscribe(async (message) => {
         console.log(message);
 
         if (message.event == 'songRequestQueueChanged') {
@@ -99,7 +108,8 @@ export class QueueListComponent implements OnInit {
 
           if (window.songs) {
             for (const songRequest of this.songRequests) {
-              window.songs.processSong(songRequest);
+              console.log('Calling processSong', { songRequest: songRequest });
+              await window.songs.processSong(songRequest);
             }
           } else {
             console.log(
@@ -107,6 +117,16 @@ export class QueueListComponent implements OnInit {
             );
           }
         }
+      });
+    }
+
+    // Attach to listening to the download progress thing.
+    if (window.songs) {
+      console.log('Connecting to onProcessSongProgress');
+      window.songs.onProcessSongProgress((songState: LocalSongState) => {
+        console.log('Download update', { songState: songState });
+        this.downloadedSongStatus.set(songState.songId, songState);
+        this.ref.detectChanges();
       });
     }
   }

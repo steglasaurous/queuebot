@@ -67,7 +67,9 @@
     </div>
     <div class="songLength">{{ queueItem.song.duration }}</div>
     <div class="requester">{{ queueItem.requesterName }}</div>
-    <div class="localState"> --</div>
+    <div class="localState">
+      <app-local-song-status [song]="queueItem.song" [songState]="downloadedSongStatus.get(queueItem.song.id)" />
+    </div>
     <div class="controls">
       <div>
         <button (click)="setSongRequestActive(queueItem.id)" title="Set as active song">

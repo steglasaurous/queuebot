@@ -12,6 +12,9 @@ const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
 const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
 const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
 const IPC_SETTINGS_DELETE_VALUE = 'settings.deleteValue';
+const IPC_SONG_DOWNLOADER_PROCESS_SONG_PROGRESS =
+  'songDownloader.processSongProgress';
+
 export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
 
 contextBridge.exposeInMainWorld('settings', {
@@ -35,4 +38,11 @@ contextBridge.exposeInMainWorld('login', {
 contextBridge.exposeInMainWorld('songs', {
   processSong: (songDto: SongDto) =>
     ipcRenderer.invoke(IPC_SONG_DOWNLOADER_PROCESS_SONG, songDto),
+  onProcessSongProgress: (callback: any) =>
+    ipcRenderer.on(
+      IPC_SONG_DOWNLOADER_PROCESS_SONG_PROGRESS,
+      (_event, songState) => {
+        callback(songState);
+      },
+    ),
 });
