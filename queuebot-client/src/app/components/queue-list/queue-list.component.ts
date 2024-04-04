@@ -108,8 +108,7 @@ export class QueueListComponent implements OnInit {
 
           if (window.songs) {
             for (const songRequest of this.songRequests) {
-              console.log('Calling processSong', { songRequest: songRequest });
-              await window.songs.processSong(songRequest);
+              window.songs.processSong(songRequest.song);
             }
           } else {
             console.log(
@@ -124,7 +123,6 @@ export class QueueListComponent implements OnInit {
     if (window.songs) {
       console.log('Connecting to onProcessSongProgress');
       window.songs.onProcessSongProgress((songState: LocalSongState) => {
-        console.log('Download update', { songState: songState });
         this.downloadedSongStatus.set(songState.songId, songState);
         this.ref.detectChanges();
       });

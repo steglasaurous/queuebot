@@ -182,11 +182,11 @@ function createWindow() {
         return;
       }
 
-      if (details.responseHeaders && details.responseHeaders['Set-Cookie']) {
+      if (details.responseHeaders && details.responseHeaders['set-cookie']) {
         // Note: This only works if the endpoint passes back a single cookie.  If there's multiple
         // cookies at some future date, this needs to be updated.
         const decodedCookie = cookie.parse(
-          details.responseHeaders['Set-Cookie'][0],
+          details.responseHeaders['set-cookie'][0],
         );
 
         if (decodedCookie['jwt']) {
