@@ -1,6 +1,6 @@
 {
   "name": "queuebot-client",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist/main-process/main.js",
   "scripts": {
     "ng": "ng",
