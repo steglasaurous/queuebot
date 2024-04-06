@@ -47,46 +47,97 @@
 <!--</mat-table>-->
 
 
-<div class="flex border-b-2 border-black text-xl font-bold">
-  <div class="w-10"></div>
-  <div class="w-2/5">Song</div>
-  <div class="">Length</div>
-  <div class="requesterHeading">Requester</div>
-  <div class="localStateHeading">Local</div>
-  <div class="controlsHeading"></div>
-</div>
 
-<div cdkDropList (cdkDropListDropped)="drop($event)" class="requestList">
-  <div cdkDrag class="requestLine" *ngFor="let queueItem of songRequests; index as i"
-       [ngClass]="{ activeRequest: queueItem.isActive }">
-    <div class="text-4xl w-10 text-center justify-center">{{ queueItem.requestOrder }}</div>
-    <div class="w-2/5">
-      <div class="songTitle">{{ queueItem.song.title }}</div>
-      <div class="songArtist">{{ queueItem.song.artist }}</div>
-      <div class="songMapper">({{ queueItem.song.mapper }})</div>
-    </div>
-    <div class="songLength">{{ queueItem.song.duration }}</div>
-    <div class="requester">{{ queueItem.requesterName }}</div>
-    <div class="localState">
+
+<table cdkDropList (cdkDropListDropped)="drop($event)" class="m-2 border-spacing-5">
+  <tr class="">
+    <th></th>
+    <th>Song</th>
+    <th>Length</th>
+    <th>Requester</th>
+    <th>Local</th>
+    <th></th>
+  </tr>
+  <tr cdkDrag class="border border-gray-500" *ngFor="let queueItem of songRequests; index as i" [ngClass]="{ 'bg-green': queueItem.isActive }">
+    <td class="w-24 text-center text-2xl text-white bg-gray-500">
+      {{ queueItem.requestOrder }}
+    </td>
+    <td class="w-1/3 min-w-min pl-5">
+      <div class="text-xl">{{ queueItem.song.title }}</div>
+      <div>{{ queueItem.song.artist }}</div>
+      <div>({{ queueItem.song.mapper }})</div>
+    </td>
+    <td class="w-12 text-right">
+      {{ queueItem.song.duration }}
+    </td>
+    <td class="w-48 text-center">
+      {{ queueItem.requesterName }}
+    </td>
+    <td class="w-48">
       <app-local-song-status [song]="queueItem.song" [songState]="downloadedSongStatus.get(queueItem.song.id)" />
-    </div>
-    <div class="controls">
+    </td>
+    <td class="flex">
       <div>
         <button (click)="setSongRequestActive(queueItem.id)" title="Set as active song">
           <mat-icon>play_circle</mat-icon>
         </button>
       </div>
-      <div class="markPlayed" title="Set song played and remove from queue">
+      <div title="Set song played and remove from queue">
         <button>
           <mat-icon>done</mat-icon>
         </button>
       </div>
-      <div class="deleteRequest">
+      <div>
         <button (click)="deleteSongRequest(queueItem.id)" title="Delete song from queue">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
-    </div>
-  </div>
-</div>
+    </td>
+  </tr>
+</table>
+
+
+
+
+<!--<div class="flex border-b-2 border-black text-xl font-bold">-->
+<!--  <div class="w-10"></div>-->
+<!--  <div class="w-2/5">Song</div>-->
+<!--  <div class="">Length</div>-->
+<!--  <div class="requesterHeading">Requester</div>-->
+<!--  <div class="localStateHeading">Local</div>-->
+<!--  <div class="controlsHeading"></div>-->
+<!--</div>-->
+<!--<div cdkDropList (cdkDropListDropped)="drop($event)" class="requestList">-->
+<!--  <div cdkDrag class="requestLine" *ngFor="let queueItem of songRequests; index as i"-->
+<!--       [ngClass]="{ activeRequest: queueItem.isActive }">-->
+<!--    <div class="text-4xl w-10 text-center justify-center">{{ queueItem.requestOrder }}</div>-->
+<!--    <div class="w-2/5">-->
+<!--      <div class="songTitle">{{ queueItem.song.title }}</div>-->
+<!--      <div class="songArtist">{{ queueItem.song.artist }}</div>-->
+<!--      <div class="songMapper">({{ queueItem.song.mapper }})</div>-->
+<!--    </div>-->
+<!--    <div class="songLength">{{ queueItem.song.duration }}</div>-->
+<!--    <div class="requester">{{ queueItem.requesterName }}</div>-->
+<!--    <div class="localState">-->
+<!--      <app-local-song-status [song]="queueItem.song" [songState]="downloadedSongStatus.get(queueItem.song.id)" />-->
+<!--    </div>-->
+<!--    <div class="controls">-->
+<!--      <div>-->
+<!--        <button (click)="setSongRequestActive(queueItem.id)" title="Set as active song">-->
+<!--          <mat-icon>play_circle</mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <div class="markPlayed" title="Set song played and remove from queue">-->
+<!--        <button>-->
+<!--          <mat-icon>done</mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <div class="deleteRequest">-->
+<!--        <button (click)="deleteSongRequest(queueItem.id)" title="Delete song from queue">-->
+<!--          <mat-icon>delete</mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
 

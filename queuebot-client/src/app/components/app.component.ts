@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -14,8 +14,14 @@ import { WebsocketService } from '../services/websocket.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'queuebot-client';
 
   constructor() {}
+
+  ngOnInit() {
+    // This triggers dark mode for tailwind, using CSS classes that have the dark: prefix.
+    // FIXME: Implement a switch "somewhere" for this.
+    // window.document.documentElement.classList.add('dark');
+  }
 }

@@ -1,0 +1,8 @@
+<table class="">
+  <tr *ngFor="let songRequest of songRequests; index as i" >
+    <td class="text-xl bg-slate-800 text-white font-bold p-2">{{ i + 1 }}</td>
+    <td class="px-5 bg-slate-600 text-white">{{ songRequest.song.title }}</td>
+    <td class="px-5 bg-slate-600 text-white" >{{ songRequest.song.artist }}</td>
+    <td class="px-5 bg-slate-600 text-white">{{ songRequest.song.mapper }}</td>
+  </tr>
+</table>

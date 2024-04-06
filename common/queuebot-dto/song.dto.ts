@@ -9,4 +9,5 @@ export interface SongDto {
   downloadUrl?: string;
   fileReference?: string;
   gameName: string;
+  coverArtUrl?: string;
 }

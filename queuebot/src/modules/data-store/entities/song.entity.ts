@@ -37,6 +37,9 @@ export class Song {
   @Column({ nullable: true })
   downloadUrl?: string;
 
+  @Column({ nullable: true })
+  coverArtUrl?: string;
+
   /**
    * If available, stores a reference of some sort (dependent on the source) that can
    * be used by a downloader to determine whether or not to download the song. (ex: auto-download song on request)
