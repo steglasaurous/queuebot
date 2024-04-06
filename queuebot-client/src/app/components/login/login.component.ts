@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import { SettingsService } from '../../services/settings.service';
 import { WindowWithElectron } from '../../models/window.global';
 import { QUEUEBOT_API_BASE_URL } from '../../app.config';
+import { ButtonPrimaryComponent } from '../button-primary/button-primary.component';
 
 declare let window: WindowWithElectron;
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [QueueListComponent],
+  imports: [QueueListComponent, ButtonPrimaryComponent],
   providers: [],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',

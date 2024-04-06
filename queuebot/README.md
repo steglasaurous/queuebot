@@ -12,12 +12,12 @@
 - [x] Server: Implement change channel settings API
 - [x] UI: Implement ability to open or close the queue from interface
 - [x] UI: Implement ability to change game from interface
-- [ ] UI: Implement showing downloaded status of each song (not downloaded, download progress, present locally)
-- [ ] UI: Create an installable package, test on a new machine
-- [ ] Deploy server changes to production
+- [x] UI: Implement showing downloaded status of each song (not downloaded, download progress, present locally)
+- [x] UI: Create an installable package, test on a new machine
+- [x] Deploy server changes to production
 
 ## Next
-
+- [ ] Add 
 - [ ] Implement missing unit and e2e tests
 - [ ] Server: Implement song-requests POST to create new song request via API
 - [ ] Server: Implement songs GET to search for songs
