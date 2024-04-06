@@ -37,6 +37,7 @@ export class SongService {
     bpm?: number,
     duration?: number,
     fileReference?: string,
+    coverArtUrl?: string,
   ): Song {
     if (!hash) {
       hash = crypto
@@ -55,6 +56,7 @@ export class SongService {
     song.bpm = bpm;
     song.duration = duration;
     song.fileReference = fileReference;
+    song.coverArtUrl = coverArtUrl;
 
     return song;
   }
@@ -82,7 +84,7 @@ export class SongService {
       existingSong.downloadUrl = song.downloadUrl;
       existingSong.bpm = song.bpm;
       existingSong.duration = song.duration;
-
+      existingSong.coverArtUrl = song.coverArtUrl;
       return await this.songRepository.save(existingSong);
     }
 

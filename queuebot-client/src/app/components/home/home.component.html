@@ -1,4 +1,4 @@
-<div class="flex flex-row">
+<div class="flex flex-row dark:bg-slate-800">
   <div>
     <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400 text-2xl" (click)="nextSong()" [disabled]="nextSongDisabled">Next Song</button>
   </div>
@@ -12,6 +12,6 @@
     {{ channelName }} <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400" (click)="logout()">Logout</button>
   </div>
 </div>
-<div>
+<div class="flex justify-center">
   <app-queue-list *ngIf="channelName != ''" [channelName]="channelName"></app-queue-list>
 </div>

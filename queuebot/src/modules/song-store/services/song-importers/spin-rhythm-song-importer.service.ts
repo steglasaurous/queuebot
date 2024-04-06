@@ -9,6 +9,7 @@ import { SongService } from '../song.service';
 @Injectable()
 export class SpinRhythmSongImporterService implements SongImporter {
   gameName = 'spin_rhythm';
+  // FIXME: Shouldn't rely on this in perpetuity - it's marked as deprecated on the spinsha.re site.
   private spinshareSearchAllUrl = 'https://spinsha.re/api/searchAll';
 
   constructor(
@@ -35,6 +36,7 @@ export class SpinRhythmSongImporterService implements SongImporter {
                 undefined,
                 undefined,
                 parsedSong.fileReference,
+                parsedSong.cover,
               ),
             );
           }
