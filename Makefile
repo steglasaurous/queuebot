@@ -1,6 +1,6 @@
-build-dev: queuebot/dist queuebot-client/dist queuebot/.env
+build-dev: queuebot/dist queuebot-client/dist queuebot-overlay/dist queuebot/.env
 
-build: queuebot/dist queuebot-client/dist
+build: queuebot/dist queuebot-client/dist queuebot-overlay/dist
 
 rebuild: queuebot/node_modules queuebot-client/node_modules
 	rm -rf queuebot/dist queuebot-client/dist queuebot/.env queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts
@@ -21,6 +21,15 @@ queuebot-client/dist: common/index.d.ts queuebot-client/node_modules queuebot-cl
 
 queuebot-client/node_modules: queuebot-client/package.json queuebot-client/package-lock.json
 	cd queuebot-client && npm ci
+
+queuebot-overlay/dist: common/index.d.ts queuebot-overlay/node_modules queuebot-overlay/src/environments/environment.ts
+	cd queuebot-overlay && npm run build
+
+queuebot-overlay/node_modules: queuebot-client/package.json queuebot-client/package-lock.json
+	cd queuebot-overlay && npm ci
+
+queuebot-overlay/src/environments/environment.ts: .env queuebot-overlay/src/environments/environment.ts.dist
+	export $$(cat .env | xargs) && envsubst < queuebot-overlay/src/environments/environment.ts.dist > queuebot-overlay/src/environments/environment.ts
 
 common/index.d.ts: common/node_modules common/index.ts
 	cd common && npx tsc -p ./tsconfig.json

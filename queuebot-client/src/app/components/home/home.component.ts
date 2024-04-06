@@ -8,11 +8,12 @@ import { ChannelDto } from '../../../../../common';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeGameComponent } from '../change-game/change-game.component';
+import { ButtonPrimaryComponent } from '../button-primary/button-primary.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [QueueListComponent, NgIf, MatSlideToggle],
+  imports: [QueueListComponent, NgIf, MatSlideToggle, ButtonPrimaryComponent],
   providers: [],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

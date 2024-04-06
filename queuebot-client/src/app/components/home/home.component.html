@@ -1,9 +1,9 @@
 <div class="flex flex-row dark:bg-slate-800">
   <div>
-    <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400 text-2xl" (click)="nextSong()" [disabled]="nextSongDisabled">Next Song</button>
+    <app-button-primary (click)="nextSong()" [disabled]="nextSongDisabled">Next Song</app-button-primary>
   </div>
   <div>
-    <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400" (click)="showChangeGameModal()">{{ channel.game.displayName }}</button>
+    <app-button-primary (click)="showChangeGameModal()">{{ channel.game.displayName }}</app-button-primary>
   </div>
   <div class="pr-5">
     <mat-slide-toggle [checked]="channel.queueOpen" (change)="toggleQueueOpen()">Open Queue</mat-slide-toggle>
