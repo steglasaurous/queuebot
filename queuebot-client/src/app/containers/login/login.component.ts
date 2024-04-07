@@ -79,6 +79,7 @@ export class LoginComponent implements OnInit {
   }
 
   submitAuthCodeForm() {
+    console.log(this.formGroup.value);
     if (this.formGroup.value.authCode != undefined) {
       this.submitAuthCode(this.formGroup.value.authCode);
     }
