@@ -1,0 +1,7 @@
+<input
+  type="text"
+  [(ngModel)]="value"
+  [disabled]="disabled"
+  (input)="change(value)"
+  (blur)="touched()"
+/>
