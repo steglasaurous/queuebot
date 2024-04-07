@@ -16,8 +16,11 @@
 - [x] UI: Create an installable package, test on a new machine
 - [x] Deploy server changes to production
 
-## Next
-- [ ] Add 
+## Next 
+- [ ] UI: Add album art to queue list, if available
+- [ ] UI Tailwind: Login container: Style form with input textbox, display only when electron isn't available
+  - Look at using proper angular form handling along with a custom input component
+- [ ] 
 - [ ] Implement missing unit and e2e tests
 - [ ] Server: Implement song-requests POST to create new song request via API
 - [ ] Server: Implement songs GET to search for songs

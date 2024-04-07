@@ -10,6 +10,9 @@ export class ButtonPrimaryComponent {
   @Input()
   disabled: boolean = false;
 
+  @Input()
+  type: 'submit' | 'reset' | 'button' = 'button';
+
   @Output()
   click: EventEmitter<any> = new EventEmitter();
   clicked() {

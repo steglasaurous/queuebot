@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { SettingsService } from '../services/settings.service';
-import { QueuebotApiService } from '../services/queuebot-api.service';
-import { WebsocketService } from '../services/websocket.service';
+import { SettingsService } from '../../services/settings.service';
+import { QueuebotApiService } from '../../services/queuebot-api.service';
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,6 @@ import { WebsocketService } from '../services/websocket.service';
   imports: [CommonModule, RouterOutlet, HttpClientModule],
   providers: [SettingsService, QueuebotApiService, WebsocketService],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit {
   title = 'queuebot-client';
