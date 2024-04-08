@@ -9,14 +9,22 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeGameComponent } from '../../components/change-game/change-game.component';
 import { ButtonPrimaryComponent } from '../../components/button-primary/button-primary.component';
+import { InputTextComponent } from '../../components/input-text/input-text.component';
+import { MatAutocomplete } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [QueueListComponent, NgIf, MatSlideToggle, ButtonPrimaryComponent],
+  imports: [
+    QueueListComponent,
+    NgIf,
+    MatSlideToggle,
+    ButtonPrimaryComponent,
+    InputTextComponent,
+    MatAutocomplete,
+  ],
   providers: [],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
 })
 export class HomeComponent {
   channelName: string = '';
@@ -90,6 +98,7 @@ export class HomeComponent {
   }
 
   showChangeGameModal() {
+    console.log('open modal');
     const dialogRef = this.dialog.open(ChangeGameComponent, {
       data: { gameId: 0 },
     });
