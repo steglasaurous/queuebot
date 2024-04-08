@@ -12,10 +12,4 @@ export class ButtonPrimaryComponent {
 
   @Input()
   type: 'submit' | 'reset' | 'button' = 'button';
-
-  @Output()
-  click: EventEmitter<any> = new EventEmitter();
-  clicked() {
-    this.click.emit();
-  }
 }

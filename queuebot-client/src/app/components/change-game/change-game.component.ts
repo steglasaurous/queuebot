@@ -9,7 +9,6 @@ import { NgFor } from '@angular/common';
   standalone: true,
   imports: [NgFor],
   templateUrl: './change-game.component.html',
-  styleUrl: './change-game.component.css',
 })
 export class ChangeGameComponent {
   games: GameDto[] = [];

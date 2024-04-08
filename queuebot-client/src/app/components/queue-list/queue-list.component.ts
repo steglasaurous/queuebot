@@ -50,7 +50,6 @@ declare let window: WindowWithElectron;
   ],
   providers: [],
   templateUrl: './queue-list.component.html',
-  styleUrl: './queue-list.component.css',
 })
 export class QueueListComponent implements OnInit {
   @Input()
