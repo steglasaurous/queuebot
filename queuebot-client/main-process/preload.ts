@@ -1,21 +1,14 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { SongDto } from '../../common';
-// import {
-//   IPC_OPEN_TWITCH_LOGIN,
-//   IPC_SETTINGS_GET_VALUE,
-//   IPC_SETTINGS_SET_VALUE,
-// } from './constants';
-
-// FIXME: Doing the import above fails - would be ideal to keep these in one place
-const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
-const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
-const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
-const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
-const IPC_SETTINGS_DELETE_VALUE = 'settings.deleteValue';
-const IPC_SONG_DOWNLOADER_PROCESS_SONG_PROGRESS =
-  'songDownloader.processSongProgress';
-
-export const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
+import {
+  IPC_OPEN_TWITCH_LOGIN,
+  IPC_PROTOCOL_HANDLER,
+  IPC_SETTINGS_DELETE_VALUE,
+  IPC_SETTINGS_GET_VALUE,
+  IPC_SETTINGS_SET_VALUE,
+  IPC_SONG_DOWNLOADER_PROCESS_SONG,
+  IPC_SONG_DOWNLOADER_PROCESS_SONG_PROGRESS,
+} from './constants';
 
 contextBridge.exposeInMainWorld('settings', {
   setValue: (key: string, value: string) =>

@@ -1,23 +1,21 @@
 # Development
 
-To run electron app: `make start-client`
+To run electron app, from the root of the repository run: `make start-client`
 
-To run in a browser with ng serve:
+To run in a browser with ng serve, first run `make build` to ensure all dependencies are installed, then: 
 
-1. Start the electron app
-2. Login to twitch
-3. Open dev tools in electron app, get JWT from network request cookie
-4. Start client with `ng serve --open` which will open a browser
-5. In browser, add keys to localStorage:
+1. `cd queuebot-client`
+2. `npx ng serve`
 
-| key              | contents should be...  |
-|------------------|------------------------|
-| setting:jwt      | JWT copied from cookie |
-| setting:username | twitch username        |
+# How the client is organized
 
-6. Refresh browser page
+```
+/
+  -- main-process                  Electron-specific code
+    -- downloader/                 Auto-downloader code
+      -- handlers/                 Game-specific download handlers.  Implement the DownloadHandler interface to create a new one.
+      -- song-downloader.ts        Song downloader service - handles finding the right handler to process a song for download
+    -- 
 
-# Todo
 
-- [ ] Implement method of auth that works with electron AND browser
-
+```
