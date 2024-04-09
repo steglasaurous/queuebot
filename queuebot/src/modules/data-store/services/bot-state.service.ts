@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserBotState } from '../../data-store/entities/user-bot-state.entity';
+import { UserBotState } from '../entities/user-bot-state.entity';
 import { Repository } from 'typeorm';
-import { Channel } from '../../data-store/entities/channel.entity';
+import { Channel } from '../entities/channel.entity';
 
 @Injectable()
 export class BotStateService {

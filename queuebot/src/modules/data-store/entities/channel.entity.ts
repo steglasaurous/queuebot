@@ -2,6 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { SongRequest } from './song-request.entity';
 import { UserBotState } from './user-bot-state.entity';
 import { Game } from './game.entity';
+import { SongBan } from './song-ban.entity';
 
 @Entity()
 export class Channel {
@@ -54,4 +55,7 @@ export class Channel {
    */
   @Column({ default: 'en' })
   lang: string;
+
+  @OneToMany(() => SongBan, (songBan) => songBan.channel)
+  songBans: SongBan[];
 }

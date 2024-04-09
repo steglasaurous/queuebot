@@ -6,9 +6,7 @@
 
 ## First
 
-- [ ] UI: Style up game change dialog
-- [ ] UI: Change purple buttons to something else
-- [ ] UI: Request order number - use incrementing number, NOT the actual order number
+- [x] UI: Request order number - use incrementing number, NOT the actual order number
 - [ ] Server: Implement banned song list - songs that cannot be queued
 - [ ] Overlay: Add highlight of what the current song is
 - [ ] UI: Add button to change queue strategy
@@ -19,6 +17,8 @@
 - [ ] Server: Importers: Only report new songs imported, vs total songs
 - [ ] Spin rhythm importer: Implement song downloader to read duration and BPM data (or use API?)
 - [ ] UI: Implement total queue length display (in mm:ss)
+- [ ] UI: Style up game change dialog
+- [ ] UI: Change purple buttons to something else
 
 ## Next
 

@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataStoreModule } from '../data-store/data-store.module';
 import { Channel } from '../data-store/entities/channel.entity';
-import { BotStateService } from './services/bot-state.service';
+import { BotStateService } from '../data-store/services/bot-state.service';
 import { SongRequestBotCommand } from './commands/song-request.bot-command';
 import { SongStoreModule } from '../song-store/song-store.module';
 import { JoinChannelsOnConnectListener } from './listeners/join-channels-on-connect.listener';
@@ -30,6 +30,7 @@ import {
 import { Metrics } from './models/metrics.enum';
 import { RbsetBotCommand } from './commands/rbset.bot-command';
 import { RemoveBotCommand } from './commands/remove.bot-command';
+import { BanSongBotCommand } from './commands/ban-song.bot-command';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { RemoveBotCommand } from './commands/remove.bot-command';
     CloseBotCommand,
     RbsetBotCommand,
     RemoveBotCommand,
+    BanSongBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -80,6 +82,7 @@ import { RemoveBotCommand } from './commands/remove.bot-command';
         CloseBotCommand,
         RbsetBotCommand,
         RemoveBotCommand,
+        BanSongBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -96,6 +99,7 @@ import { RemoveBotCommand } from './commands/remove.bot-command';
         closeBotCommand: CloseBotCommand,
         rbSetCommand: RbsetBotCommand,
         removeBotCommand: RemoveBotCommand,
+        banSongBotCommand: BanSongBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -112,6 +116,7 @@ import { RemoveBotCommand } from './commands/remove.bot-command';
           closeBotCommand,
           rbSetCommand,
           removeBotCommand,
+          banSongBotCommand,
         ];
       },
     },

@@ -68,10 +68,7 @@ import { DanceDashSongImporterService } from './services/song-importers/dance-da
     {
       provide: SONG_SEARCH_STRATEGIES,
       inject: [LocalStrategy, SpinRhythmSearchStrategy],
-      useFactory: (
-        localStrategy: LocalStrategy,
-        spinRhythmStrategy: SpinRhythmSearchStrategy,
-      ) => {
+      useFactory: (localStrategy: LocalStrategy) => {
         // Add back spinRhythmStrategy to this array to query the spinsha.re API directly.
         return [localStrategy];
       },
