@@ -6,6 +6,8 @@
 
 ## First
 
+- [ ] UI: Style up game change dialog
+- [ ] UI: Change purple buttons to something else
 - [ ] UI: Request order number - use incrementing number, NOT the actual order number
 - [ ] Server: Implement banned song list - songs that cannot be queued
 - [ ] Overlay: Add highlight of what the current song is
