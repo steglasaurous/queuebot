@@ -12,16 +12,12 @@
     {{ channelName }} <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400" (click)="logout()">Logout</button>
   </div>
 </div>
-<div>
-  <div>
+<div class="flex flex-row justify-center items-center">
+  <label class="pr-2">
     Search:
-  </div>
-  <div>
-    <app-input-text></app-input-text>
-  </div>
-  <div>
-    <app-button-primary>Add to Queue</app-button-primary>
-  </div>
+  </label>
+  <app-input-text class="w-96"></app-input-text>
+  <app-button-primary>Add to Queue</app-button-primary>
 </div>
 <div class="flex justify-center">
   <app-queue-list *ngIf="channelName != ''" [channelName]="channelName"></app-queue-list>
