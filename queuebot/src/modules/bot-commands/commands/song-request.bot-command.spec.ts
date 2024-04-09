@@ -8,7 +8,7 @@ import {
   getMockChatMessage,
   getSampleSong,
 } from '../../../../test/helpers';
-import { BotStateService } from '../services/bot-state.service';
+import { BotStateService } from '../../data-store/services/bot-state.service';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { SongService } from '../../song-store/services/song.service';

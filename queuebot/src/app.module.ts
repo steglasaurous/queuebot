@@ -26,7 +26,6 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ConfigModule.forRoot(),
     BotCommandsModule,
     TypeOrmModule.forRoot(typeORMAppConfig),
-    SongStoreModule,
     ScheduleModule.forRoot(),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
@@ -39,6 +38,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
         AcceptLanguageResolver,
       ],
     }),
+    SongStoreModule,
     SongRequestModule,
     WebsocketModule,
     ApiModule,
@@ -47,6 +47,5 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     MetricsModule,
   ],
   controllers: [AppController],
-  providers: [],
 })
 export class AppModule {}

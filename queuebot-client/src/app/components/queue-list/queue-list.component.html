@@ -9,7 +9,7 @@
   </tr>
   <tr cdkDrag class="border border-gray-500" *ngFor="let queueItem of songRequests; index as i" [ngClass]="{ 'bg-green': queueItem.isActive }">
     <td class="w-24 text-center text-2xl text-white bg-gray-500">
-      {{ queueItem.requestOrder }}
+      {{ i + 1 }}
     </td>
     <td class="w-1/3 min-w-min pl-5">
       <div class="text-xl">{{ queueItem.song.title }}</div>

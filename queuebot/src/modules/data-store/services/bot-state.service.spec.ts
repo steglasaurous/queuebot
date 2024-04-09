@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BotStateService } from './bot-state.service';
 import { getGenericNestMock } from '../../../../test/helpers';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Channel } from '../../data-store/entities/channel.entity';
-import { UserBotState } from '../../data-store/entities/user-bot-state.entity';
+import { Channel } from '../entities/channel.entity';
+import { UserBotState } from '../entities/user-bot-state.entity';
 
 describe('BotStateService', () => {
   let service: BotStateService;

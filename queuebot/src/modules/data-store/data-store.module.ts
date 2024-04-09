@@ -12,6 +12,8 @@ import { UserAuthSource } from './entities/user-auth-source.entity';
 import { SettingService } from './services/setting.service';
 import { SettingDefinition } from './entities/setting-definition.entity';
 import { Setting } from './entities/setting.entity';
+import { SongBan } from './entities/song-ban.entity';
+import { BotStateService } from './services/bot-state.service';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { Setting } from './entities/setting.entity';
       Game,
       Song,
       SongRequest,
+      SongBan,
       UserBotState,
       User,
       UserAuthSource,
@@ -27,7 +30,13 @@ import { Setting } from './entities/setting.entity';
       SettingDefinition,
     ]),
   ],
-  exports: [TypeOrmModule, DtoMappingService, UserService, SettingService],
-  providers: [DtoMappingService, UserService, SettingService],
+  exports: [
+    TypeOrmModule,
+    DtoMappingService,
+    UserService,
+    SettingService,
+    BotStateService,
+  ],
+  providers: [DtoMappingService, UserService, SettingService, BotStateService],
 })
 export class DataStoreModule {}
