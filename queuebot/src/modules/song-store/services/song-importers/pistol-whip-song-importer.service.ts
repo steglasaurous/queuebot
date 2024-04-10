@@ -26,11 +26,18 @@ export class PistolWhipSongImporterService implements SongImporter {
   gameName = 'pistol_whip';
 
   importSongs(): Promise<number> {
-    return new Promise<number>(async (resolve) => {
+    return new Promise<number>(async (resolve, reject) => {
       const game = await this.gameRepository.findOneBy({ name: this.gameName });
       let songCount = 0;
 
-      const data = await this.modIoApiService.getModsForGame(4407);
+      let data;
+      try {
+        data = await this.modIoApiService.getModsForGame(4407);
+      } catch (e) {
+        reject(e);
+        return;
+      }
+
       for (const dataPage of data) {
         for (const dataItem of dataPage.data) {
           const existingSong = await this.songService.getSongBySongHash(

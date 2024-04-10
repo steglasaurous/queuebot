@@ -19,11 +19,18 @@ export class SongImporterManagerService implements OnApplicationBootstrap {
       this.logger.log('Executing song importer', {
         importerName: importer.constructor.name,
       });
-      const songsImported = await importer.importSongs();
-      this.logger.log('Song importer done', {
-        importer: importer.constructor.name,
-        songsImported: songsImported,
-      });
+      try {
+        const songsImported = await importer.importSongs();
+        this.logger.log('Song importer done', {
+          importer: importer.constructor.name,
+          songsImported: songsImported,
+        });
+      } catch (e) {
+        this.logger.warn('Song importer failed', {
+          importer: importer.constructor.name,
+          error: e,
+        });
+      }
     }
   }
 

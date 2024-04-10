@@ -19,11 +19,10 @@ export class SpinRhythmSongImporterService implements SongImporter {
   ) {}
 
   importSongs(): Promise<number> {
-    return new Promise<number>(async (resolve) => {
+    return new Promise<number>(async (resolve, reject) => {
       const game = await this.gameRepository.findOneBy({ name: this.gameName });
-      this.httpService
-        .get(this.spinshareSearchAllUrl)
-        .subscribe(async (response) => {
+      this.httpService.get(this.spinshareSearchAllUrl).subscribe({
+        next: async (response) => {
           for (const parsedSong of response.data.data.songs) {
             await this.songService.saveSong(
               this.songService.createSongEntity(
@@ -41,7 +40,11 @@ export class SpinRhythmSongImporterService implements SongImporter {
             );
           }
           resolve(response.data.data.songs.length);
-        });
+        },
+        error: (e) => {
+          reject(e);
+        },
+      });
     });
   }
 }
