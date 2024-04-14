@@ -5,14 +5,10 @@ import {
   getMockChatMessage,
   getSampleSong,
 } from '../../../../test/helpers';
-import { ClearBotCommand } from './clear.bot-command';
-import { SongRequestService } from '../../song-request/services/song-request.service';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { ChatMessage } from '../../chat/services/chat-message';
 import { I18nService } from 'nestjs-i18n';
-import { BanSongBotCommand } from './ban-song.bot-command';
 import { SongService } from '../../song-store/services/song.service';
-import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 import { BanSongRemoveBotCommand } from './ban-song-remove.bot-command';
 import { SongBan } from '../../data-store/entities/song-ban.entity';
 
@@ -141,6 +137,18 @@ describe('Ban song remove bot command', () => {
     const response = await service.execute(channel, chatMessage);
     expect(response).toEqual('chat.RemoveFromBanListError');
     expect(i18nMock.t).toHaveBeenCalledWith('chat.RemoveFromBanListError', {
+      lang: 'en',
+    });
+  });
+  it('should report an error if search threw an exception', async () => {
+    chatMessage.userIsBroadcaster = true;
+
+    // The error can vary since at the moment, the search itself doesn't specifically return
+    // a rejection - this would be a thrown error likely from TypeORM.
+    songServiceMock.searchSongs.mockRejectedValue({ error: true });
+    const response = await service.execute(channel, chatMessage);
+    expect(response).toEqual('chat.SearchErrorTryAgain');
+    expect(i18nMock.t).toHaveBeenCalledWith('chat.SearchErrorTryAgain', {
       lang: 'en',
     });
   });

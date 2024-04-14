@@ -3,6 +3,7 @@ import { SongService } from './song.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Song } from '../../data-store/entities/song.entity';
 import { SONG_SEARCH_STRATEGIES } from '../injection-tokens';
+import { getGenericNestMock } from '../../../../test/helpers';
 
 describe('SongServiceService', () => {
   let service: SongService;
@@ -22,7 +23,11 @@ describe('SongServiceService', () => {
           useValue: [],
         },
       ],
-    }).compile();
+    })
+      .useMocker((token) => {
+        return getGenericNestMock(token);
+      })
+      .compile();
 
     service = module.get<SongService>(SongService);
   });
