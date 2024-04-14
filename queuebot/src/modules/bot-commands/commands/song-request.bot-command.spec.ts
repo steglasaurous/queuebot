@@ -12,12 +12,10 @@ import { BotStateService } from '../../data-store/services/bot-state.service';
 import { I18nService } from 'nestjs-i18n';
 import { SongRequestService } from '../../song-request/services/song-request.service';
 import { SongService } from '../../song-store/services/song.service';
-import { UserBotState } from '../../data-store/entities/user-bot-state.entity';
 import { SongRequestErrorType } from '../../song-request/models/song-request-error-type.enum';
 
 describe('SongRequestBotCommand', () => {
   let service: SongRequestBotCommand;
-  let botStateService;
   let i18n;
   let songRequestService;
   let songService;
@@ -145,81 +143,6 @@ describe('SongRequestBotCommand', () => {
   });
 
   // FIXME: Move these tests into tests for songService, as that functionality now exists there.
-
-  // it('should show x more songs if there are more than 5 songs in the results', async () => {
-  //   const songResults = [];
-  //   let expectedResponse = 'chat.SelectSong';
-  //
-  //   for (let i = 1; i <= 6; i++) {
-  //     songResults.push(getSampleSong(i));
-  //     if (i < 6) {
-  //       expectedResponse += `#${i} title_${i} - artist_${i} (mapper_${i}) `;
-  //     }
-  //   }
-  //   expectedResponse += 'chat.AndMore';
-  //
-  //   songService.searchSongs.mockReturnValue(songResults);
-  //   const response = await service.execute(channel, chatMessage);
-  //   expect(response).toEqual(expectedResponse);
-  //   expect(i18n.t).toHaveBeenCalledWith('chat.SelectSong', { lang: 'en' });
-  //   expect(i18n.t).toHaveBeenCalledWith('chat.AndMore', {
-  //     lang: 'en',
-  //     args: { songsRemaining: 1 },
-  //   });
-  // });
-
-  // it('should add a song from a previous search by # to the request queue', async () => {
-  //   const songResults = [getSampleSong(1), getSampleSong(2)];
-  //   const botState: UserBotState = {
-  //     id: 1,
-  //     requesterName: 'someuser',
-  //     channel: channel,
-  //     state: { lastQueryResults: songResults },
-  //     timestamp: new Date(),
-  //   };
-  //
-  //   botStateService.getState.mockReturnValue(botState);
-  //   songRequestService.addRequest.mockReturnValue({
-  //     success: true,
-  //   });
-  //
-  //   chatMessage.message = '!req #1';
-  //
-  //   const response = await service.execute(channel, chatMessage);
-  //   expect(response).toEqual('chat.SongAddedToQueue');
-  //   expect(i18n.t).toHaveBeenCalledWith('chat.SongAddedToQueue', {
-  //     lang: 'en',
-  //     args: {
-  //       title: songResults[0].title,
-  //       artist: songResults[0].artist,
-  //       mapper: songResults[0].mapper,
-  //     },
-  //   });
-  // });
-
-  // it('should return no songs found if an incorrect # is requested from a previous search', async () => {
-  //   const songResults = [getSampleSong(1), getSampleSong(2)];
-  //   const botState: UserBotState = {
-  //     id: 1,
-  //     requesterName: 'someuser',
-  //     channel: channel,
-  //     state: { lastQueryResults: songResults },
-  //     timestamp: new Date(),
-  //   };
-  //
-  //   botStateService.getState.mockReturnValue(botState);
-  //   songRequestService.addRequest.mockReturnValue({
-  //     success: true,
-  //   });
-  //
-  //   chatMessage.message = '!req #8';
-  //
-  //   const response = await service.execute(channel, chatMessage);
-  //   expect(response).toEqual('chat.NoSongsFound');
-  //   expect(i18n.t).toHaveBeenCalledWith('chat.NoSongsFound', {
-  //     lang: 'en',
-  //   });
-  // });
 
   it('should send a message that the song is already in the queue', async () => {
     const song = getSampleSong(1);
