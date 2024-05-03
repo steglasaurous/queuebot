@@ -24,7 +24,8 @@
       up into 2 separate messages, without the ! in front on the 2nd message.
 - [ ] When removing the active song with remove function, makr the next song as active and emit "up next" message
 - [ ] Add !commands to list commands?  Or link to site with details
-
+- [ ] Add handling to allow client to stay logged in over a long period of time.
+- [ ] Explore "song ban timeouts" - where a song is banned for a period of time
 ## Next
 
 - [ ] Server: Implement song-requests POST to create new song request via API
