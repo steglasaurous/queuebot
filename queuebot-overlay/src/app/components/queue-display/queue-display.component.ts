@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForOf } from '@angular/common';
+import {NgClass, NgForOf} from '@angular/common';
 import { SongRequestDto } from '../../../../../common';
 import { WebsocketService } from '../../services/websocket.service';
 import { ActivatedRoute } from '@angular/router';
@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
   standalone: true,
   imports: [
     NgForOf,
+    NgClass,
   ],
   templateUrl: './queue-display.component.html',
   styleUrl: './queue-display.component.css'

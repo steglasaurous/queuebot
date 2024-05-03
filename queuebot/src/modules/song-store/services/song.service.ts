@@ -75,6 +75,7 @@ export class SongService {
    *
    * @param lang
    * @param searchResults
+   * FIXME: Consider moving this to its own class?
    */
   getSongSelectionOutput(lang: string = 'en', searchResults: Song[]): string {
     let outputMessage = this.i18n.t('chat.SelectSong', {

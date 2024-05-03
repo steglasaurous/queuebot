@@ -10,7 +10,7 @@ import { Song } from '../../data-store/entities/song.entity';
 import { SongService } from '../../song-store/services/song.service';
 
 @Injectable()
-export class BanSongBotCommand extends BaseBotCommand {
+export class BanSongRemoveBotCommand extends BaseBotCommand {
   private logger: Logger = new Logger();
 
   constructor(
@@ -19,11 +19,11 @@ export class BanSongBotCommand extends BaseBotCommand {
     private songService: SongService,
   ) {
     super();
-    this.triggers = ['!addsongban'];
+    this.triggers = ['!removesongban'];
   }
 
   getDescription(): string {
-    return 'Adds a song to the ban list';
+    return 'Remove a song from the ban list';
   }
 
   async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
@@ -57,25 +57,28 @@ export class BanSongBotCommand extends BaseBotCommand {
     }
 
     if (searchResults.length == 1) {
-      const songBan = new SongBan();
-      songBan.song = searchResults[0];
-      songBan.channel = channel;
+      // Find the song in the ban list.
+      const songBan = await this.songBanRepository.findOneBy({
+        song: searchResults[0],
+        channel: channel,
+      });
 
-      try {
-        await this.songBanRepository.save(songBan);
-      } catch (e) {
-        if (e.code == '23505') {
-          // Assume this is already in the ban list.
-          return this.i18n.t('chat.SongAlreadyInBanList');
-        }
-
-        this.logger.warn('Adding song to ban list threw database error', {
-          e: e,
-        });
-        return this.i18n.t('chat.AddToBanListError', { lang: channel.lang });
+      if (!songBan) {
+        return this.i18n.t('chat.SongNotInBanList', { lang: channel.lang });
       }
 
-      return this.i18n.t('chat.SongAddedToBanList', {
+      try {
+        await this.songBanRepository.remove(songBan);
+      } catch (e) {
+        this.logger.warn('Removing song from ban list threw database error', {
+          e: e,
+        });
+        return this.i18n.t('chat.RemoveFromBanListError', {
+          lang: channel.lang,
+        });
+      }
+
+      return this.i18n.t('chat.SongRemovedFromBanList', {
         lang: channel.lang,
         args: {
           title: searchResults[0].title,

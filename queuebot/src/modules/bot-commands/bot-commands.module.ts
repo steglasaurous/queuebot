@@ -31,6 +31,7 @@ import { Metrics } from './models/metrics.enum';
 import { RbsetBotCommand } from './commands/rbset.bot-command';
 import { RemoveBotCommand } from './commands/remove.bot-command';
 import { BanSongBotCommand } from './commands/ban-song.bot-command';
+import { BanSongRemoveBotCommand } from './commands/ban-song-remove.bot-command';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { BanSongBotCommand } from './commands/ban-song.bot-command';
     RbsetBotCommand,
     RemoveBotCommand,
     BanSongBotCommand,
+    BanSongRemoveBotCommand,
     {
       provide: 'BOT_COMMANDS',
       inject: [
@@ -83,6 +85,7 @@ import { BanSongBotCommand } from './commands/ban-song.bot-command';
         RbsetBotCommand,
         RemoveBotCommand,
         BanSongBotCommand,
+        BanSongRemoveBotCommand,
       ],
       useFactory: (
         joinChannelBotCommand: JoinChannelBotCommand,
@@ -100,6 +103,7 @@ import { BanSongBotCommand } from './commands/ban-song.bot-command';
         rbSetCommand: RbsetBotCommand,
         removeBotCommand: RemoveBotCommand,
         banSongBotCommand: BanSongBotCommand,
+        banSongRemoveBotCommand: BanSongRemoveBotCommand,
       ) => {
         return [
           joinChannelBotCommand,
@@ -117,6 +121,7 @@ import { BanSongBotCommand } from './commands/ban-song.bot-command';
           rbSetCommand,
           removeBotCommand,
           banSongBotCommand,
+          banSongRemoveBotCommand,
         ];
       },
     },

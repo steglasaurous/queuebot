@@ -19,6 +19,11 @@
 - [ ] UI: Implement total queue length display (in mm:ss)
 - [ ] UI: Style up game change dialog
 - [ ] UI: Change purple buttons to something else
+- [ ] UI, API: Dragging a song to position 1 fails to swap it
+- [ ] Server: When returning multiple results, if titles or artists make a message too long, it will break the message 
+      up into 2 separate messages, without the ! in front on the 2nd message.
+- [ ] When removing the active song with remove function, makr the next song as active and emit "up next" message
+- [ ] Add !commands to list commands?  Or link to site with details
 
 ## Next
 
@@ -43,6 +48,7 @@
 - [ ] Server: !rollback - put the last song that was popped off the queue back on top
 - [ ] Server: Add ability to set limits on how many requests can be queued per user, per role, etc.
 - [ ] Idea: Allow adding search filters by difficulty, so streamer can limit difficulty level being requested.
+- [ ] Implement github action to build & run tests in CI
 
 ## Done
 - 

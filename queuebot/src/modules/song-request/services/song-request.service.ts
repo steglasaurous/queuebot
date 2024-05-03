@@ -13,6 +13,7 @@ import { SettingService } from '../../data-store/services/setting.service';
 import { SettingName } from '../../data-store/models/setting-name.enum';
 import { SongRequestQueueChangedEvent } from '../events/song-request-queue-changed.event';
 import { Cron } from '@nestjs/schedule';
+import { SongBan } from '../../data-store/entities/song-ban.entity';
 
 @Injectable()
 export class SongRequestService {
@@ -24,6 +25,7 @@ export class SongRequestService {
     private eventEmitter: EventEmitter2,
     private queueStrategyService: QueueStrategyService,
     private settingService: SettingService,
+    @InjectRepository(SongBan) private songBanRepository: Repository<SongBan>,
   ) {}
 
   async addRequest(
@@ -32,6 +34,19 @@ export class SongRequestService {
     requesterName: string,
   ): Promise<SongRequestResponse> {
     return new Promise<SongRequestResponse>(async (resolve) => {
+      // Before we go any further, check the ban list to ensure this song isn't on it.
+      const bannedSong = await this.songBanRepository.findOneBy({
+        channel: channel,
+        song: song,
+      });
+      if (bannedSong) {
+        resolve({
+          success: false,
+          errorType: SongRequestErrorType.SONG_IS_BANNED,
+        });
+        return;
+      }
+
       let savedSong: Song;
       if (!song.id) {
         // If the song hasn't been persisted to database, do that first.

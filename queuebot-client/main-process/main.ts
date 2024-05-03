@@ -22,7 +22,7 @@ import {
 } from './constants';
 
 const settingsService = new SettingsStoreService(
-  path.join(__dirname, 'settings.json'),
+  app.getPath('userData') + path.sep + 'settings.json',
 );
 
 let win: BrowserWindow | null;

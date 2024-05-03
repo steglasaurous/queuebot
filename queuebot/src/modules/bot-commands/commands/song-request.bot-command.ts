@@ -103,6 +103,12 @@ export class SongRequestBotCommand extends BaseBotCommand {
         return this.i18n.t('chat.SongAlreadyPlayed', {
           lang: channel.lang,
         });
+      } else if (
+        requestResult.errorType == SongRequestErrorType.SONG_IS_BANNED
+      ) {
+        return this.i18n.t('chat.SongIsBanned', {
+          lang: channel.lang,
+        });
       } else {
         return this.i18n.t('chat.SongRequestFailed', {
           lang: channel.lang,
