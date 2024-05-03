@@ -52,6 +52,8 @@ start-server: queuebot/.env queuebot/node_modules
 start-client: queuebot-client/src/environments/environment.ts queuebot-client/main-process/environment.ts queuebot-client/node_modules
 	cd queuebot-client && npm run electron-tsc-dev
 
+test:
+	cd queuebot && npm run test:cov
 
 clean:
 	rm -rf \

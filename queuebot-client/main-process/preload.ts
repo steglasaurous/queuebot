@@ -1,14 +1,26 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { SongDto } from '../../common';
-import {
-  IPC_OPEN_TWITCH_LOGIN,
-  IPC_PROTOCOL_HANDLER,
-  IPC_SETTINGS_DELETE_VALUE,
-  IPC_SETTINGS_GET_VALUE,
-  IPC_SETTINGS_SET_VALUE,
-  IPC_SONG_DOWNLOADER_PROCESS_SONG,
-  IPC_SONG_DOWNLOADER_PROCESS_SONG_PROGRESS,
-} from './constants';
+
+/*
+ * SHARED CONSTANTS BETWEEN MAIN and PRELOADER.
+ * Using this in source since the preloader runs in the context of the renderer and can't import
+ * other files at runtime.  A bundler could solve this but it's a lot of work for not a lot of benefit IMO.
+ * Manage this manually between the two files for now.
+ */
+const IPC_OPEN_TWITCH_LOGIN = 'login.openTwitchLogin';
+const IPC_SETTINGS_GET_VALUE = 'settings.getValue';
+const IPC_SETTINGS_SET_VALUE = 'settings.setValue';
+const IPC_SETTINGS_DELETE_VALUE = 'settings.deleteValue';
+
+const IPC_SONG_DOWNLOADER_PROCESS_SONG = 'songDownloader.processSong';
+const IPC_SONG_DOWNLOADER_PROCESS_SONG_PROGRESS =
+  'songDownloader.processSongProgress';
+
+const IPC_PROTOCOL_HANDLER = 'login.protocolHandler';
+
+/*
+ * END OF SHARED CONSTANTS
+ */
 
 contextBridge.exposeInMainWorld('settings', {
   setValue: (key: string, value: string) =>
