@@ -7,7 +7,7 @@
 ## First
 
 - [x] UI: Request order number - use incrementing number, NOT the actual order number
-- [ ] Server: Implement banned song list - songs that cannot be queued
+- [x] Server: Implement banned song list - songs that cannot be queued
 - [ ] Overlay: Add highlight of what the current song is
 - [ ] UI: Add button to change queue strategy
 - [ ] Overlay: Change font/colors

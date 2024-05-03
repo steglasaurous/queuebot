@@ -7,7 +7,7 @@
     <th class="w-48">Local</th>
     <th></th>
   </tr>
-  <tr cdkDrag class="border border-gray-500" *ngFor="let queueItem of songRequests; index as i" [ngClass]="{ 'bg-green': queueItem.isActive }">
+  <tr cdkDrag class="border border-gray-500" *ngFor="let queueItem of songRequests; index as i" [ngClass]="{ 'bg-green-500': queueItem.isActive }">
     <td class="w-24 text-center text-2xl text-white bg-gray-500">
       {{ i + 1 }}
     </td>

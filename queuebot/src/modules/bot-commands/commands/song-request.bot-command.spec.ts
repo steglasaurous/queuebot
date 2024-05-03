@@ -21,6 +21,7 @@ describe('SongRequestBotCommand', () => {
   let songService;
   let channel;
   let chatMessage;
+  let botStateService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
