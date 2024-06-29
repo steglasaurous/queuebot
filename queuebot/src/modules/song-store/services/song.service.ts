@@ -134,7 +134,7 @@ export class SongService {
     return song;
   }
 
-  async saveSong(song: Song): Promise<Song> {
+  async saveSong(song: Song, updateExisting = true): Promise<Song> {
     // Because this all happens asynchronously, we can have a shitload of inserts happening
     // all at once.  This helps to deal with dupes within the dataset itself (of which do exist in sources like
     // the audio trip spreadsheet.
@@ -149,7 +149,7 @@ export class SongService {
       songHash: song.songHash,
     });
 
-    if (existingSong) {
+    if (existingSong && updateExisting) {
       // Do an update on this.
       existingSong.title = song.title;
       existingSong.artist = song.artist;

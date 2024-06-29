@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Game } from './game.entity';
 import { SongRequest } from './song-request.entity';
@@ -49,6 +51,12 @@ export class Song {
    */
   @Column({ nullable: true })
   fileReference: string;
+
+  @CreateDateColumn()
+  createdOn: Date;
+
+  @UpdateDateColumn()
+  updatedOn: Date;
 
   @ManyToOne(() => Game, (game) => game.songs, { eager: true })
   game: Game;

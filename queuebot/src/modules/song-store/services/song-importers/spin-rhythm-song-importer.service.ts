@@ -23,6 +23,8 @@ export class SpinRhythmSongImporterService implements SongImporter {
       const game = await this.gameRepository.findOneBy({ name: this.gameName });
       this.httpService.get(this.spinshareSearchAllUrl).subscribe({
         next: async (response) => {
+          // FIXME: This takes... a long time.  Find a way to do incremental updates
+          // or avoid dealing with stuff we already know about.
           for (const parsedSong of response.data.data.songs) {
             await this.songService.saveSong(
               this.songService.createSongEntity(
