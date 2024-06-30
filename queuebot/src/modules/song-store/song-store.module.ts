@@ -65,7 +65,6 @@ import { SynthRiderzSongImporterService } from './services/song-importers/synth-
         synthRiderz: SynthRiderzSongImporterService,
       ) => {
         return [audioTrip, spin, pistolWhip, danceDash, synthRiderz];
-        // return [synthRiderz];
       },
     },
     LocalStrategy,

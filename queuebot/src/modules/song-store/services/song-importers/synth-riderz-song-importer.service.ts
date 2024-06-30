@@ -48,7 +48,12 @@ export class SynthRiderzSongImporterService implements SongImporter {
 
               // If the created datetime of this song is more than 10 seconds old, consider it
               // an existing song and stop processing.
-              if (Date.now() - song.createdOn.getTime() > 10000) {
+              if (
+                Date.now() -
+                  (song.createdOn.getTime() -
+                    song.createdOn.getTimezoneOffset() * 60 * 1000) >
+                10000
+              ) {
                 break;
               }
 
