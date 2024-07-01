@@ -85,6 +85,10 @@ Also note using **!req** on its own will show instructions on how to request son
 
 **!requestobot on** - Enable the bot to respond to commands in your channel.
 
+**!addsongban** - Add a song to your banned songs list.  Requests for this song will be refused.
+
+**!removesongban** - Removes a song from the banned songs lost.
+
 **!getout** - Broadcaster and mods only. Have requestobot leave your channel.  Once left, commands will not work until you invite the bot into your channel again.
 
 ## Song Auto-downloader

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { QueueListComponent } from '../queue-list/queue-list.component';
+import { QueueListComponent } from '../../components/queue-list/queue-list.component';
 import { SettingsService } from '../../services/settings.service';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { NgIf } from '@angular/common';
@@ -7,15 +7,24 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { ChannelDto } from '../../../../../common';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { ChangeGameComponent } from '../change-game/change-game.component';
+import { ChangeGameComponent } from '../../components/change-game/change-game.component';
+import { ButtonPrimaryComponent } from '../../components/button-primary/button-primary.component';
+import { InputTextComponent } from '../../components/input-text/input-text.component';
+import { MatAutocomplete } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [QueueListComponent, NgIf, MatSlideToggle],
+  imports: [
+    QueueListComponent,
+    NgIf,
+    MatSlideToggle,
+    ButtonPrimaryComponent,
+    InputTextComponent,
+    MatAutocomplete,
+  ],
   providers: [],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
 })
 export class HomeComponent {
   channelName: string = '';
@@ -89,6 +98,7 @@ export class HomeComponent {
   }
 
   showChangeGameModal() {
+    console.log('open modal');
     const dialogRef = this.dialog.open(ChangeGameComponent, {
       data: { gameId: 0 },
     });

@@ -24,6 +24,10 @@ import { Migration1709249266297 } from '../migrations/1709249266297-migration';
 import { Migration1709865668612 } from '../migrations/1709865668612-migration';
 import { Migration1709872065282 } from '../migrations/1709872065282-migration';
 import { Migration1709872297346 } from '../migrations/1709872297346-migration';
+import { Migration1712350029931 } from '../migrations/1712350029931-migration';
+import { SongBan } from './modules/data-store/entities/song-ban.entity';
+import { Migration1712701179751 } from '../migrations/1712701179751-migration';
+import { Migration1719683478090 } from '../migrations/1719683478090-migration';
 
 export const typeORMAppConfig: DataSourceOptions = {
   type: 'postgres',
@@ -37,11 +41,12 @@ export const typeORMAppConfig: DataSourceOptions = {
     Game,
     Song,
     SongRequest,
+    SongBan,
     UserBotState,
     User,
     UserAuthSource,
-    SettingDefinition,
     Setting,
+    SettingDefinition,
   ],
   migrations: [
     Migration1703611705901,
@@ -55,6 +60,9 @@ export const typeORMAppConfig: DataSourceOptions = {
     Migration1709865668612,
     Migration1709872065282,
     Migration1709872297346,
+    Migration1712350029931,
+    Migration1712701179751,
+    Migration1719683478090,
   ],
   migrationsRun: true,
 };

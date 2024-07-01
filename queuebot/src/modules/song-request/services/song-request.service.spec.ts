@@ -15,6 +15,7 @@ import { SongService } from '../../song-store/services/song.service';
 import { SongRequestErrorType } from '../models/song-request-error-type.enum';
 import { Song } from '../../data-store/entities/song.entity';
 import { SongRequestQueueChangedEvent } from '../events/song-request-queue-changed.event';
+import { SongBan } from '../../data-store/entities/song-ban.entity';
 
 describe('SongRequestService', () => {
   let service: SongRequestService;
@@ -35,6 +36,10 @@ describe('SongRequestService', () => {
               findOneBy: jest.fn(),
               find: jest.fn(),
               save: jest.fn(),
+            };
+          case getRepositoryToken(SongBan):
+            return {
+              findOneBy: jest.fn(),
             };
         }
         return getGenericNestMock(token);

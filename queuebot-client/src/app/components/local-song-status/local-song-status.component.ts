@@ -9,7 +9,6 @@ import { PercentPipe } from '@angular/common';
   standalone: true,
   imports: [MatIcon, PercentPipe],
   templateUrl: './local-song-status.component.html',
-  styleUrl: './local-song-status.component.css',
 })
 export class LocalSongStatusComponent implements OnInit, OnDestroy {
   @Input()

@@ -1,6 +1,6 @@
 import { ChatMessage } from '../../chat/services/chat-message';
 import { SongService } from '../../song-store/services/song.service';
-import { BotStateService } from '../services/bot-state.service';
+import { BotStateService } from '../../data-store/services/bot-state.service';
 import { Channel } from '../../data-store/entities/channel.entity';
 import { Inject, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
@@ -25,15 +25,6 @@ export class SongRequestBotCommand extends BaseBotCommand {
     this.triggers = ['!req', '!srr', '!bsr', '!ssr', '!request', '!atr'];
   }
   async execute(channel: Channel, chatMessage: ChatMessage): Promise<string> {
-    // Load bot state for this user, if any.
-    const userBotState = await this.botStateService.getState(
-      chatMessage.username,
-      chatMessage.channelName,
-    );
-
-    // If the request is in the form of "#1", "#2", etc, this is to choose from a list of songs prior.  Otherwise treat this as
-    // a new request.
-
     // New request.
     if (chatMessage.message.indexOf(' ') == -1) {
       // No search term.  Display help.
@@ -58,30 +49,13 @@ export class SongRequestBotCommand extends BaseBotCommand {
       .substring(chatMessage.message.indexOf(' ') + 1)
       .trim();
 
-    const searchSongNumberResult = searchTerms.match(/^#(?<songNumber>[0-9]?)/);
-    if (searchSongNumberResult && userBotState.state) {
-      const previousResults = userBotState.state['lastQueryResults'];
-
-      let matchedSong: Song | undefined;
-      if (previousResults) {
-        matchedSong =
-          previousResults[
-            parseInt(searchSongNumberResult.groups.songNumber) - 1
-          ];
-
-        if (matchedSong !== undefined) {
-          return await this.addSongToQueue(channel, chatMessage, matchedSong);
-        }
-      }
-
-      return this.i18n.t('chat.NoSongsFound', { lang: channel.lang });
-    }
-
     let searchResults: Song[];
     try {
       searchResults = await this.songService.searchSongs(
         searchTerms,
         channel.game,
+        chatMessage.username,
+        chatMessage.channelName,
       );
     } catch (err) {
       this.logger.warn('searchSongs returned an error', err); // FIXME: put more context around the error.
@@ -98,34 +72,13 @@ export class SongRequestBotCommand extends BaseBotCommand {
       // Only one? perfect! Let's throw it in the queue.
       return await this.addSongToQueue(channel, chatMessage, searchResults[0]);
     } else if (searchResults.length > 1) {
-      await this.botStateService.setState(
-        chatMessage.username,
-        chatMessage.channelName,
-        { lastQueryResults: searchResults },
+      return this.songService.getSongSelectionOutput(
+        channel.lang,
+        searchResults,
       );
-
-      let outputMessage = this.i18n.t('chat.SelectSong', {
-        lang: channel.lang,
-      });
-      let songLimit = 5;
-      if (searchResults.length < 5) {
-        songLimit = searchResults.length;
-      }
-      for (let i = 0; i < songLimit; i++) {
-        outputMessage += `#${i + 1} ${searchResults[i].title} - ${
-          searchResults[i].artist
-        } (${searchResults[i].mapper}) `;
-      }
-      if (searchResults.length > songLimit) {
-        outputMessage += this.i18n.t('chat.AndMore', {
-          lang: channel.lang,
-          args: { songsRemaining: searchResults.length - songLimit },
-        });
-      }
-
-      return outputMessage;
     }
   }
+
   getDescription(): string {
     return 'Add a song request to the queue. Use the song title to request a song. If more than one song matches, you will be presented with a list of matches, and can respond with **!req #1** to select the first song, **!req #2** to select the second song, etc.';
   }
@@ -148,6 +101,12 @@ export class SongRequestBotCommand extends BaseBotCommand {
         requestResult.errorType == SongRequestErrorType.ALREADY_PLAYED
       ) {
         return this.i18n.t('chat.SongAlreadyPlayed', {
+          lang: channel.lang,
+        });
+      } else if (
+        requestResult.errorType == SongRequestErrorType.SONG_IS_BANNED
+      ) {
+        return this.i18n.t('chat.SongIsBanned', {
           lang: channel.lang,
         });
       } else {

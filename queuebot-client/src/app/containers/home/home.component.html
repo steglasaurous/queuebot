@@ -1,0 +1,24 @@
+<div class="flex flex-row dark:bg-slate-800 justify-center">
+  <div>
+    <app-button-primary (click)="nextSong()" [disabled]="nextSongDisabled">Next Song</app-button-primary>
+  </div>
+  <div>
+    <app-button-primary (click)="showChangeGameModal()">{{ channel.game.displayName }}</app-button-primary>
+  </div>
+  <div class="pr-5">
+    <mat-slide-toggle [checked]="channel.queueOpen" (change)="toggleQueueOpen()">Open Queue</mat-slide-toggle>
+  </div>
+  <div class="text-right">
+    {{ channelName }} <button class="border-2 p-2 bg-purple-300 hover:bg-purple-400" (click)="logout()">Logout</button>
+  </div>
+</div>
+<div class="flex flex-row justify-center items-center">
+  <label class="pr-2">
+    Search:
+  </label>
+  <app-input-text class="w-96"></app-input-text>
+  <app-button-primary>Add to Queue</app-button-primary>
+</div>
+<div class="flex justify-center">
+  <app-queue-list *ngIf="channelName != ''" [channelName]="channelName"></app-queue-list>
+</div>

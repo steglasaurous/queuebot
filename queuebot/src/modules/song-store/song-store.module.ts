@@ -18,6 +18,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PistolWhipSongImporterService } from './services/song-importers/pistol-whip-song-importer.service';
 import { ModIoApiService } from './services/mod-io-api.service';
 import { DanceDashSongImporterService } from './services/song-importers/dance-dash-song-importer.service';
+import { SynthRiderzSongImporterService } from './services/song-importers/synth-riderz-song-importer.service';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { DanceDashSongImporterService } from './services/song-importers/dance-da
     SpinRhythmSongImporterService,
     PistolWhipSongImporterService,
     DanceDashSongImporterService,
+    SynthRiderzSongImporterService,
     {
       provide: SONG_IMPORTERS,
       inject: [
@@ -53,14 +55,16 @@ import { DanceDashSongImporterService } from './services/song-importers/dance-da
         SpinRhythmSongImporterService,
         PistolWhipSongImporterService,
         DanceDashSongImporterService,
+        SynthRiderzSongImporterService,
       ],
       useFactory: (
         audioTrip: AudioTripSongImporterService,
         spin: SpinRhythmSongImporterService,
         pistolWhip: PistolWhipSongImporterService,
         danceDash: DanceDashSongImporterService,
+        synthRiderz: SynthRiderzSongImporterService,
       ) => {
-        return [audioTrip, spin, pistolWhip, danceDash];
+        return [audioTrip, spin, pistolWhip, danceDash, synthRiderz];
       },
     },
     LocalStrategy,
@@ -68,10 +72,7 @@ import { DanceDashSongImporterService } from './services/song-importers/dance-da
     {
       provide: SONG_SEARCH_STRATEGIES,
       inject: [LocalStrategy, SpinRhythmSearchStrategy],
-      useFactory: (
-        localStrategy: LocalStrategy,
-        spinRhythmStrategy: SpinRhythmSearchStrategy,
-      ) => {
+      useFactory: (localStrategy: LocalStrategy) => {
         // Add back spinRhythmStrategy to this array to query the spinsha.re API directly.
         return [localStrategy];
       },

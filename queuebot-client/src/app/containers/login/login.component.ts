@@ -1,22 +1,40 @@
 import { Component, Inject, NgZone, OnInit } from '@angular/core';
-import { QueueListComponent } from '../queue-list/queue-list.component';
+import { QueueListComponent } from '../../components/queue-list/queue-list.component';
 import { QueuebotApiService } from '../../services/queuebot-api.service';
 import { Router } from '@angular/router';
 import { SettingsService } from '../../services/settings.service';
 import { WindowWithElectron } from '../../models/window.global';
 import { QUEUEBOT_API_BASE_URL } from '../../app.config';
+import { ButtonPrimaryComponent } from '../../components/button-primary/button-primary.component';
+import { InputTextComponent } from '../../components/input-text/input-text.component';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 declare let window: WindowWithElectron;
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [QueueListComponent],
+  imports: [
+    QueueListComponent,
+    ButtonPrimaryComponent,
+    InputTextComponent,
+    ReactiveFormsModule,
+  ],
   providers: [],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
+  formGroup = new FormGroup({
+    authCode: new FormControl('', {
+      validators: [Validators.required],
+    }),
+  });
+
   constructor(
     private queuebotApiService: QueuebotApiService,
     private settingsService: SettingsService,
@@ -58,6 +76,13 @@ export class LoginComponent implements OnInit {
           });
         }
       });
+  }
+
+  submitAuthCodeForm() {
+    console.log(this.formGroup.value);
+    if (this.formGroup.value.authCode != undefined) {
+      this.submitAuthCode(this.formGroup.value.authCode);
+    }
   }
 
   openLoginPage() {

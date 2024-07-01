@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Game } from './game.entity';
 import { SongRequest } from './song-request.entity';
@@ -37,6 +39,9 @@ export class Song {
   @Column({ nullable: true })
   downloadUrl?: string;
 
+  @Column({ nullable: true })
+  coverArtUrl?: string;
+
   /**
    * If available, stores a reference of some sort (dependent on the source) that can
    * be used by a downloader to determine whether or not to download the song. (ex: auto-download song on request)
@@ -46,6 +51,12 @@ export class Song {
    */
   @Column({ nullable: true })
   fileReference: string;
+
+  @CreateDateColumn()
+  createdOn: Date;
+
+  @UpdateDateColumn()
+  updatedOn: Date;
 
   @ManyToOne(() => Game, (game) => game.songs, { eager: true })
   game: Game;

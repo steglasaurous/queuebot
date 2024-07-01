@@ -3,4 +3,5 @@ export enum SongRequestErrorType {
   ALREADY_IN_QUEUE,
   ALREADY_PLAYED,
   SERVER_ERROR,
+  SONG_IS_BANNED,
 }

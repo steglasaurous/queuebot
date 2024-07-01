@@ -8,22 +8,12 @@ import {
   GameDto,
 } from '../../../../../common';
 import { Game } from '../entities/game.entity';
+import { Song } from '../entities/song.entity';
 
 @Injectable()
 export class DtoMappingService {
   public songRequestToDto(songRequest: SongRequest): SongRequestDto {
-    const songDto: SongDto = {
-      id: songRequest.song.id,
-      title: songRequest.song.title,
-      artist: songRequest.song.artist,
-      songHash: songRequest.song.songHash,
-      mapper: songRequest.song.mapper,
-      bpm: songRequest.song.bpm,
-      duration: songRequest.song.duration,
-      downloadUrl: songRequest.song.downloadUrl,
-      fileReference: songRequest.song.fileReference,
-      gameName: songRequest.song.game.name,
-    };
+    const songDto: SongDto = this.songToDto(songRequest.song);
 
     return {
       id: songRequest.id,
@@ -55,6 +45,22 @@ export class DtoMappingService {
       displayName: game.displayName,
       setGameName: game.setGameName,
       twitchCategoryId: game.twitchCategoryId,
+    };
+  }
+
+  public songToDto(song: Song): SongDto {
+    return {
+      id: song.id,
+      title: song.title,
+      artist: song.artist,
+      songHash: song.songHash,
+      mapper: song.mapper,
+      bpm: song.bpm,
+      duration: song.duration,
+      downloadUrl: song.downloadUrl,
+      fileReference: song.fileReference,
+      gameName: song.game.name,
+      coverArtUrl: song.coverArtUrl,
     };
   }
 }

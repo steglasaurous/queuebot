@@ -21,15 +21,21 @@ export class ModIoApiService {
    * @param modIoGameId
    */
   async getModsForGame(modIoGameId: number): Promise<any[]> {
-    return new Promise<object[]>(async (resolve) => {
+    return new Promise<object[]>(async (resolve, reject) => {
       let morePagesRemain = true;
       let offset = 0;
       const results: object[] = [];
       while (morePagesRemain) {
         this.logger.log('Getting page of data');
-        const result = await this.sendApiRequest(
-          `${this.baseUrl}/games/${modIoGameId}/mods?_offset=${offset}&api_key=${this.apiKey}`,
-        );
+        let result;
+        try {
+          result = await this.sendApiRequest(
+            `${this.baseUrl}/games/${modIoGameId}/mods?_offset=${offset}&api_key=${this.apiKey}`,
+          );
+        } catch (e) {
+          reject(e);
+          return;
+        }
         results.push(result);
         this.logger.log('result', {
           count: result.result_count,
@@ -48,10 +54,15 @@ export class ModIoApiService {
   }
 
   private sendApiRequest(url: string): Promise<any> {
-    return new Promise<object>((resolve) => {
-      this.httpService.get(url).subscribe(async (response) => {
-        // Check if there's more pages of results.  If we don't have them all, keep getting the next page until we're done.
-        resolve(response.data);
+    return new Promise<object>((resolve, reject) => {
+      this.httpService.get(url).subscribe({
+        next: async (response) => {
+          // Check if there's more pages of results.  If we don't have them all, keep getting the next page until we're done.
+          resolve(response.data);
+        },
+        error: (e) => {
+          reject(e);
+        },
       });
     });
   }
